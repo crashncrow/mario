@@ -13,12 +13,12 @@ const m = [
 const Floor = () =>{
   return (
     <>
-    <div className='inline-flex' style={{margin: '-10px 0'}}>
+    <div className='inline-flex' style={{margin: '-6px 0'}}>
       {m.map((x, i) => (
         <Brick key={`brick_1_${i}`} render={x}/>
       ))}
     </div>
-    <div className='inline-flex' style={{margin: '-10px 0'}}>
+    <div className='inline-flex' style={{margin: '-6px 0'}}>
       {m.map((x, i) => (
         <Brick key={`brick_2_${i}`} render={x}/>
       ))}

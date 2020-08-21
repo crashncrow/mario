@@ -1,6 +1,7 @@
 import Head from 'next/head'
 import Mario from 'components/Mario'
 import Floor from 'components/Floor'
+import Pipe from 'components/Pipe'
 
 export default function Home() {
   return (
@@ -12,6 +13,7 @@ export default function Home() {
 
       <main className="h-full w-full text-center pt-32">
         <Mario />
+        <Pipe />
         <Floor />
       </main>
     </div>
