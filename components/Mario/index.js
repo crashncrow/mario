@@ -124,10 +124,10 @@ const Mario = () =>{
     <>
     <button className="bg-white rounded px-10 m-10" onClick={handleClick} >GO!</button>
 
-    <div className='flex flex-wrap m-auto w-32'>
+    <div className='flex flex-wrap m-auto w-16'>
       {m.map((x, i) => (
         <div 
-          className={`h-2 w-2 border-noneflex-none ${c[x]}`}
+          className={`h-1 w-1 border-noneflex-none ${c[x]}`}
           key={`mario_${index}_${i}`}
           >
           </div>

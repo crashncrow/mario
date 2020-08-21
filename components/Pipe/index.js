@@ -49,10 +49,10 @@ const s = [
 const Pipe = () =>{
   return (
     <>
-    <div className="flex flex-wrap m-auto w-64" style={{'margin-bottom': '-6px'}}>
+    <div className="flex flex-wrap m-auto w-32" style={{'margin-bottom': '-12px'}}>
       {m.map((x, i) => (
         <div 
-          className={`h-2 w-2 border border-none flex-none ${c[x]}`}
+          className={`h-1 w-1 border border-none flex-none ${c[x]}`}
           key={`mario_${i}`}
           >
           </div>
@@ -60,7 +60,7 @@ const Pipe = () =>{
 
       {s.map((x, i) => (
         <div 
-          className={`h-2 w-2 border border-none flex-none ${c[x]}`}
+          className={`h-1 w-1 border border-none flex-none ${c[x]}`}
           key={`mario_${i}`}
           >
           </div>
