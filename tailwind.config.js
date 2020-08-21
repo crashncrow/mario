@@ -1,8 +1,6 @@
 module.exports = {
   purge: [
-    './components/**/*.tsx',
     './components/**/*.js',
-    './pages/**/*.tsx',
     './pages/**/*.js',
   ],
   theme: {
@@ -16,4 +14,7 @@ module.exports = {
     outline: ['focus'],
   },
   plugins: [],
+  future: {
+    removeDeprecatedGapUtilities: true,
+  }
 }

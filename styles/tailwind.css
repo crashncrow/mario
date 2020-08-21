@@ -1,6 +1,3 @@
 @tailwind base;
 @tailwind components;
-body{
-   @apply m-0
-}
 @tailwind utilities;

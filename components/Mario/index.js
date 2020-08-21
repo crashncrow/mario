@@ -1,10 +1,11 @@
 import { useState } from 'react'
+import { useEffect } from 'react'
 
 const c = {
   0: 'bg-transparent',
-  1: 'bg-red-500',
-  2: 'bg-yellow-700',
-  3: 'bg-yellow-500'
+  1: 'bg-red-600',
+  2: 'bg-yellow-800',
+  3: 'bg-orange-400'
 }
 
 const m0 = [
@@ -91,23 +92,33 @@ const Mario = () =>{
   
   const handleClick = () =>
   {
+    setIndex(index < 4 ? index + 1 : 1)
+  }
+
+  useEffect(() => {
+    //console.log(index)
     if(index == 1){
-      setIndex(2)
       setM(m2)
     }
     else if(index == 2){
-      setIndex(3)
       setM(m3)
     }
     else if(index == 3){
-      setIndex(4)
       setM(m4)
     }
     else{
-      setIndex(1)
       setM(m1)
     }
-  }
+  }, [index])
+
+  // useEffect(() => {
+  //   document.addEventListener('keyup', logKey);
+  // }, [])
+  
+  // function logKey(e) {
+  //   console.log(e.code);
+  //   setIndex(index < 4 ? index + 1 : 1)
+  // }
 
   return (
     <>
@@ -120,7 +131,7 @@ const Mario = () =>{
           </div>
       ))}
     </div>
-    <button className="bg-white rounded px-5 m-5" onClick={handleClick} >Go</button>
+    <button className="bg-white rounded px-10 m-10" onClick={handleClick} >GO!</button>
     </>
 
   )
