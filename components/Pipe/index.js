@@ -46,10 +46,10 @@ const s = [
   0, 0, 1, 3, 3, 3, 2, 2, 3, 3, 3, 3, 3, 2, 3, 3, 2, 2, 2, 2, 2, 2, 2, 2, 2, 3, 2, 3, 3, 1, 0, 0
 ]
 
-const Pipe = () =>{
+const Pipe = ({position, size}) =>{
   return (
     <>
-    <div className="flex flex-wrap m-auto w-32" style={{'margin-bottom': '-12px'}}>
+    <div className="flex flex-wrap absolute w-32 mb-12 bottom-0" style={{left: `${position * 64}px`}}>
       {m.map((x, i) => (
         <div 
           className={`h-1 w-1 border border-none flex-none ${c[x]}`}
@@ -58,13 +58,33 @@ const Pipe = () =>{
           </div>
       ))}
 
-      {s.map((x, i) => (
+      {  
+        Array(size).fill(1).map((x, i) => (
+          
+            s.map((x, j) => 
+              (
+              <div 
+                className={`h-1 w-1 border border-none ${c[x]}`}
+                key={`mario_${i}${j}`}
+                >
+                </div>
+              )
+            )
+          
+        ))
+      }
+      
+      {/* 
+      {
+        s.map((x, i) => (
         <div 
           className={`h-1 w-1 border border-none flex-none ${c[x]}`}
           key={`mario_${i}`}
           >
           </div>
-      ))}
+      ))
+      } 
+      */}
     </div>
     </>
 

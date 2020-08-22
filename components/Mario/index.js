@@ -86,17 +86,22 @@ const m3 = [
 
 const m4 =  m2
 
+const ALLOWED_KEYS =  ['ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight']
+
 const Mario = () =>{
   const [m, setM] = useState(m1)
   const [index, setIndex] = useState(1)
+  const [left, setLeft] = useState(100)
+  const [pressedKeys, setPressedKeys] = useState([]);
   
   const handleClick = () =>
   {
     setIndex(index < 4 ? index + 1 : 1)
+    setLeft(left + 20)
   }
 
   useEffect(() => {
-    //console.log(index)
+    // console.log(index)
     if(index == 1){
       setM(m2)
     }
@@ -112,26 +117,52 @@ const Mario = () =>{
   }, [index])
 
   // useEffect(() => {
-  //   document.addEventListener('keyup', logKey);
+  //   document.addEventListener('keydown', logKey);
   // }, [])
   
   // function logKey(e) {
+  //   //e.preventDefault()
+  //   handleClick()
   //   console.log(e.code);
-  //   setIndex(index < 4 ? index + 1 : 1)
+  //   //setIndex(index + 1)
   // }
+
+  useEffect(() => {
+    const onKeyDown = ({key}) => {
+        if (ALLOWED_KEYS.includes(key) && !pressedKeys.includes(key)) {
+            setPressedKeys(previousPressedKeys => [...previousPressedKeys, key]);
+        }
+    }
+
+    const onKeyUp = ({key}) => {
+        if (ALLOWED_KEYS.includes(key)) {
+            setPressedKeys(previousPressedKeys => previousPressedKeys.filter(k => k !== key));
+        }
+    }
+
+    document.addEventListener('keydown', onKeyDown);
+    document.addEventListener('keyup', onKeyUp);
+
+    return () => {
+        document.removeEventListener('keydown', onKeyDown);
+        document.removeEventListener('keyup', onKeyUp);
+    }
+  }, []);
 
   return (
     <>
-    <button className="bg-white rounded px-10 m-10" onClick={handleClick} >GO!</button>
-
-    <div className='flex flex-wrap m-auto w-16'>
+    
+    {/* <button className="bg-white fixed rounded px-10 m-10" onClick={handleClick} >GO!</button> */}
+    <div className='flex flex-wrap m-auto w-16 fixed bottom-0 z-50 mb-12 left-32' style={{left: `${left}px`}}>
+    
       {m.map((x, i) => (
         <div 
-          className={`h-1 w-1 border-noneflex-none ${c[x]}`}
+          className={`h-1 w-1 border-none flex-none ${c[x]}`}
           key={`mario_${index}_${i}`}
           >
           </div>
       ))}
+      {/* {pressedKeys.map(e => <span key={e} className="key">{e}</span>)} */}
     </div>
     </>
 
