@@ -11,11 +11,14 @@ export default function Home() {
       <Head>
         <title>It's Me, Mario!</title>
         <link rel="icon" href="/favicon.ico" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
       </Head>
 
       <main className="h-full w-full">
         <Cloud position={10}/>
         <Cloud position={20}/>
+        <Cloud position={30}/>
+
         <Mario />
         <div className="inline-block">  
           
@@ -24,11 +27,10 @@ export default function Home() {
           <Pipe position={30} size={3}/>
           
         </div>
-        <Floor />
       </main>
       
     </div>
-    
+    <Floor />
     </>
   )
 }

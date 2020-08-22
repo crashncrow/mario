@@ -152,8 +152,8 @@ const Mario = () =>{
   return (
     <>
     
-    <button className="bg-white fixed rounded px-10 m-10" onClick={handleClick} >GO!</button>
-    <div className='flex flex-wrap m-auto w-16 absolute bottom-0 z-50 mb-12 left-32' style={{left: `${left}px`}}>
+    {/* <button className="bg-white fixed rounded px-10 m-10" onClick={handleClick} >GO!</button> */}
+    <div className='flex flex-wrap m-auto w-16 fixed bottom-0 z-50 mb-12 left-32' style={{left: `${left}px`}}>
     
       {m.map((x, i) => (
         <div 
