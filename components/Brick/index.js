@@ -33,7 +33,7 @@ const Brick = ({render}) =>{
     <div className='flex flex-wrap m-auto w-16'>
       {m.map((x, i) => (
         <div 
-          className={`h-1 w-1 border border-none flex-none ${render ? c[x] : c[render]}`}
+          className={`h-1 w-1 border-none flex-none ${render ? c[x] : c[render]}`}
           key={`mario_${i}`}
           >
           </div>
