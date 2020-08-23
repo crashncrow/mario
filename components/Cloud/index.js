@@ -1,6 +1,3 @@
-import { useState } from 'react'
-import { useEffect } from 'react'
-
 const c = {
   0: '',//bg-transparent
   1: 'bg-black',
