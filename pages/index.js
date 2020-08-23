@@ -35,9 +35,9 @@ export default function Home() {
       </Head>
 
       <main className="h-full w-full">
-        <Cloud position={10}/>
-        <Cloud position={20}/>
-        <Cloud position={30}/>
+        <Cloud position={8}/>
+        <Cloud position={22}/>
+        <Cloud position={29}/>
 
         <Mario />
         <div className="inline-block">  
