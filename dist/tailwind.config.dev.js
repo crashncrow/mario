@@ -1,13 +1,14 @@
+"use strict";
+
 module.exports = {
-  purge: [
-    './components/**/*.js',
-    './pages/**/*.js',
-  ],
+  purge: ['./components/**/*.js', './pages/**/*.js'],
   theme: {
     extend: {
-      backgroundImage: theme => ({
-        'bg': "url('/bg.png')",
-      }) ,
+      backgroundImage: function backgroundImage(theme) {
+        return {
+          'bg': "url('/bg.png')"
+        };
+      },
       spacing: {
         '7': '1.75rem',
         '9': '2.25rem',
@@ -34,10 +35,10 @@ module.exports = {
     }
   },
   variants: {
-    outline: ['focus'],
+    outline: ['focus']
   },
   plugins: [],
   future: {
-    removeDeprecatedGapUtilities: true,
+    removeDeprecatedGapUtilities: true
   }
-}
+};
