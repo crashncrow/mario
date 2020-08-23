@@ -161,9 +161,6 @@ const Mario = () =>{
 
   const [ m, setM ] = useState(m1)
   const [ index, setIndex ] = useState(1)
-  // const [ left, setLeft ] = useState(100)
-  // const [ bottom, setBottom ] = useState(0)
-  
   
   // const handleClick = () =>
   // {

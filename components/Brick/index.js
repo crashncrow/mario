@@ -34,7 +34,7 @@ const Brick = ({render}) => {
   }, [])
 
   return (
-    <div className={`flex flex-wrap m-auto w-16 ${render ? 'bg-orange-500' : ''}`}>
+    <div className={`flex flex-wrap m-auto w-16 ${render && 'bg-orange-500'}`}>
       {
         matrix.map((x, i) => (
           x.map((y, j) => (
