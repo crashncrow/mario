@@ -1,10 +1,30 @@
+import { useEffect } from 'react'
 import Head from 'next/head'
 import Mario from 'components/Mario'
 import Floor from 'components/Floor'
 import Pipe from 'components/Pipe'
 import Cloud from 'components/Cloud'
 
+import { useAppContext } from 'contexts/AppContext'
+
 export default function Home() {
+  const { bottom, setBottom } = useAppContext()
+
+  const trackClick = (e) => {
+    console.log(e)
+    setBottom(bottom + 100)
+
+    setTimeout(() => setBottom(0), 200)
+  }
+
+  useEffect(() => {
+    document.addEventListener('click', trackClick)
+    return () => {
+        document.removeEventListener('click', trackClick);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
+
   return (
     <>
     <div className="h-screen overflow-x-scroll">

@@ -1,5 +1,6 @@
-import { useState, useRef, useMemo, useEffect } from 'react'
+import { useState, useRef, useEffect } from 'react'
 import { useScrollPosition } from 'hooks/scroll'
+import { useAppContext } from 'contexts/AppContext'
 
 const PositionStore = () => {
   const [renderCount, triggerReRender] = useState(0)
@@ -118,6 +119,8 @@ const HORIZONTAL_KEYS =  ['ArrowLeft', 'ArrowRight']
 
 
 const Mario = () =>{
+  const { left, setLeft, bottom, setBottom } = useAppContext()
+
   const positionsStore = PositionStore()
   const viewportRef = useRef(null)
   const redBoxRef = useRef(null)
@@ -132,7 +135,6 @@ const Mario = () =>{
 
       setLeft(currPos.x + 100)
       setIndex(index + 1)
-
     },
     [positionsStore],
     null,
@@ -148,25 +150,26 @@ const Mario = () =>{
     300
   )
 
-  useMemo(
-    () => (
-      console.log(`X: ${positionsStore.getViewportX()} Y: ${positionsStore.getViewportY()}`)
-    ),
-    [positionsStore]
-  )
+  // useMemo(
+  //   () => (
+  //     console.log(`X: ${positionsStore.getViewportX()} Y: ${positionsStore.getViewportY()}`)
+  //   ),
+  //   [positionsStore]
+  // )
 
   // ***************************
 
-  const [m, setM] = useState(m1)
-  const [index, setIndex] = useState(1)
-  const [left, setLeft] = useState(100)
-  const [pressedKeys, setPressedKeys] = useState([]);
+  const [ m, setM ] = useState(m1)
+  const [ index, setIndex ] = useState(1)
+  // const [ left, setLeft ] = useState(100)
+  // const [ bottom, setBottom ] = useState(0)
   
-  const handleClick = () =>
-  {
-    setIndex(index + 0.5) 
-    setLeft(left + 40)
-  }
+  
+  // const handleClick = () =>
+  // {
+  //   setIndex(index + 0.5) 
+  //   setLeft(left + 40)
+  // }
 
   useEffect(() => {
     if(index % 4 == 1){
@@ -183,84 +186,63 @@ const Mario = () =>{
     }
   }, [index])
 
-  useEffect(() => {
-    // document.addEventListener('keydown', logKey);
-    console.log(pressedKeys)
-    pressedKeys.map( key => {
-      if(HORIZONTAL_KEYS.includes(key)){
-        handleClick()
-        setIndex(index + 1)  
-
-        if(key === 'ArrowLeft'){
-          setLeft(left - 30)  
-        } else {
-          setLeft(left + 30)
-        }
-      }
-        
-    })
-    
-  }, [pressedKeys])
+  // const [pressedKeys, setPressedKeys] = useState([]);
+  // useEffect(() => {
+  //   // document.addEventListener('keydown', logKey);
+  //   console.log(pressedKeys)
+  //   pressedKeys.map( key => {
+  //     if(HORIZONTAL_KEYS.includes(key)){
+  //       handleClick()
+  //       setIndex(index + 1)  
+  //       if(key === 'ArrowLeft'){
+  //         setLeft(left - 30)  
+  //       } else {
+  //         setLeft(left + 30)
+  //       }
+  //     }
+  //   })
+  // }, [pressedKeys])
   
-  useEffect(() => {
-
-    const onKeyDown = (e) => {
-        console.log(e)
-        e.preventDefault()
-        const key = e.code
-
-        if (ALLOWED_KEYS.includes(key) && !pressedKeys.includes(key)) {
-            setPressedKeys(previousPressedKeys => [...previousPressedKeys, key]);         
-        }
-    }
-
-    const onKeyUp = ({key}) => {
-        if (ALLOWED_KEYS.includes(key)) {
-            setPressedKeys(previousPressedKeys => previousPressedKeys.filter(k => k !== key));
-        }
-    }
-
-    document.addEventListener('keydown', onKeyDown);
-    document.addEventListener('keyup', onKeyUp);
-
-    return () => {
-        document.removeEventListener('keydown', onKeyDown);
-        document.removeEventListener('keyup', onKeyUp);
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  // useEffect(() => {
+  //   const onKeyDown = (e) => {
+  //       console.log(e)
+  //       e.preventDefault()
+  //       const key = e.code
+  //       if (ALLOWED_KEYS.includes(key) && !pressedKeys.includes(key)) {
+  //           setPressedKeys(previousPressedKeys => [...previousPressedKeys, key]);         
+  //       }
+  //   }
+  //   const onKeyUp = ({key}) => {
+  //       if (ALLOWED_KEYS.includes(key)) {
+  //           setPressedKeys(previousPressedKeys => previousPressedKeys.filter(k => k !== key));
+  //       }
+  //   }
+  //   document.addEventListener('keydown', onKeyDown);
+  //   document.addEventListener('keyup', onKeyUp);
+  //   return () => {
+  //       document.removeEventListener('keydown', onKeyDown);
+  //       document.removeEventListener('keyup', onKeyUp);
+  //   }
+  //   // eslint-disable-next-line react-hooks/exhaustive-deps
+  // }, []);
 
   return (
     <>
     <div className="fixed top-0" style={{width: '5000px'}}>
-      <div>MARIO</div>
       <div ref={viewportRef}>
-        <div>
-          Deferred Rendering:
-          <span>{positionsStore.renderCount}</span>
-        </div>
-        <div>
-          Viewport:
-          <span>
-            X: {positionsStore.getViewportX()} Y: {positionsStore.getViewportY()}
-          </span>
-        </div>
-        <div>
-          Mario:
-          <span>
-            X:{positionsStore.getElementX()} Y:{positionsStore.getElementY()}
-          </span>
-        </div>
+        <div>Deferred Rendering: {positionsStore.renderCount}</div>
+        <div>Viewport: X: {positionsStore.getViewportX()} Y: {positionsStore.getViewportY()}</div>
+        <div>Mario: X:{positionsStore.getElementX()} Y:{positionsStore.getElementY()}</div>
       </div>
     </div>
     
     {/* <button className="bg-white fixed rounded px-10 m-10 mt-40" onClick={handleClick} >GO!</button> */}
-    
-    {pressedKeys.map(e => <span key={e} className="fixed">{e}</span>)}
+    {/* {pressedKeys.map(e => <span key={e} className="fixed">{e}</span>)} */}
+
     <div 
       ref={redBoxRef} 
       className='flex flex-wrap m-auto w-16 absolute bottom-0 z-50 mb-12 left-32' 
-      style={{left: `${left}px`}}>
+      style={{left: `${left}px`, bottom: `${bottom}px`}}>
     
       {m.map((x, i) => (
         <div 
@@ -269,11 +251,8 @@ const Mario = () =>{
           >
           </div>
       ))}
-      
     </div>
-
     </>
-
   )
 }
 
