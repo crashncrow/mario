@@ -1,3 +1,6 @@
+import { processFullArray } from 'libs/pixless'
+import { useState, useEffect } from 'react'
+
 const c = {
   0: '',//bg-transparent
   1: 'bg-black',
@@ -34,21 +37,24 @@ const m = [
 // cons pxls = m.splite
 
 const Cloud = ({position, size}) =>{
+  const [matrix, setMatrix ] = useState([])
+  
+  useEffect(() => {
+    setMatrix(processFullArray(m))
+  }, [])
+
   return (
-    <>
     <div className="flex flex-wrap absolute w-32 mb-24 top-0 mt-10" style={{left: `${position * 64}px`}}>
-      {m.map((x, i) => (
+      {matrix.map((x, i) => (
         x.map((y, j) => (
           <div 
-          className={`h-1 w-1 border border-none flex-none ${c[y]}`}
+          className={`h-1 w-${y.count} border-none flex-none ${c[y.color]}`}
           key={`mario_${i}${j}`}
           >
           </div>
         ))
       ))}
     </div>
-    </>
-
   )
 }
 
