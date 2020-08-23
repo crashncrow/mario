@@ -4,6 +4,7 @@ import Mario from 'components/Mario'
 import Floor from 'components/Floor'
 import Pipe from 'components/Pipe'
 import Cloud from 'components/Cloud'
+import Bush from 'components/Bush'
 
 import { useAppContext } from 'contexts/AppContext'
 
@@ -20,7 +21,7 @@ export default function Home() {
 
   const trackClick = (e) => {
     console.log(e)
-    setBottom(bottom + 100)
+    setBottom(bottom + 130)
 
     setTimeout(() => setBottom(0), 200)
   }
@@ -43,15 +44,21 @@ export default function Home() {
       </Head>
 
       <main className="h-full w-full">
-        <Cloud position={8}/>
-        <Cloud position={22}/>
-        <Cloud position={29}/>
+        <Cloud position={8} size={1}/>
+        <Cloud position={22} size={3}/>
+        <Cloud position={29} size={2}/>
 
         <Mario />
         <div className="inline-block">  
           
+          <Bush position={6} size={3}/>
+          
           <Pipe position={10} size={1}/>
+          
           <Pipe position={20} size={2}/>
+
+          <Bush position={24} size={3}/>
+
           <Pipe position={30} size={3}/>
           
         </div>
