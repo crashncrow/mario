@@ -120,20 +120,19 @@ const HORIZONTAL_KEYS =  ['ArrowLeft', 'ArrowRight']
 
 
 const Mario = () =>{
-  const [reverse, setReverse ] = useState(false)
-  const [matrix1, setMatrix1 ] = useState([])
-  const [matrix2, setMatrix2 ] = useState([])
-  const [matrix3, setMatrix3 ] = useState([])
-  const [ m, setM ] = useState(matrix1)
-  const [ index, setIndex ] = useState(1)
+  const [ reverse, setReverse ] = useState(false)
+  const [ matrix1, setMatrix1 ] = useState(processFullArray(m1))
+  const [ matrix2, setMatrix2 ] = useState(processFullArray(m2))
+  const [ matrix3, setMatrix3 ] = useState(processFullArray(m3))
   
-  useEffect(() => {
-    const m_initial = processFullArray(m1)
-    setMatrix1(m_initial)
-    setMatrix2(processFullArray(m2))
-    setMatrix3(processFullArray(m3))
-    setM(m_initial)
-  }, [])
+  const [ index, setIndex ] = useState(1)
+  const [ m, setM ] = useState(matrix1)
+  
+  // useEffect(() => {
+  //   setMatrix1(processFullArray(m1))
+  //   setMatrix2(processFullArray(m2))
+  //   setMatrix3(processFullArray(m3))
+  // }, [])
   
   const { left, setLeft, bottom, setBottom } = useAppContext()
 
@@ -249,9 +248,6 @@ const Mario = () =>{
         <div>Mario: X:{positionsStore.getElementX()} Y:{positionsStore.getElementY()}</div>
       </div>
     </div>
-    
-    {/* <button className="bg-white fixed rounded px-10 m-10 mt-40" onClick={handleClick} >GO!</button> */}
-    {/* {pressedKeys.map(e => <span key={e} className="fixed">{e}</span>)} */}
 
     <div 
       ref={redBoxRef} 
