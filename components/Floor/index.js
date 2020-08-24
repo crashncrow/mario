@@ -1,8 +1,8 @@
 import Brick from 'components/Brick'
 
 const m = [
-  //69, 2, 16, 3, 143
-  15, 2, 20, 3, 10
+  69, 2, 16, 3, 143
+  //15, 2, 20, 3, 10
 ]
 
 const levels = 1
@@ -12,7 +12,7 @@ const Floor = () =>{
     <div className="absolute bottom-0">
       {
       Array(levels).fill(1).map((x, k) => (
-        <div className='inline-flex' style={{margin: '-14px 0'}} key={`floor_level${k}`}>
+        <div className='inline-flex' key={`floor_level${k}`}>
         {
         m.map((y, i) => {
             return Array(y).fill(1).map((x, j) => {

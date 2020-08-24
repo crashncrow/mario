@@ -51,15 +51,23 @@ export default function Home() {
         <Mario />
         <div className="inline-block">  
           
-          <Bush position={6} size={3}/>
-          
-          <Pipe position={10} size={1}/>
-          
-          <Pipe position={20} size={2}/>
+          <Bush position={12} size={3}/>
 
-          <Bush position={24} size={3}/>
+          <Bush position={24} size={1}/>
+          
+          <Pipe position={29} size={1}/>
+                    
+          <Pipe position={39} size={2}/>
 
-          <Pipe position={30} size={3}/>
+          <Bush position={42} size={2}/>
+
+          <Pipe position={47} size={3}/>
+
+          <Pipe position={58} size={3}/>
+
+          <Bush position={60} size={3}/>
+
+          <Bush position={71} size={1}/>
           
         </div>
       </main>
