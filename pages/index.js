@@ -44,9 +44,18 @@ export default function Home() {
       </Head>
 
       <main className="h-full w-full">
-        <Cloud position={8} size={1}/>
-        <Cloud position={22} size={3}/>
-        <Cloud position={29} size={2}/>
+        <Cloud position={9} size={1}/>
+        <Cloud position={20} size={1}/>
+        <Cloud position={29} size={3}/>
+        <Cloud position={38} size={2}/>
+        <Cloud position={58} size={1}/>
+        <Cloud position={68} size={1}/>
+        <Cloud position={78} size={3}/>
+        <Cloud position={86} size={2}/>
+        <Cloud position={105} size={1}/>
+        <Cloud position={116} size={1}/>
+        <Cloud position={122} size={3}/>
+        <Cloud position={130} size={2}/>
 
         <Mario />
         <div className="inline-block">  
@@ -68,6 +77,14 @@ export default function Home() {
           <Bush position={60} size={3}/>
 
           <Bush position={71} size={1}/>
+
+          <Bush position={90} size={2}/>
+
+          <Bush position={108} size={3}/>
+
+          <Bush position={118} size={1}/>
+
+          <Bush position={134} size={2}/>
           
         </div>
       </main>
