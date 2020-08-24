@@ -124,11 +124,15 @@ const Mario = () =>{
   const [matrix1, setMatrix1 ] = useState([])
   const [matrix2, setMatrix2 ] = useState([])
   const [matrix3, setMatrix3 ] = useState([])
+  const [ m, setM ] = useState(matrix1)
+  const [ index, setIndex ] = useState(1)
   
   useEffect(() => {
-    setMatrix1(processFullArray(m1))
+    const m_initial = processFullArray(m1)
+    setMatrix1(m_initial)
     setMatrix2(processFullArray(m2))
     setMatrix3(processFullArray(m3))
+    setM(m_initial)
   }, [])
   
   const { left, setLeft, bottom, setBottom } = useAppContext()
@@ -180,15 +184,6 @@ const Mario = () =>{
   // )
 
   // ***************************
-
-  const [ m, setM ] = useState(matrix1)
-  const [ index, setIndex ] = useState(1)
-  
-  // const handleClick = () =>
-  // {
-  //   setIndex(index + 0.5) 
-  //   setLeft(left + 40)
-  // }
 
   useEffect(() => {
     if(index % 4 == 1){
@@ -265,8 +260,8 @@ const Mario = () =>{
 
       {m.map((x, i) => {
         if(reverse){
-          let reversed = x.slice().reverse();
-          return reversed.map((y, j) => (
+          // reverse without mutate
+          return x.slice().reverse().map((y, j) => (
             <div 
             className={`h-1 w-${y.count} flex-none ${c[y.color]}`}
             key={`mario_${i}${j}`}

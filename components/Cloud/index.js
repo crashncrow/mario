@@ -108,7 +108,7 @@ const Cloud = ({position, size}) =>{
         x.map((y, j) => (
           <div 
           className={`h-1 w-${y.count} border-none flex-none ${c[y.color]}`}
-          key={`mario_${i}${j}`}
+          key={`cloud_1_${i}${j}`}
           >
           </div>
         ))
@@ -117,12 +117,12 @@ const Cloud = ({position, size}) =>{
 
       {
       Array(size).fill(1).map((x, i) => (
-      <div className="flex flex-wrap w-16">
+      <div className="flex flex-wrap w-16" key={`cloud_2_${i}`}>
       {matrix2.map((x, i) => (
         x.map((y, j) => (
           <div 
           className={`h-1 w-${y.count} border-none flex-none ${c[y.color]}`}
-          key={`mario_${i}${j}`}
+          key={`cloud_2_${i}${j}`}
           >
           </div>
         ))
@@ -136,7 +136,7 @@ const Cloud = ({position, size}) =>{
         x.map((y, j) => (
           <div 
           className={`h-1 w-${y.count} border-none flex-none ${c[y.color]}`}
-          key={`mario_${i}${j}`}
+          key={`cloud_3_${i}${j}`}
           >
           </div>
         ))

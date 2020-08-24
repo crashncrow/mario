@@ -16,7 +16,7 @@ const Floor = () =>{
         {
         m.map((y, i) => {
             return Array(y).fill(1).map((x, j) => (
-              <div className={`flex flex-wrap w-16 ${ (i%2 === 0) && 'bg-orange-500'} mb-0`}>
+              <div className={`flex flex-wrap w-16 ${ (i%2 === 0) && 'bg-orange-500'} mb-0`} key={`floor_${j}}`}>
                 <div className="flex flex-wrap w-16 h-16">
                   {
                     (i%2 === 0) &&
