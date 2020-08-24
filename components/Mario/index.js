@@ -238,7 +238,7 @@ const Mario = () =>{
 
     <div 
       ref={redBoxRef} 
-      className='flex flex-wrap m-auto w-16 absolute bottom-0 z-50 mb-12 left-32' 
+      className='flex flex-wrap m-auto w-16 absolute bottom-0 z-50 mb-16 left-32' 
       style={{left: `${left}px`, bottom: `${bottom}px`}}>
     
       {m.map((x, i) => (
