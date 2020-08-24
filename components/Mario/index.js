@@ -1,5 +1,6 @@
 import { useState, useRef, useEffect } from 'react'
 import { useScrollPosition } from 'hooks/scroll'
+import { useWindowDimensions } from 'hooks/window'
 import { useAppContext } from 'contexts/AppContext'
 import { processFullArray } from 'libs/pixless'
 
@@ -113,13 +114,14 @@ const m3 = [
   [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
 ]
 
-const m4 =  m2
-
-const ALLOWED_KEYS =  ['ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight']
-const HORIZONTAL_KEYS =  ['ArrowLeft', 'ArrowRight']
-
+// const ALLOWED_KEYS =  ['ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight']
+// const HORIZONTAL_KEYS =  ['ArrowLeft', 'ArrowRight']
 
 const Mario = () =>{
+  const { height, width } = useWindowDimensions();
+  const { left, setLeft, bottom, setBottom, objects } = useAppContext()
+
+  const [ collision, setCollision ] = useState(false)
   const [ reverse, setReverse ] = useState(false)
   const [ matrix1, setMatrix1 ] = useState(processFullArray(m1))
   const [ matrix2, setMatrix2 ] = useState(processFullArray(m2))
@@ -127,26 +129,19 @@ const Mario = () =>{
   
   const [ index, setIndex ] = useState(1)
   const [ m, setM ] = useState(matrix1)
-  
-  // useEffect(() => {
-  //   setMatrix1(processFullArray(m1))
-  //   setMatrix2(processFullArray(m2))
-  //   setMatrix3(processFullArray(m3))
-  // }, [])
-  
-  const { left, setLeft, bottom, setBottom } = useAppContext()
 
   const positionsStore = PositionStore()
-  const viewportRef = useRef(null)
+
+  // const viewportRef = useRef(null)
   const redBoxRef = useRef(null)
 
   // Viewport scroll position
   useScrollPosition(
     ({ prevPos, currPos }) => {
       positionsStore.setViewportPosition(currPos)
-      const { style } = viewportRef.current
-      style.top = `${150 + currPos.y}px`
-      style.left = `${10 + currPos.x}px`
+      // const { style } = viewportRef.current
+      // style.top = `${150 + currPos.y}px`
+      // style.left = `${10 + currPos.x}px`
 
 
       if((prevPos.x < currPos.x) && reverse){
@@ -168,12 +163,55 @@ const Mario = () =>{
 
   // Element scroll position
   useScrollPosition(
-    ({ currPos }) => positionsStore.setElementPosition(currPos),
+    ({ currPos }) => {
+      positionsStore.setElementPosition(currPos)
+    },
     [],
     redBoxRef,
     false,
     300
   )
+
+  const checkCollision = () =>{
+    let toco = false
+    const x = positionsStore.getViewportX() + 100
+    const y = positionsStore.getViewportY()
+    // console.log('Y', height - bottom - 64)
+
+    objects.map((obj,i) =>{
+      // console.log('OBJ:', obj)
+      // console.log('WH:', height)
+      if (x < obj.x + obj.width &&
+        x + 64 > obj.x ) {
+         setCollision(true)
+         console.log('COLLISION')
+         toco = true
+      }
+      
+    })
+
+    if(!toco){
+      
+        setCollision(false)
+
+    }
+    // setCollision(true)
+  }
+
+  const scrollHandler = _ => {
+    checkCollision()
+  }
+
+  // useEffect(() => {
+  //   checkCollision()
+  // }, [bottom]);
+
+  useEffect(() => {
+    window.addEventListener("scroll", scrollHandler, true);
+    return () => {
+      window.removeEventListener("scroll", scrollHandler, true);
+    };
+  }, []);
 
   // useMemo(
   //   () => (
@@ -241,17 +279,17 @@ const Mario = () =>{
 
   return (
     <>
-    <div className="fixed top-0" style={{width: '5000px'}}>
+    {/* <div className="fixed top-0" style={{width: '5000px'}}>
       <div ref={viewportRef}>
         <div>Deferred Rendering: {positionsStore.renderCount}</div>
         <div>Viewport: X: {positionsStore.getViewportX()} Y: {positionsStore.getViewportY()}</div>
         <div>Mario: X:{positionsStore.getElementX()} Y:{positionsStore.getElementY()}</div>
       </div>
-    </div>
+    </div> */}
 
     <div 
       ref={redBoxRef} 
-      className='flex flex-wrap m-auto w-16 absolute bottom-0 z-50 mb-16' 
+      className={`flex flex-wrap m-auto w-16 absolute bottom-0 z-50 mb-16 ${collision && 'bg-black'}`}
       style={{left: `${left}px`, bottom: `${bottom}px`}}>
 
       {m.map((x, i) => {

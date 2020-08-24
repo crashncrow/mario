@@ -1,4 +1,13 @@
+import { useState, useRef, useEffect } from 'react'
+import { useAppContext } from 'contexts/AppContext'
+
 const Brick = ({position, size}) => {
+  const { objects, setObjects } = useAppContext()
+
+  useEffect(() => {
+    setObjects( objects.push( { x: position * 64, y: 16 * size, width: 64, height: 16 * size } ) )
+  }, []);
+
   return (
     <>
     

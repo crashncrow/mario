@@ -1,10 +1,10 @@
 import { useEffect } from 'react'
 import Head from 'next/head'
+import Sky from 'components/Sky'
 import Mario from 'components/Mario'
 import Floor from 'components/Floor'
 import Pipe from 'components/Pipe'
-import Cloud from 'components/Cloud'
-import Bush from 'components/Bush'
+import Plants from 'components/Plants'
 import Brick from 'components/Brick'
 
 import { useAppContext } from 'contexts/AppContext'
@@ -22,7 +22,7 @@ export default function Home() {
 
   const trackClick = (e) => {
     console.log(e)
-    setBottom(bottom + 130)
+    setBottom(bottom + 200)
 
     setTimeout(() => setBottom(0), 200)
   }
@@ -45,55 +45,20 @@ export default function Home() {
       </Head>
 
       <main className="h-full w-full">
-        <Cloud position={9} size={1}/>
+        <Mario />
+        <Sky />
+        <Plants />
 
         <Brick position={9} size={1}/>
         <Brick position={11} size={1}/>
 
-        <Cloud position={20} size={1}/>
-        <Cloud position={29} size={3}/>
-        <Cloud position={38} size={2}/>
-        <Cloud position={58} size={1}/>
-        <Cloud position={68} size={1}/>
-        <Cloud position={78} size={3}/>
-        <Cloud position={86} size={2}/>
-        <Cloud position={105} size={1}/>
-        <Cloud position={116} size={1}/>
-        <Cloud position={122} size={3}/>
-        <Cloud position={130} size={2}/>
-
-        <Mario />
-        <div className="inline-block">  
-          
-          <Bush position={12} size={3}/>
-
-          <Bush position={24} size={1}/>
-          
-          <Pipe position={29} size={1}/>
-                    
+        <div className="inline-block">            
+          <Pipe position={29} size={1}/>                    
           <Pipe position={39} size={2}/>
-
-          <Bush position={42} size={2}/>
-
           <Pipe position={47} size={3}/>
-
           <Pipe position={58} size={3}/>
-
-          <Bush position={60} size={3}/>
-
-          <Bush position={71} size={1}/>
-
-          <Bush position={90} size={2}/>
-
-          <Bush position={108} size={3}/>
-
-          <Bush position={118} size={1}/>
-
-          <Bush position={134} size={2}/>
-          
         </div>
       </main>
-      
     </div>
     <Floor />
     </>
