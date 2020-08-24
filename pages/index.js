@@ -50,8 +50,6 @@ export default function Home() {
         <Brick position={9} size={1}/>
         <Brick position={11} size={1}/>
 
-        <Brick position={13} size={3}/>
-
         <Cloud position={20} size={1}/>
         <Cloud position={29} size={3}/>
         <Cloud position={38} size={2}/>
