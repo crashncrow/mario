@@ -5,6 +5,7 @@ import Floor from 'components/Floor'
 import Pipe from 'components/Pipe'
 import Cloud from 'components/Cloud'
 import Bush from 'components/Bush'
+import Brick from 'components/Brick'
 
 import { useAppContext } from 'contexts/AppContext'
 
@@ -45,6 +46,12 @@ export default function Home() {
 
       <main className="h-full w-full">
         <Cloud position={9} size={1}/>
+
+        <Brick position={9} size={1}/>
+        <Brick position={11} size={1}/>
+
+        <Brick position={13} size={3}/>
+
         <Cloud position={20} size={1}/>
         <Cloud position={29} size={3}/>
         <Cloud position={38} size={2}/>
