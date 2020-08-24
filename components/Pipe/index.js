@@ -40,7 +40,7 @@ const t2 = [
 
 const Pipe = ({position, size}) =>{
   return (
-    <div className="flex flex-wrap absolute w-32 mb-12 bottom-0" style={{left: `${position * 64}px`}}>
+    <div className="flex flex-wrap absolute w-32 mb-16 bottom-0" style={{left: `${position * 64}px`}}>
       <div className="flex flex-wrap bg-green-500 w-32 h-15 border-4 border-black pb-1">
         <div className="mt-1 w-5 mb-4 h-full border-t-4 border-r-8 border-green-800"></div>
         <div className="flex flex-wrap mt-1 w-19 mb-4 ml-6 h-full border-t-4 border-l-4 border-green-800">
