@@ -67,7 +67,7 @@ const m3 =[
 
 // cons pxls = m.splite
 
-const Cloud = ({position, size}) =>{
+const Bush = ({position, size}) =>{
   const [matrix1, setMatrix1 ] = useState([])
   const [matrix2, setMatrix2 ] = useState([])
   const [matrix3, setMatrix3 ] = useState([])
@@ -123,4 +123,4 @@ const Cloud = ({position, size}) =>{
   )
 }
 
-export default Cloud
+export default Bush

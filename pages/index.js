@@ -5,6 +5,7 @@ import Mario from 'components/Mario'
 import Floor from 'components/Floor'
 import Pipe from 'components/Pipe'
 import Plants from 'components/Plants'
+import Mountains from 'components/Mountains'
 import Brick from 'components/Brick'
 import Box from 'components/Box'
 
@@ -61,13 +62,15 @@ export default function Home() {
         <Mario />
         <Sky />
         <Plants />
+        <Mountains />
 
-        <Box position={5} size={1}/>
+        <Box position={17} size={1}/>
 
-        <Brick position={9} size={1}/>
-        <Box position={10} size={1}/>
-        <Brick position={11} size={1}/>
-        <Box position={12} size={1}/>
+        <Brick position={21} size={1}/>
+        <Box position={22} size={1}/>
+        <Brick position={23} size={1}/>
+        <Box position={24} size={1}/>
+        <Brick position={25} size={1}/>
 
         <div className="inline-block">            
           <Pipe position={29} size={1}/>                    
