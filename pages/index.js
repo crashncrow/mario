@@ -1,4 +1,6 @@
-import { useEffect } from 'react'
+import { useEffect, useRef } from 'react';
+import useDoubleClick from 'hooks/clicks'
+
 import Head from 'next/head'
 import Sky from 'components/Sky'
 import Mario from 'components/Mario'
@@ -32,26 +34,33 @@ const purge = [
 ]
 
 export default function Home() {
-  const { bottom, setBottom } = useAppContext()
+  const buttonRef = useRef();
+  const { jump } = useAppContext()
 
-  const trackClick = (e) => {
-    console.log(e)
-    console.log(bottom)
-    setBottom(bottom + 200)
-
-    setTimeout(() => setBottom(0), 200)
-  }
+  useDoubleClick({
+    onSingleClick: e => {
+      console.log(e, 'single click');
+      jump(1)
+    },
+    onDoubleClick: e => {
+      console.log(e, 'double click');
+      jump(2)
+    },
+    ref: buttonRef,
+    latency: 250
+  });
 
   useEffect(() => {
-    document.addEventListener('click', trackClick)
-    return () => {
-        document.removeEventListener('click', trackClick);
-    }
+    // document.addEventListener('click', jump)
+    // return () => {
+    //     document.removeEventListener('click', jump);
+    // }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
   return (
     <>
+    <div className="w-full h-full fixed" ref={buttonRef}></div>
     <div className="h-screen overflow-x-scroll">
       <Head>
         <title>It's Me, Mario!</title>

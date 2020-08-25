@@ -33,9 +33,9 @@ const PositionStore = () => {
 
 const c = {
   0: '', // bg-transparent
-  1: 'bg-red-600',
-  2: 'bg-yellow-800',
-  3: 'bg-orange-400'
+  1: 'bg-mario-red',
+  2: 'bg-mario-brown',
+  3: 'bg-mario-skin'
 }
 
 const m0 = [
@@ -119,7 +119,7 @@ const m3 = [
 
 const Mario = () =>{
   const { height, width } = useWindowDimensions();
-  const { left, setLeft, bottom, setBottom, objects, collision, setCollision } = useAppContext()
+  const { left, setLeft, bottom, objects, collision, setCollision } = useAppContext()
 
   const [ reverse, setReverse ] = useState(false)
   const [ matrix1, setMatrix1 ] = useState(processFullArray(m1))

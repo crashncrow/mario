@@ -8,6 +8,8 @@ export const AppContextProvider = ({ children }) => {
   const [ objects, setObjects ] = useState([])
   const [ collision, setCollision ] = useState(false)
 
+  const [ jump, setJump ] = useState(0)
+
   useEffect(() => {
     console.log(objects)
   }, [objects])
@@ -15,6 +17,23 @@ export const AppContextProvider = ({ children }) => {
   useEffect(() => {
     console.log('bottom', bottom)
   }, [bottom])
+
+  useEffect(() => {
+    console.log('jump - prev', bottom)
+    if(jump){
+      setBottom(jump * 150)
+    }
+    else{
+      setBottom(0)
+    }
+    console.log('jump - after', bottom)
+  }, [jump])
+
+  const j = (i) => {
+    setJump(i)
+    
+    setTimeout(() => setJump(0), 200)
+  }
 
   return (
     <AppContext.Provider
@@ -24,9 +43,10 @@ export const AppContextProvider = ({ children }) => {
         objects: objects,
         collision: collision,
         setLeft: setLeft,
-        setBottom: setBottom,
+        // setBottom: setBottom,
         setObjects: setObjects,
-        setCollision: setCollision
+        setCollision: setCollision,
+        jump: j
       }}
     >
       {children}
