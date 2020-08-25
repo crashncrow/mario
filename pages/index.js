@@ -28,6 +28,7 @@ const purge = [
   'ml-9', 'ml-10', 'ml-11', 'ml-12', 'ml-13', 'ml-14', 'ml-15', 
   'ml-16', 'ml-17', 'ml-18', 'ml-19', 'ml-20', 'ml-21', 'ml-22',
   'ml-23', 'ml-24', 'ml-25', 'ml-26', 'ml-27', 'ml-28', 'ml-29',
+  'ml-30', 'ml-31', 'ml-32', 'ml-33', 'ml-34', 'ml-35'
 ]
 
 export default function Home() {
