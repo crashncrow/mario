@@ -102,7 +102,7 @@ const Cloud = ({position, size}) =>{
   }, [])
 
   return (
-    <div className={`flex flex-wrap absolute w-${16 + (16 * size)} mb-24 top-0 mt-10`} style={{left: `${position * 64}px`}}>
+    <div className={`flex flex-wrap absolute w-${16 + (16 * size)} mb-64 pb-64 bottom-0`} style={{left: `${position * 64}px`}}>
       <div className="flex flex-wrap w-8">
       {matrix1.map((x, i) => (
         x.map((y, j) => (

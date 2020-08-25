@@ -119,9 +119,8 @@ const m3 = [
 
 const Mario = () =>{
   const { height, width } = useWindowDimensions();
-  const { left, setLeft, bottom, setBottom, objects } = useAppContext()
+  const { left, setLeft, bottom, setBottom, objects, collision, setCollision } = useAppContext()
 
-  const [ collision, setCollision ] = useState(false)
   const [ reverse, setReverse ] = useState(false)
   const [ matrix1, setMatrix1 ] = useState(processFullArray(m1))
   const [ matrix2, setMatrix2 ] = useState(processFullArray(m2))
@@ -131,29 +130,28 @@ const Mario = () =>{
   const [ m, setM ] = useState(matrix1)
 
   const positionsStore = PositionStore()
-
-  // const viewportRef = useRef(null)
+  const viewportRef = useRef(null)
   const redBoxRef = useRef(null)
 
   // Viewport scroll position
   useScrollPosition(
     ({ prevPos, currPos }) => {
       positionsStore.setViewportPosition(currPos)
-      // const { style } = viewportRef.current
-      // style.top = `${150 + currPos.y}px`
-      // style.left = `${10 + currPos.x}px`
+      const { style } = viewportRef.current
+      style.top = `${150 + currPos.y}px`
+      style.left = `${10 + currPos.x}px`
 
 
       if((prevPos.x < currPos.x) && reverse){
-        //console.log('nooootreverse', prevPos, currPos)
         setReverse(false)
       }
       else if ((prevPos.x > currPos.x) && !reverse){
-        //console.log('reverse', prevPos, currPos)
         setReverse(true)
       }
-
-      setLeft(currPos.x + 100)
+      
+      if(!collision){
+        setLeft(currPos.x + 100)
+      }
       setIndex(index + 1)
     },
     [positionsStore],
@@ -175,27 +173,23 @@ const Mario = () =>{
   const checkCollision = () =>{
     let toco = false
     const x = positionsStore.getViewportX() + 100
-    const y = positionsStore.getViewportY()
-    // console.log('Y', height - bottom - 64)
+    const y = height - 64
 
-    objects.map((obj,i) =>{
-      // console.log('OBJ:', obj)
-      // console.log('WH:', height)
+    objects.map((obj,i) => {
+      //console.log(y, obj.y,  obj.y + obj.height)
       if (x < obj.x + obj.width &&
-        x + 64 > obj.x ) {
+        x + 64 > obj.x && 
+        y >= obj.y &&
+        y <= obj.y + obj.height) {
          setCollision(true)
          console.log('COLLISION')
          toco = true
       }
-      
     })
 
     if(!toco){
-      
         setCollision(false)
-
     }
-    // setCollision(true)
   }
 
   const scrollHandler = _ => {
@@ -213,15 +207,6 @@ const Mario = () =>{
     };
   }, []);
 
-  // useMemo(
-  //   () => (
-  //     console.log(`X: ${positionsStore.getViewportX()} Y: ${positionsStore.getViewportY()}`)
-  //   ),
-  //   [positionsStore]
-  // )
-
-  // ***************************
-
   useEffect(() => {
     if(index % 4 == 1){
       setM(matrix2)
@@ -237,55 +222,15 @@ const Mario = () =>{
     }
   }, [index])
 
-  // const [pressedKeys, setPressedKeys] = useState([]);
-  // useEffect(() => {
-  //   // document.addEventListener('keydown', logKey);
-  //   console.log(pressedKeys)
-  //   pressedKeys.map( key => {
-  //     if(HORIZONTAL_KEYS.includes(key)){
-  //       handleClick()
-  //       setIndex(index + 1)  
-  //       if(key === 'ArrowLeft'){
-  //         setLeft(left - 30)  
-  //       } else {
-  //         setLeft(left + 30)
-  //       }
-  //     }
-  //   })
-  // }, [pressedKeys])
-  
-  // useEffect(() => {
-  //   const onKeyDown = (e) => {
-  //       console.log(e)
-  //       e.preventDefault()
-  //       const key = e.code
-  //       if (ALLOWED_KEYS.includes(key) && !pressedKeys.includes(key)) {
-  //           setPressedKeys(previousPressedKeys => [...previousPressedKeys, key]);         
-  //       }
-  //   }
-  //   const onKeyUp = ({key}) => {
-  //       if (ALLOWED_KEYS.includes(key)) {
-  //           setPressedKeys(previousPressedKeys => previousPressedKeys.filter(k => k !== key));
-  //       }
-  //   }
-  //   document.addEventListener('keydown', onKeyDown);
-  //   document.addEventListener('keyup', onKeyUp);
-  //   return () => {
-  //       document.removeEventListener('keydown', onKeyDown);
-  //       document.removeEventListener('keyup', onKeyUp);
-  //   }
-  //   // eslint-disable-next-line react-hooks/exhaustive-deps
-  // }, []);
-
   return (
     <>
-    {/* <div className="fixed top-0" style={{width: '5000px'}}>
+    <div className="hidden fixed top-0" style={{width: '5000px'}}>
       <div ref={viewportRef}>
         <div>Deferred Rendering: {positionsStore.renderCount}</div>
         <div>Viewport: X: {positionsStore.getViewportX()} Y: {positionsStore.getViewportY()}</div>
         <div>Mario: X:{positionsStore.getElementX()} Y:{positionsStore.getElementY()}</div>
       </div>
-    </div> */}
+    </div>
 
     <div 
       ref={redBoxRef} 

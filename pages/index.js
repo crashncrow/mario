@@ -6,6 +6,7 @@ import Floor from 'components/Floor'
 import Pipe from 'components/Pipe'
 import Plants from 'components/Plants'
 import Brick from 'components/Brick'
+import Box from 'components/Box'
 
 import { useAppContext } from 'contexts/AppContext'
 
@@ -22,6 +23,7 @@ export default function Home() {
 
   const trackClick = (e) => {
     console.log(e)
+    console.log(bottom)
     setBottom(bottom + 200)
 
     setTimeout(() => setBottom(0), 200)
@@ -49,8 +51,12 @@ export default function Home() {
         <Sky />
         <Plants />
 
+        <Box position={5} size={1}/>
+
         <Brick position={9} size={1}/>
+        <Box position={10} size={1}/>
         <Brick position={11} size={1}/>
+        <Box position={12} size={1}/>
 
         <div className="inline-block">            
           <Pipe position={29} size={1}/>                    

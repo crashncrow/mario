@@ -4,8 +4,8 @@ import { useState, useEffect } from 'react'
 const c = {
   0: '',//bg-transparent
   1: 'bg-black',
-  2: 'bg-green-500',
-  3: 'bg-green-800',
+  2: 'bg-green-light',
+  3: 'bg-green-dark',
 }
 
 const m1 = [

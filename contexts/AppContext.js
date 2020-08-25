@@ -3,14 +3,18 @@ import React, { createContext, useContext, useState, useEffect } from 'react'
 const AppContext = createContext(null)
 
 export const AppContextProvider = ({ children }) => {
-  const [left, setLeft] = useState(100)
-  const [bottom, setBottom] = useState(0)
-  const [objects, setObjects] = useState([])
+  const [ left, setLeft ] = useState(100)
+  const [ bottom, setBottom ] = useState(0)
+  const [ objects, setObjects ] = useState([])
+  const [ collision, setCollision ] = useState(false)
 
   useEffect(() => {
     console.log(objects)
-  }, [objects]);
+  }, [objects])
 
+  useEffect(() => {
+    console.log('bottom', bottom)
+  }, [bottom])
 
   return (
     <AppContext.Provider
@@ -18,9 +22,11 @@ export const AppContextProvider = ({ children }) => {
         left: left,
         bottom: bottom,
         objects: objects,
+        collision: collision,
         setLeft: setLeft,
         setBottom: setBottom,
-        setObjects: setObjects
+        setObjects: setObjects,
+        setCollision: setCollision
       }}
     >
       {children}
