@@ -60,7 +60,7 @@ export default function Home() {
 
   return (
     <>
-    <div className="w-full h-full fixed" ref={buttonRef}></div>
+    <div className="w-full h-full fixed z-50" ref={buttonRef}></div>
     <div className="h-screen overflow-x-scroll">
       <Head>
         <title>It's Me, Mario!</title>
