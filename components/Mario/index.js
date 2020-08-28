@@ -118,7 +118,7 @@ const size = 64
 
 const Mario = () =>{
   const { height } = useWindowDimensions();
-  const { left, setLeft, bottom, collision, checkCollision } = useAppContext()
+  const { left, setLeft, bottom, collision } = useAppContext()
 
   const [ reverse, setReverse ] = useState(false)
   const [ matrix1 ] = useState(processFullArray(m1))
@@ -127,9 +127,6 @@ const Mario = () =>{
   
   const [ index, setIndex ] = useState(1)
   const [ m, setM ] = useState(matrix1)
-
-  // const [ x, setX ] = useState(0)
-  // const [ y, setY ] = useState(0)
 
   const positionsStore = PositionStore()
   const viewportRef = useRef(null)
@@ -184,26 +181,20 @@ const Mario = () =>{
     300
   )
 
-  const scrollHandler = _ => {
-    console.log('scrollHandler', left)
-    // // const x = left;
-    // const x = positionsStore.getViewportX() + 100 // <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<< ---------------
-    // const y = height - bottom - size
-    checkCollision(left, bottom + 64)
-  }
+  // const scrollHandler = _ => {
+  //   console.log('scrollHandler', left)
+  //   // // const x = left;
+  //   // const x = positionsStore.getViewportX() + 100 // <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<< ---------------
+  //   // const y = height - bottom - size
+  //   // checkCollision(left, bottom + 64)
+  // }
 
-  useEffect(() => {
-    // const x = positionsStore.getViewportX() + 100
-    // const y = height - bottom - size
-    // checkCollision(objects, x, y)
-  }, [bottom]);
-
-  useEffect(() => {
-    window.addEventListener("scroll", scrollHandler, true);
-    return () => {
-      window.removeEventListener("scroll", scrollHandler, true);
-    };
-  }, [left]);
+  // useEffect(() => {
+  //   window.addEventListener("scroll", scrollHandler, true);
+  //   return () => {
+  //     window.removeEventListener("scroll", scrollHandler, true);
+  //   };
+  // }, [left]);
 
   useEffect(() => {
     if(index % 4 == 1){
@@ -233,7 +224,7 @@ const Mario = () =>{
       }}
     ></div>
     }
-    <div className=" fixed top-0" style={{width: '5000px'}}>
+    <div className="hidden fixed top-0" style={{width: '5000px'}}>
       <div ref={viewportRef}>
         <div>Deferred Rendering: {positionsStore.renderCount}</div>
         <div>Viewport: X: {positionsStore.getViewportX()} Y: {positionsStore.getViewportY()}</div>

@@ -14,14 +14,12 @@ import Box from 'components/Box'
 import { useAppContext } from 'contexts/AppContext'
 const debug = true
 const elements = [
-  { type: 'Box', x: 17, y: 4, size: 1, width: 64, height: 64 },
-  { type: 'Box', x: 22, y: 4, size: 1, width: 64, height: 64 },
-  { type: 'Box', x: 23, y: 7, size: 1, width: 64, height: 64 },
-  { type: 'Box', x: 24, y: 4, size: 1, width: 64, height: 64 },
-  { type: 'Box', x: 81, y: 7, size: 1, width: 64, height: 64 },
-  { type: 'Box', x: 95, y: 7, size: 1, width: 64, height: 64 },
-
-  
+  { type: 'Box', x: 17,  y: 4, size: 1, width: 64, height: 64 },
+  { type: 'Box', x: 22,  y: 4, size: 1, width: 64, height: 64 },
+  { type: 'Box', x: 23,  y: 7, size: 1, width: 64, height: 64 },
+  { type: 'Box', x: 24,  y: 4, size: 1, width: 64, height: 64 },
+  { type: 'Box', x: 81,  y: 7, size: 1, width: 64, height: 64 },
+  { type: 'Box', x: 95,  y: 7, size: 1, width: 64, height: 64 },
   { type: 'Box', x: 107, y: 4, size: 1, width: 64, height: 64 },
   { type: 'Box', x: 110, y: 4, size: 1, width: 64, height: 64 },
   { type: 'Box', x: 110, y: 7, size: 1, width: 64, height: 64 },
@@ -49,12 +47,9 @@ const elements = [
   { type: 'Brick', x: 100, y: 4, size: 1, width: 64, height: 64 },
   { type: 'Brick', x: 101, y: 4, size: 1, width: 64, height: 64 },
   { type: 'Brick', x: 119, y: 4, size: 1, width: 64, height: 64 },
-
   { type: 'Brick', x: 122, y: 7, size: 1, width: 64, height: 64 },
   { type: 'Brick', x: 123, y: 7, size: 1, width: 64, height: 64 },
   { type: 'Brick', x: 124, y: 7, size: 1, width: 64, height: 64 },
-
-  
   { type: 'Brick', x: 129, y: 7, size: 1, width: 64, height: 64 },
   { type: 'Brick', x: 130, y: 4, size: 1, width: 64, height: 64 },
   { type: 'Brick', x: 131, y: 4, size: 1, width: 64, height: 64 },
@@ -63,16 +58,31 @@ const elements = [
   { type: 'Pipe', x: 29, y:1, size: 1, width: 128, height: 128 },
   { type: 'Pipe', x: 39, y:1, size: 2, width: 128, height: 192 },
   { type: 'Pipe', x: 47, y:1, size: 3, width: 128, height: 256 },
-  { type: 'Pipe', x: 58, y:1, size: 3, width: 128, height: 256 }
+  { type: 'Pipe', x: 58, y:1, size: 3, width: 128, height: 256 },
+  
+  // 69, 2, 16, 3, 143
+  { type: 'Floor', x: 0, y:0, size: 69, width: 69*64, height: 64 }, 
+  { type: 'Floor', x: 71, y:0, size: 16, width: 16*64, height: 64 }, 
+  { type: 'Floor', x: 90, y:0, size: 143, width: 143*64, height: 64 }, 
 ]
 
 export default function Home() {
   const buttonRef = useRef()
-  const { left, bottom, setBottom, setObjects, checkCollision } = useAppContext()
+  const { left, bottom, setBottom, setObjects, collision, checkCollision } = useAppContext()
+
+
 
   useEffect(() => {
-    console.log('Set objects', elements)
+    // console.log('Set objects', elements)
     setObjects(elements)
+
+    // setInterval(async () => {
+    //   console.log('CHECKKKK!')
+    //   console.log('left', left, 'bottom', bottom)
+    //   if(!checkCollision(left, bottom)){
+    //     setBottom(bottom - 64)
+    //   }
+    // }, 500);
   }, [])
 
   const jump = ( limit ) => {
@@ -92,22 +102,26 @@ export default function Home() {
 
   useDoubleClick({
     onSingleClick: (e) => {
-      console.log('single click', elements)
-      setBottom(bottom + (jump(128)) + 64)
+      console.log('single click')
+      if(collision){
+        setBottom(bottom + (jump(128)) + 64)
 
-      setTimeout(() => {
-        setBottom(64)
-        checkCollision(left, bottom + 64)
-      }, 200)
+        setTimeout(() => {
+          // setBottom(64)
+          checkCollision(left, bottom + 64)
+        }, 200)
+      }
     },
     onDoubleClick: (e) => {
-      console.log('double click', elements)
-      setBottom(bottom + (jump(320)) + 64)
-      
-      setTimeout(() => {
-        setBottom(64)
-        checkCollision(left, bottom + 64)
-      }, 200)
+      console.log('double click')
+      if(collision){
+        setBottom(bottom + (jump(320)) + 64)
+        
+        setTimeout(() => {
+          // setBottom(64)
+          checkCollision(left, bottom + 64)
+        }, 200)
+      }
     },
     ref: buttonRef,
     latency: 250
@@ -148,19 +162,28 @@ export default function Home() {
               ></div>
             ))}
 
+            <div
+              className='absolute border-4 border-mario-brown z-50 w-1 h-1'
+              style={{
+                bottom: `${(bottom) }px`,
+                left: `${(left)}px`,
+              }}
+            ></div>
+
             {elements.map((el, i) => {
               if (el.type === 'Box') {
                 return <Box x={el.x} y={el.y} size={el.size} key={i}/>
               } else if (el.type === 'Brick') {
                 return <Brick x={el.x} y={el.y} size={el.size} key={i}/>
-              } else {
+              } else if (el.type === 'Pipe'){
                 return <Pipe x={el.x} size={el.size} key={i}/>
+              } else if (el.type === 'Floor'){
+                return <Floor x={el.x} y={el.y} size={el.size} key={i}/>
               }
             })}
           </div>
         </main>
       </div>
-      <Floor />
     </>
   )
 }
