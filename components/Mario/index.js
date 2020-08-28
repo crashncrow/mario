@@ -160,7 +160,7 @@ const Mario = () =>{
       //   setLeft(left - 30)
       // }
 
-      setLeft(currPos.x - 100)
+      setLeft(currPos.x + 100)
       
       //if(!collision){
         //setLeft(left + 20)
