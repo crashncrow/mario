@@ -2,6 +2,7 @@ module.exports = {
   purge: [
     './components/**/*.js',
     './pages/**/*.js',
+    './libs/**/*.js',
   ],
   theme: {
     extend: {

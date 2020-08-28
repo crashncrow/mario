@@ -114,20 +114,22 @@ const m3 = [
   [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
 ]
 
-// const ALLOWED_KEYS =  ['ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight']
-// const HORIZONTAL_KEYS =  ['ArrowLeft', 'ArrowRight']
+const size = 64
 
 const Mario = () =>{
-  const { height, width } = useWindowDimensions();
-  const { left, setLeft, bottom, objects, collision, setCollision } = useAppContext()
+  const { height } = useWindowDimensions();
+  const { left, setLeft, bottom, collision, checkCollision } = useAppContext()
 
   const [ reverse, setReverse ] = useState(false)
-  const [ matrix1, setMatrix1 ] = useState(processFullArray(m1))
-  const [ matrix2, setMatrix2 ] = useState(processFullArray(m2))
-  const [ matrix3, setMatrix3 ] = useState(processFullArray(m3))
+  const [ matrix1 ] = useState(processFullArray(m1))
+  const [ matrix2 ] = useState(processFullArray(m2))
+  const [ matrix3 ] = useState(processFullArray(m3))
   
   const [ index, setIndex ] = useState(1)
   const [ m, setM ] = useState(matrix1)
+
+  // const [ x, setX ] = useState(0)
+  // const [ y, setY ] = useState(0)
 
   const positionsStore = PositionStore()
   const viewportRef = useRef(null)
@@ -144,14 +146,24 @@ const Mario = () =>{
 
       if((prevPos.x < currPos.x) && reverse){
         setReverse(false)
+        
       }
       else if ((prevPos.x > currPos.x) && !reverse){
         setReverse(true)
+        
+      }
+
+      if(!reverse){
+        setLeft(left + 30)
+      }
+      else{
+        setLeft(left - 30)
       }
       
-      if(!collision){
-        setLeft(currPos.x + 100)
-      }
+      //if(!collision){
+        //setLeft(left + 20)
+      //}
+
       setIndex(index + 1)
     },
     [positionsStore],
@@ -170,42 +182,26 @@ const Mario = () =>{
     300
   )
 
-  const checkCollision = () =>{
-    let toco = false
-    const x = positionsStore.getViewportX() + 100
-    const y = height - 64
-
-    objects.map((obj,i) => {
-      //console.log(y, obj.y,  obj.y + obj.height)
-      if (x < obj.x + obj.width &&
-        x + 64 > obj.x && 
-        y >= obj.y &&
-        y <= obj.y + obj.height) {
-         setCollision(true)
-         console.log('COLLISION')
-         toco = true
-      }
-    })
-
-    if(!toco){
-        setCollision(false)
-    }
-  }
-
   const scrollHandler = _ => {
-    checkCollision()
+    console.log('scrollHandler', left)
+    // // const x = left;
+    // const x = positionsStore.getViewportX() + 100 // <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<< ---------------
+    // const y = height - bottom - size
+    checkCollision(left, bottom + 64)
   }
 
-  // useEffect(() => {
-  //   checkCollision()
-  // }, [bottom]);
+  useEffect(() => {
+    // const x = positionsStore.getViewportX() + 100
+    // const y = height - bottom - size
+    // checkCollision(objects, x, y)
+  }, [bottom]);
 
   useEffect(() => {
     window.addEventListener("scroll", scrollHandler, true);
     return () => {
       window.removeEventListener("scroll", scrollHandler, true);
     };
-  }, []);
+  }, [left]);
 
   useEffect(() => {
     if(index % 4 == 1){
@@ -224,7 +220,18 @@ const Mario = () =>{
 
   return (
     <>
-    <div className="hidden fixed top-0" style={{width: '5000px'}}>
+    { 
+      <div id="border_mario"
+      className='absolute border-4 border-mario-red z-50'
+      style={{
+        bottom: `${bottom}px`,
+        left: `${left}px`,
+        height: `${size}px`,
+        width: `${size}px`
+      }}
+    ></div>
+    }
+    <div className=" fixed top-0" style={{width: '5000px'}}>
       <div ref={viewportRef}>
         <div>Deferred Rendering: {positionsStore.renderCount}</div>
         <div>Viewport: X: {positionsStore.getViewportX()} Y: {positionsStore.getViewportY()}</div>
@@ -234,7 +241,7 @@ const Mario = () =>{
 
     <div 
       ref={redBoxRef} 
-      className={`flex flex-wrap m-auto w-16 absolute bottom-0 z-50 mb-16 ${collision && 'bg-black'}`}
+      className={`flex flex-wrap w-16 absolute bottom-0 z-50 ${collision ? 'bg-black' : ''}`}
       style={{left: `${left}px`, bottom: `${bottom}px`}}>
 
       {m.map((x, i) => {

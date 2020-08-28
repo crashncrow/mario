@@ -1,4 +1,4 @@
-import { useEffect } from 'react';
+import { useLayoutEffect } from 'react';
 
 /**
  * A simple React hook for differentiating single and double clicks on the same component.
@@ -14,7 +14,7 @@ const useDoubleClick = ({
   onSingleClick = () => null,
   onDoubleClick = () => null
 }) => {
-  useEffect(() => {
+  useLayoutEffect(() => {
     const clickRef = ref.current;
     let clickCount = 0;
     const handleClick = e => {

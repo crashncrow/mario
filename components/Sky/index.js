@@ -7,12 +7,12 @@ const m = [
   {position: 38, size: 2},
   {position: 58, size: 1},
   {position: 68, size: 1},
-  {position: 78, size: 3},
+  {position: 76, size: 3},
   {position: 86, size: 2},
   {position: 105, size: 1},
   {position: 116, size: 1},
-  {position: 122, size: 3},
-  {position: 130, size: 2},
+  {position: 125, size: 3},
+  {position: 134, size: 2},
 ]
 
 const Sky = () =>{

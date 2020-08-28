@@ -1,20 +1,13 @@
-import { useState, useRef, useEffect } from 'react'
-import { useAppContext } from 'contexts/AppContext'
+const size = 64
 
-const Brick = ({position, size}) => {
-  const { objects, setObjects } = useAppContext()
-
-  useEffect(() => {
-    setObjects( objects.push( { x: position * 64, y: 16 * size, width: 64, height: 16 * size } ) )
-  }, []);
-
+const Brick = ({x, y}) => {
   return (
     <>
-    
-      <div className={`flex flex-wrap absolute bg-brick-dark border-b-4 border-black bottom-0 mb-64`} style={{left: `${position * 64}px`, width:  `${size * 64}px`}}>
-      {
-      Array(size).fill(1).map((x, k) => (
-        <div className="flex flex-wrap w-16 h-15" key={`bricks_${k}`}>
+      <div 
+        className={`flex flex-wrap absolute bg-brick-dark border-b-4 border-black bottom-0`} 
+        style={{left: `${x * size}px`, bottom: `${(y * size)}px`}}>
+
+        <div className="flex flex-wrap w-16 h-15" >
           <div className="h-full w-full border-t-4 border-brick-light">
             <div className="h-3 w-full border-r-4 border-b-4 border-black">
               <div className="h-full w-8 border-r-4 border-black">
@@ -34,8 +27,6 @@ const Brick = ({position, size}) => {
             </div>
           </div>    
         </div>
-          ))
-        }
       </div>
     
     </>

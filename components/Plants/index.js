@@ -8,8 +8,8 @@ const m = [
   {position: 71, size: 1},
   {position: 90, size: 2},
   {position: 108, size: 3},
-  {position: 118, size: 1},
-  {position: 134, size: 2},
+  {position: 120, size: 1},
+  {position: 138, size: 2},
 ]
 
 const Plants = () =>{

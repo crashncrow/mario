@@ -27,7 +27,7 @@ var useDoubleClick = function useDoubleClick(_ref) {
       onDoubleClick = _ref$onDoubleClick === void 0 ? function () {
     return null;
   } : _ref$onDoubleClick;
-  (0, _react.useEffect)(function () {
+  (0, _react.useLayoutEffect)(function () {
     var clickRef = ref.current;
     var clickCount = 0;
 

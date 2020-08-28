@@ -1,4 +1,4 @@
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef } from 'react'
 import useDoubleClick from 'hooks/clicks'
 
 import Head from 'next/head'
@@ -12,85 +12,155 @@ import Brick from 'components/Brick'
 import Box from 'components/Box'
 
 import { useAppContext } from 'contexts/AppContext'
+const debug = true
+const elements = [
+  { type: 'Box', x: 17, y: 4, size: 1, width: 64, height: 64 },
+  { type: 'Box', x: 22, y: 4, size: 1, width: 64, height: 64 },
+  { type: 'Box', x: 23, y: 7, size: 1, width: 64, height: 64 },
+  { type: 'Box', x: 24, y: 4, size: 1, width: 64, height: 64 },
+  { type: 'Box', x: 81, y: 7, size: 1, width: 64, height: 64 },
+  { type: 'Box', x: 95, y: 7, size: 1, width: 64, height: 64 },
 
-const purge = [
-  'w-1',  'w-2',  'w-3',  'w-4',  'w-5',  'w-6',  'w-7', 'w-8', 
-  'w-9',  'w-10', 'w-11', 'w-12', 'w-13', 'w-14', 'w-15', 
-  'w-16', 'w-17', 'w-18', 'w-19', 'w-20', 'w-21', 'w-22',
-  'w-23', 'w-24', 'w-25', 'w-26', 'w-27', 'w-28', 'w-29', 
-  'w-30', 'w-31', 'w-32', 'w-33', 'w-34', 'w-35', 'w-36', 
-  'w-37', 'w-38', 'w-39', 'w-40', 'w-41', 'w-42', 'w-43', 
-  'w-44', 'w-45', 'w-46', 'w-47', 'w-48', 'w-49', 'w-50', 
-  'w-51', 'w-52', 'w-53', 'w-54', 'w-55', 'w-56', 'w-57', 
-  'w-58', 'w-59', 'w-60', 'w-61', 'w-62', 'w-63', 'w-64', 
-  'w-65', 'w-66', 'w-67', 'w-68', 'w-69', 'w-70', 'w-71', 
-  'w-72', 'w-73', 'w-74', 'w-75', 'w-76', 'w-77', 'w-78', 
-  'w-79', 'w-80', 
+  
+  { type: 'Box', x: 107, y: 4, size: 1, width: 64, height: 64 },
+  { type: 'Box', x: 110, y: 4, size: 1, width: 64, height: 64 },
+  { type: 'Box', x: 110, y: 7, size: 1, width: 64, height: 64 },
+  { type: 'Box', x: 113, y: 4, size: 1, width: 64, height: 64 },
+  { type: 'Box', x: 130, y: 7, size: 1, width: 64, height: 64 },
+  { type: 'Box', x: 131, y: 7, size: 1, width: 64, height: 64 },
 
-  'ml-9', 'ml-10', 'ml-11', 'ml-12', 'ml-13', 'ml-14', 'ml-15', 
-  'ml-16', 'ml-17', 'ml-18', 'ml-19', 'ml-20', 'ml-21', 'ml-22',
-  'ml-23', 'ml-24', 'ml-25', 'ml-26', 'ml-27', 'ml-28', 'ml-29',
-  'ml-30', 'ml-31', 'ml-32', 'ml-33', 'ml-34', 'ml-35'
+  { type: 'Brick', x: 21, y: 4, size: 1, width: 64, height: 64 },
+  { type: 'Brick', x: 23, y: 4, size: 1, width: 64, height: 64 },
+  { type: 'Brick', x: 25, y: 4, size: 1, width: 64, height: 64 },
+  { type: 'Brick', x: 78, y: 4, size: 1, width: 64, height: 64 },
+  { type: 'Brick', x: 79, y: 4, size: 1, width: 64, height: 64 },
+  { type: 'Brick', x: 80, y: 4, size: 1, width: 64, height: 64 },
+  { type: 'Brick', x: 82, y: 7, size: 1, width: 64, height: 64 },
+  { type: 'Brick', x: 83, y: 7, size: 1, width: 64, height: 64 },
+  { type: 'Brick', x: 84, y: 7, size: 1, width: 64, height: 64 },
+  { type: 'Brick', x: 85, y: 7, size: 1, width: 64, height: 64 },
+  { type: 'Brick', x: 86, y: 7, size: 1, width: 64, height: 64 },
+  { type: 'Brick', x: 87, y: 7, size: 1, width: 64, height: 64 },
+  { type: 'Brick', x: 88, y: 7, size: 1, width: 64, height: 64 },
+  { type: 'Brick', x: 92, y: 7, size: 1, width: 64, height: 64 },
+  { type: 'Brick', x: 93, y: 7, size: 1, width: 64, height: 64 },
+  { type: 'Brick', x: 94, y: 7, size: 1, width: 64, height: 64 },
+  { type: 'Brick', x: 95, y: 4, size: 1, width: 64, height: 64 },
+  { type: 'Brick', x: 100, y: 4, size: 1, width: 64, height: 64 },
+  { type: 'Brick', x: 101, y: 4, size: 1, width: 64, height: 64 },
+  { type: 'Brick', x: 119, y: 4, size: 1, width: 64, height: 64 },
+
+  { type: 'Brick', x: 122, y: 7, size: 1, width: 64, height: 64 },
+  { type: 'Brick', x: 123, y: 7, size: 1, width: 64, height: 64 },
+  { type: 'Brick', x: 124, y: 7, size: 1, width: 64, height: 64 },
+
+  
+  { type: 'Brick', x: 129, y: 7, size: 1, width: 64, height: 64 },
+  { type: 'Brick', x: 130, y: 4, size: 1, width: 64, height: 64 },
+  { type: 'Brick', x: 131, y: 4, size: 1, width: 64, height: 64 },
+  { type: 'Brick', x: 132, y: 7, size: 1, width: 64, height: 64 },
+
+  { type: 'Pipe', x: 29, y:1, size: 1, width: 128, height: 128 },
+  { type: 'Pipe', x: 39, y:1, size: 2, width: 128, height: 192 },
+  { type: 'Pipe', x: 47, y:1, size: 3, width: 128, height: 256 },
+  { type: 'Pipe', x: 58, y:1, size: 3, width: 128, height: 256 }
 ]
 
 export default function Home() {
-  const buttonRef = useRef();
-  const { jump } = useAppContext()
+  const buttonRef = useRef()
+  const { left, bottom, setBottom, setObjects, checkCollision } = useAppContext()
+
+  useEffect(() => {
+    console.log('Set objects', elements)
+    setObjects(elements)
+  }, [])
+
+  const jump = ( limit ) => {
+    let j = 0
+
+      for(let i = 1; i * 64 <= limit; i++ ){
+        if( !checkCollision(left, bottom + (i * 64) + 64)){
+          j = i * 64
+        }
+        else{
+          break
+        }
+      }
+
+      return j
+  }
 
   useDoubleClick({
-    onSingleClick: e => {
-      console.log(e, 'single click');
-      jump(1)
+    onSingleClick: (e) => {
+      console.log('single click', elements)
+      setBottom(bottom + (jump(128)) + 64)
+
+      setTimeout(() => {
+        setBottom(64)
+        checkCollision(left, bottom + 64)
+      }, 200)
     },
-    onDoubleClick: e => {
-      console.log(e, 'double click');
-      jump(2)
+    onDoubleClick: (e) => {
+      console.log('double click', elements)
+      setBottom(bottom + (jump(320)) + 64)
+      
+      setTimeout(() => {
+        setBottom(64)
+        checkCollision(left, bottom + 64)
+      }, 200)
     },
     ref: buttonRef,
     latency: 250
-  });
-
-  useEffect(() => {
-    // document.addEventListener('click', jump)
-    // return () => {
-    //     document.removeEventListener('click', jump);
-    // }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [])
+  })
 
   return (
     <>
-    <div className="w-full h-full fixed z-50" ref={buttonRef}></div>
-    <div className="h-screen overflow-x-scroll">
-      <Head>
-        <title>It's Me, Mario!</title>
-        <link rel="icon" href="/favicon.ico" />
-        <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-      </Head>
+      <div className='w-full h-full fixed z-50' ref={buttonRef}></div>
+      <div className='h-screen overflow-x-scroll'>
+        <Head>
+          <title>It's Me, Mario!</title>
+          <link rel='icon' href='/favicon.ico' />
+          <meta
+            name='viewport'
+            content='width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no'
+          />
+        </Head>
 
-      <main className="h-full w-full">
-        <Mario />
-        <Sky />
-        <Plants />
-        <Mountains />
+        <main className='h-full w-full'>
+          <Mario />
+          <Sky />
+          <Plants />
+          <Mountains />
 
-        <Box position={17} size={1}/>
+          <div className='inline-block'>
+          
 
-        <Brick position={21} size={1}/>
-        <Box position={22} size={1}/>
-        <Brick position={23} size={1}/>
-        <Box position={24} size={1}/>
-        <Brick position={25} size={1}/>
+            {debug && elements.map((o, i) => (
+              <div
+                key={i}
+                className='absolute border-4 border-mario-red z-50'
+                style={{
+                  bottom: `${(o.y * 64) }px`,
+                  left: `${(o.x * 64)}px`,
+                  height: `${o.height}px`,
+                  width: `${o.width}px`
+                }}
+              ></div>
+            ))}
 
-        <div className="inline-block">            
-          <Pipe position={29} size={1}/>                    
-          <Pipe position={39} size={2}/>
-          <Pipe position={47} size={3}/>
-          <Pipe position={58} size={3}/>
-        </div>
-      </main>
-    </div>
-    <Floor />
+            {elements.map((el, i) => {
+              if (el.type === 'Box') {
+                return <Box x={el.x} y={el.y} size={el.size} key={i}/>
+              } else if (el.type === 'Brick') {
+                return <Brick x={el.x} y={el.y} size={el.size} key={i}/>
+              } else {
+                return <Pipe x={el.x} size={el.size} key={i}/>
+              }
+            })}
+          </div>
+        </main>
+      </div>
+      <Floor />
     </>
   )
 }

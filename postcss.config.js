@@ -4,6 +4,7 @@ const purgecss = [
     content: [
       './components/**/*.js',
       './pages/**/*.js',
+      './libs/**/*.js',
     ],
     defaultExtractor: (content) => content.match(/[\w-/:]+(?<!:)/g) || [],
   },
