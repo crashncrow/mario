@@ -1,10 +1,13 @@
+import React, { useState, useEffect } from 'react'
+
 const size = 64
 
-const Brick = ({x, y}) => {
+const Brick = ({x, y, touches}) => {
+
   return (
     <>
       <div 
-        className={`flex flex-wrap absolute bg-brick-dark border-b-4 border-black bottom-0`} 
+        className={`flex flex-wrap absolute bg-brick-dark border-b-4 border-black bottom-0 ${touches ? 'mb-2' : ''}`} 
         style={{left: `${x * size}px`, bottom: `${(y * size)}px`}}>
 
         <div className="flex flex-wrap w-16 h-15" >

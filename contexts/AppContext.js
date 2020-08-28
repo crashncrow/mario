@@ -3,7 +3,7 @@ import React, { createContext, useContext, useState, useEffect } from 'react'
 const AppContext = createContext(null)
 
 export const AppContextProvider = ({ children }) => {
-  const [debug] = useState(true)
+  const [debug] = useState(false)
   const [left, setLeft] = useState(100)
   const [bottom, setBottom] = useState(64)
   const [objects, setObjects] = useState([])
@@ -34,15 +34,20 @@ export const AppContextProvider = ({ children }) => {
   const checkCollision = (x, y) => {
     let toco = false
     // console.log('CHECK COLLISIONS')
-    // console.log(objects)
+    console.log(objects)
+    let objs = [...objects]
 
-    objects.map((obj,i) => {
+    objs.map((obj,i) => {
       // console.log('X', x, (obj.x * 64),  (obj.x * 64) + obj.width)
       // console.log('Y', y, (obj.y * 64),  (obj.y * 64) + obj.height)
 
       if (
         x < (obj.x * 64) + obj.width && x + 64 > (obj.x * 64) && 
         y >= (obj.y * 64) && y <= (obj.y * 64) + obj.height) {
+          
+          if(obj.type === 'Brick' || obj.type === 'Box'){
+            obj.touches++
+          }
          setCollision(true)
          console.log('COLLISION')
          toco = true
@@ -50,7 +55,11 @@ export const AppContextProvider = ({ children }) => {
     })
 
     if(!toco){
+        
         setCollision(false)
+    }
+    else{
+      setObjects(objs)
     }
     
     return toco

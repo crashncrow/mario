@@ -1,10 +1,10 @@
 const size = 64
 
-const Box = ({ x, y }) => {
+const Box = ({ x, y, touches }) => {
   return (
     <>
       <div
-        className='flex flex-wrap absolute bottom-0'
+        className={`flex flex-wrap absolute bottom-0 ${touches ? 'mb-2' : ''}`}
         style={{left: `${x * size}px`, bottom: `${(y * size)}px`}}
       >
         <div className='flex flex-wrap w-16 h-16'>
