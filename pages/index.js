@@ -1,4 +1,4 @@
-import { useEffect, useRef } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import useDoubleClick from 'hooks/clicks'
 
 import Head from 'next/head'
@@ -12,7 +12,7 @@ import Brick from 'components/Brick'
 import Box from 'components/Box'
 
 import { useAppContext } from 'contexts/AppContext'
-const debug = true
+
 const elements = [
   { type: 'Box', x: 17,  y: 4, size: 1, width: 64, height: 64 },
   { type: 'Box', x: 22,  y: 4, size: 1, width: 64, height: 64 },
@@ -68,21 +68,10 @@ const elements = [
 
 export default function Home() {
   const buttonRef = useRef()
-  const { left, bottom, setBottom, setObjects, collision, checkCollision } = useAppContext()
-
-
+  const { debug, left, bottom, setBottom, setObjects, collision, checkCollision, setJumping } = useAppContext()
 
   useEffect(() => {
-    // console.log('Set objects', elements)
     setObjects(elements)
-
-    // setInterval(async () => {
-    //   console.log('CHECKKKK!')
-    //   console.log('left', left, 'bottom', bottom)
-    //   if(!checkCollision(left, bottom)){
-    //     setBottom(bottom - 64)
-    //   }
-    // }, 500);
   }, [])
 
   const jump = ( limit ) => {
@@ -104,22 +93,26 @@ export default function Home() {
     onSingleClick: (e) => {
       console.log('single click')
       if(collision){
-        setBottom(bottom + (jump(128)) + 64)
+        setJumping(true)
+        setBottom(bottom => bottom + (jump(128)) + 64)
 
         setTimeout(() => {
+          setJumping(false)
           // setBottom(64)
-          checkCollision(left, bottom + 64)
+          // checkCollision(left, bottom + 64)
         }, 200)
       }
     },
     onDoubleClick: (e) => {
       console.log('double click')
       if(collision){
-        setBottom(bottom + (jump(320)) + 64)
+        setJumping(true)
+        setBottom(bottom => bottom + (jump(320)) + 64)
         
         setTimeout(() => {
+          setJumping(false)
           // setBottom(64)
-          checkCollision(left, bottom + 64)
+          // checkCollision(left, bottom + 64)
         }, 200)
       }
     },
@@ -162,13 +155,13 @@ export default function Home() {
               ></div>
             ))}
 
-            <div
+            {debug && <div
               className='absolute border-4 border-mario-brown z-50 w-1 h-1'
               style={{
                 bottom: `${(bottom) }px`,
                 left: `${(left)}px`,
               }}
-            ></div>
+            ></div>}
 
             {elements.map((el, i) => {
               if (el.type === 'Box') {

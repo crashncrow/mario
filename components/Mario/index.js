@@ -118,7 +118,7 @@ const size = 64
 
 const Mario = () =>{
   const { height } = useWindowDimensions();
-  const { left, setLeft, bottom, collision } = useAppContext()
+  const { debug, left, setLeft, bottom, collision } = useAppContext()
 
   const [ reverse, setReverse ] = useState(false)
   const [ matrix1 ] = useState(processFullArray(m1))
@@ -214,7 +214,7 @@ const Mario = () =>{
   return (
     <>
     { 
-      <div id="border_mario"
+      debug && <div id="border_mario"
       className='absolute border-4 border-mario-red z-50'
       style={{
         bottom: `${bottom}px`,
@@ -234,7 +234,7 @@ const Mario = () =>{
 
     <div 
       ref={redBoxRef} 
-      className={`flex flex-wrap w-16 absolute bottom-0 z-50 ${collision ? 'bg-black' : ''}`}
+      className={`flex flex-wrap w-16 absolute bottom-0 z-50 ${collision && debug? 'bg-black' : ''}`}
       style={{left: `${left}px`, bottom: `${bottom}px`}}>
 
       {m.map((x, i) => {

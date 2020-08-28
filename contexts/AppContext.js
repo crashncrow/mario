@@ -3,25 +3,33 @@ import React, { createContext, useContext, useState, useEffect } from 'react'
 const AppContext = createContext(null)
 
 export const AppContextProvider = ({ children }) => {
+  const [debug] = useState(true)
   const [left, setLeft] = useState(100)
   const [bottom, setBottom] = useState(64)
   const [objects, setObjects] = useState([])
   const [collision, setCollision] = useState(false)
 
+  const [jumping, setJumping] = useState(false)
+ 
   const [jump, setJump] = useState(0)
 
   useEffect(() => {
-    // console.log('bottom', bottom)
-    checkCollision(left, bottom)
+    if(!checkCollision(left, bottom) && left > 100  && !jumping){
+      setBottom(bottom => bottom - 64)
+    }
   }, [bottom])
 
-  useEffect(() => {
-    // console.log('left', left)
-    
-    if(!checkCollision(left, bottom) && left > 100){
-      setBottom(bottom - 64)
+  useEffect(() => {    
+    if(!checkCollision(left, bottom) && left > 100 && !jumping){
+      setBottom(bottom => bottom - 64)
     }
   }, [left])
+
+  useEffect(() => {    
+    if(!checkCollision(left, bottom) && left > 100 && !jumping){
+      setBottom(bottom => bottom - 64)
+    }
+  }, [jumping])
 
   const checkCollision = (x, y) => {
     let toco = false
@@ -51,6 +59,7 @@ export const AppContextProvider = ({ children }) => {
   return (
     <AppContext.Provider
       value={{
+        debug: debug,
         left: left,
         bottom: bottom,
         objects: objects,
@@ -59,6 +68,7 @@ export const AppContextProvider = ({ children }) => {
         setBottom: setBottom,
         setObjects: setObjects,
         checkCollision: checkCollision,
+        setJumping: setJumping
       }}
     >
       {children}
