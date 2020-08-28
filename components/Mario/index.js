@@ -153,12 +153,14 @@ const Mario = () =>{
         
       }
 
-      if(!reverse){
-        setLeft(left + 30)
-      }
-      else{
-        setLeft(left - 30)
-      }
+      // if(!reverse){
+      //   setLeft(left + 30)
+      // }
+      // else{
+      //   setLeft(left - 30)
+      // }
+
+      setLeft(currPos.x - 100)
       
       //if(!collision){
         //setLeft(left + 20)
