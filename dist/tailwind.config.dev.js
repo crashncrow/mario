@@ -12,7 +12,9 @@ module.exports = {
         'brick-dark': '#db6c03',
         'mario-red': '#d82801',
         'mario-skin': '#fd9838',
-        'mario-brown': '#886f03'
+        'mario-brown': '#886f03',
+        'box-yellow': '#feb600',
+        'box-orange': '#db6c03'
       },
       backgroundImage: function backgroundImage(theme) {
         return {

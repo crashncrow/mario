@@ -32,7 +32,7 @@ export const AppContextProvider = ({ children }) => {
   const checkCollision = (x, y) => {
     let toco = false
     // console.log('CHECK COLLISIONS')
-    console.log(objects)
+    // console.log(objects)
     let objs = [...objects]
 
     objs.map((obj,i) => {

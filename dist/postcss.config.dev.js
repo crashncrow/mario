@@ -15,5 +15,5 @@ var purgecss = ['@fullhuman/postcss-purgecss', {
   }
 }];
 module.exports = {
-  plugins: ['postcss-import', 'tailwindcss', 'autoprefixer'].concat(_toConsumableArray(process.env.NODE_ENV === 'production' ? [purgecss] : [purgecss]))
+  plugins: ['postcss-import', 'tailwindcss', 'autoprefixer'].concat(_toConsumableArray(process.env.NODE_ENV === 'production' ? [purgecss] : []))
 };
