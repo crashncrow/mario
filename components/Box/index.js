@@ -1,10 +1,26 @@
+import { useState, useEffect } from 'react'
+
 const size = 64
 
 const Box = ({ x, y, touches }) => {
+  const [ jumps, setJumps ] = useState(0)
+
+  useEffect(() => {
+
+  }, [])
+
+  const incrementJump = () => {
+    setTimeout(() => {
+      setJumps(touches)
+    }, 200)
+    
+    return 'mb-2'
+  }
+
   return (
     <>
       <div
-        className={`flex flex-wrap absolute bottom-0 ${touches ? 'mb-2' : ''}`}
+        className={`flex flex-wrap absolute bottom-0 ${touches !== jumps ? incrementJump() : ''}`}
         style={{left: `${x * size}px`, bottom: `${(y * size)}px`}}
       >
         <div className='flex flex-wrap w-16 h-16'>

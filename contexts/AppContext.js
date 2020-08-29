@@ -10,8 +10,6 @@ export const AppContextProvider = ({ children }) => {
   const [collision, setCollision] = useState(false)
 
   const [jumping, setJumping] = useState(false)
- 
-  const [jump, setJump] = useState(0)
 
   useEffect(() => {
     if(!checkCollision(left, bottom) && left > 100  && !jumping){
