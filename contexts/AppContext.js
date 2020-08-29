@@ -39,22 +39,23 @@ export const AppContextProvider = ({ children }) => {
       // console.log('X', x, (obj.x * 64),  (obj.x * 64) + obj.width)
       // console.log('Y', y, (obj.y * 64),  (obj.y * 64) + obj.height)
 
-      if (
-        x < (obj.x * 64) + obj.width && x + 64 > (obj.x * 64) && 
-        y >= (obj.y * 64) && y <= (obj.y * 64) + obj.height) {
+      if ( x < (obj.x * 64) + obj.width && x + 64 > (obj.x * 64) && 
+        y >= (obj.y * 64) && y <= (obj.y * 64) + obj.height ) {
           
           if(obj.type === 'Brick' || obj.type === 'Box'){
-            obj.touches++
+            if ( y <= obj.y * 64 ) {
+              obj.touches++
+            }
           }
-         setCollision(true)
-         console.log('COLLISION')
-         toco = true
+
+          setCollision(true)
+          console.log('COLLISION')
+          toco = true
       }
     })
 
-    if(!toco){
-        
-        setCollision(false)
+    if(!toco) {  
+      setCollision(false)
     }
     else{
       setObjects(objs)
