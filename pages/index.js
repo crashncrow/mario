@@ -131,7 +131,20 @@ export default function Home() {
             name='viewport'
             content='width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no'
           />
+          <link href="https://fonts.googleapis.com/css?family=Press+Start+2P" rel="stylesheet"></link>
         </Head>
+
+        <div className="top-0">
+          <div className="fixed left-0 p-4">
+          <div className="text-white">MARIO</div>
+          <div className="text-white">000000</div>
+          </div>
+
+          <div className="fixed right-0 p-4 text-right">
+            <div className="text-white">TIME</div>
+            <div className="text-white">400</div>
+          </div>
+        </div>
 
         <main className='h-full w-full'>
           <Mario />

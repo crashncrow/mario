@@ -14,7 +14,7 @@ const Box = ({ x, y, touches }) => {
       setJumps(touches)
     }, 200)
     
-    return 'mb-2'
+    return jumps ? '' : 'mb-2'
   }
 
   return (
