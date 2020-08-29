@@ -26,6 +26,14 @@ const Mountain = ({position, size}) =>{
               <div className="absolute left-0 top-0 h-4 w-2 bg-black mt-7 ml-41"></div>
               <div className="absolute left-0 top-0 h-4 w-3 bg-black mt-4 ml-44"></div>
               <div className="absolute left-0 top-0 h-6 w-1 bg-black mt-3 ml-45"></div>
+
+              <div className="absolute left-0 top-0 h-4 w-2 bg-black mt-22 ml-26"></div>
+              <div className="absolute left-0 top-0 h-4 w-3 bg-black mt-19 ml-29"></div>
+              <div className="absolute left-0 top-0 h-6 w-1 bg-black mt-18 ml-30"></div>
+
+              <div className="absolute left-0 top-0 h-4 w-2 bg-black mt-22 ml-48"></div>
+              <div className="absolute left-0 top-0 h-4 w-3 bg-black mt-19 ml-51"></div>
+              <div className="absolute left-0 top-0 h-6 w-1 bg-black mt-18 ml-52"></div>
             </>
           :
             <>

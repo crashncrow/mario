@@ -5,14 +5,12 @@ const size = 64
 const Box = ({ x, y, touches }) => {
   const [ jumps, setJumps ] = useState(0)
 
-  useEffect(() => {
-
-  }, [])
-
   const incrementJump = () => {
-    setTimeout(() => {
-      setJumps(touches)
-    }, 200)
+    if(!jumps) {
+      setTimeout(() => {
+        setJumps(touches)
+      }, 200)
+    }
     
     return jumps ? '' : 'mb-2'
   }

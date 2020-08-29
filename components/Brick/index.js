@@ -5,10 +5,6 @@ const size = 64
 const Brick = ({x, y, touches}) => {
   const [ jumps, setJumps ] = useState(0)
 
-  useEffect(() => {
-
-  }, [])
-
   const incrementJump = () => {
     setTimeout(() => {
       setJumps(touches)
