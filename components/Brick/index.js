@@ -1,8 +1,8 @@
-import { useState, useEffect } from 'react'
-
-const size = 64
+import { useState } from 'react'
+import { useAppContext } from 'contexts/AppContext'
 
 const Brick = ({x, y, touches}) => {
+  const { pixels } = useAppContext()
   const [ jumps, setJumps ] = useState(0)
 
   const incrementJump = () => {
@@ -17,7 +17,7 @@ const Brick = ({x, y, touches}) => {
     <>
       <div 
         className={`flex flex-wrap absolute bg-brick-dark border-b-4 border-black bottom-0 ${touches !== jumps ? incrementJump() : ''}`} 
-        style={{left: `${x * size}px`, bottom: `${(y * size)}px`}}>
+        style={{left: `${x * pixels}px`, bottom: `${(y * pixels)}px`}}>
 
         <div className="flex flex-wrap w-16 h-15" >
           <div className="h-full w-full border-t-4 border-brick-light">
@@ -40,7 +40,6 @@ const Brick = ({x, y, touches}) => {
           </div>    
         </div>
       </div>
-    
     </>
   )
 }

@@ -1,7 +1,10 @@
+import { useAppContext } from 'contexts/AppContext'
 
-const Mountain = ({position, size}) =>{
+const Mountain = ({x, size}) => {
+  const { pixels } = useAppContext()
+
   return (
-    <div className="absolute bottom-0 left-0 mb-16 " style={{left: `${position * 64}px` }}>
+    <div className="absolute bottom-0 left-0 mb-16 " style={{left: `${x * pixels}px` }}>
         {
           Array((size === 2? 35 : 16)).fill(1).map((x, i, elements) => {
             if(i > 2){

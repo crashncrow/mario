@@ -1,6 +1,5 @@
 import { useState, useRef, useEffect } from 'react'
 import { useScrollPosition } from 'hooks/scroll'
-import { useWindowDimensions } from 'hooks/window'
 import { useAppContext } from 'contexts/AppContext'
 import { processFullArray } from 'libs/pixless'
 
@@ -29,7 +28,6 @@ const PositionStore = () => {
     renderCount
   }
 }
-
 
 const c = {
   0: '', // bg-transparent
@@ -114,79 +112,56 @@ const m3 = [
   [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
 ]
 
-const size = 64
+const matrix1 = processFullArray(m1)
+const matrix2 = processFullArray(m2)
+const matrix3 = processFullArray(m3)
 
-const Mario = () =>{
-  const { height } = useWindowDimensions();
-  const { debug, left, setLeft, bottom, collision } = useAppContext()
+const Mario = () => {
+  const { canWalkLeft, canWalkRight, pixels, debug, left, setLeft, bottom, collision } = useAppContext()
 
   const [ reverse, setReverse ] = useState(false)
-  const [ matrix1 ] = useState(processFullArray(m1))
-  const [ matrix2 ] = useState(processFullArray(m2))
-  const [ matrix3 ] = useState(processFullArray(m3))
-  
   const [ index, setIndex ] = useState(1)
-  const [ m, setM ] = useState(matrix1)
+  const [ currentMatrix, setCurrentMatrix ] = useState(matrix1)
 
   const positionsStore = PositionStore()
   const viewportRef = useRef(null)
-  const redBoxRef = useRef(null)
+
 
   // Viewport scroll position
   useScrollPosition(
     ({ prevPos, currPos }) => {
       positionsStore.setViewportPosition(currPos)
-      const { style } = viewportRef.current
-      style.top = `${150 + currPos.y}px`
-      style.left = `${10 + currPos.x}px`
 
-
-      if((prevPos.x < currPos.x) && reverse){
+      if((prevPos.x < currPos.x) && reverse) {
         setReverse(false)
-        
       }
-      else if ((prevPos.x > currPos.x) && !reverse){
+      else if ((prevPos.x > currPos.x) && !reverse) {
         setReverse(true)
-        
       }
 
-      // if(!reverse){
-      //   setLeft(left + 30)
-      // }
-      // else{
-      //   setLeft(left - 30)
-      // }
-
-      setLeft(currPos.x + 100)
+      if(left > currPos.x + 100){
+        if(canWalkLeft) {
+          setLeft(currPos.x + 100)
+        }
+      }
+      else{
+        if(canWalkRight) {
+          setLeft(currPos.x + 100)
+        }
+      }
       
-      //if(!collision){
-        //setLeft(left + 20)
-      //}
-
-      setIndex(index + 1)
+      setIndex(index => index + 1)
     },
     [positionsStore],
     null,
     true
   )
 
-  // Element scroll position
-  useScrollPosition(
-    ({ currPos }) => {
-      positionsStore.setElementPosition(currPos)
-    },
-    [],
-    redBoxRef,
-    false,
-    300
-  )
-
   // const scrollHandler = _ => {
   //   console.log('scrollHandler', left)
-  //   // // const x = left;
-  //   // const x = positionsStore.getViewportX() + 100 // <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<< ---------------
-  //   // const y = height - bottom - size
-  //   // checkCollision(left, bottom + 64)
+  //   const x = positionsStore.getViewportX() + 100 
+  //   const y = height - bottom - pixels
+  //   checkCollision(left, bottom + pixels)
   // }
 
   // useEffect(() => {
@@ -198,16 +173,16 @@ const Mario = () =>{
 
   useEffect(() => {
     if(index % 4 == 1){
-      setM(matrix2)
+      setCurrentMatrix(matrix2)
     }
     else if(index % 4 == 2){
-      setM(matrix3)
+      setCurrentMatrix(matrix3)
     }
     else if(index % 4 == 3){
-      setM(matrix2)
+      setCurrentMatrix(matrix2)
     }
     else{
-      setM(matrix1)
+      setCurrentMatrix(matrix1)
     }
   }, [index])
 
@@ -218,12 +193,13 @@ const Mario = () =>{
       className='absolute border-4 border-mario-red z-50'
       style={{
         bottom: `${bottom}px`,
-        left: `${left}px`,
-        height: `${size}px`,
-        width: `${size}px`
+        left: `${left + 10}px`,
+        height: `${pixels}px`,
+        width: `${pixels - 20}px`
       }}
     ></div>
     }
+
     <div className="hidden fixed top-0" style={{width: '5000px'}}>
       <div ref={viewportRef}>
         <div>Deferred Rendering: {positionsStore.renderCount}</div>
@@ -233,11 +209,10 @@ const Mario = () =>{
     </div>
 
     <div 
-      ref={redBoxRef} 
-      className={`flex flex-wrap w-16 absolute bottom-0 z-50 ${collision && debug? 'bg-black' : ''}`}
+      className={`flex flex-wrap w-16 absolute bottom-0 z-40 ${collision && debug? 'bg-black' : ''}`}
       style={{left: `${left}px`, bottom: `${bottom}px`}}>
 
-      {m.map((x, i) => {
+      {currentMatrix.map((x, i) => {
         if(reverse){
           // reverse without mutate
           return x.slice().reverse().map((y, j) => (

@@ -1,9 +1,15 @@
+import { useAppContext } from 'contexts/AppContext'
+import { useWindowDimensions } from 'hooks/window'
+
 const Floor = ({x, y, size}) => {
+  const { pixels, left } = useAppContext()
+  const { width } = useWindowDimensions();
+
   return (
-    <div className="absolute bottom-0" style={{left: `${x * 64}px`}}>
+    <div className="absolute bottom-0" style={{left: `${x * pixels}px`}}>
       <div className='inline-flex'>
           {
-            Array(size).fill(1).map((x, j) => (
+            Array(Math.min(size, parseInt((left + width) / pixels))).fill(1).map((ele, j) => (
               <div className={`flex flex-wrap w-16 bg-brick-dark mb-0`} key={`floor_${j}}`}>
                 <div className="flex flex-wrap w-16 h-16">
                   <div className="w-10 h-15 b">

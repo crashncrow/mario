@@ -1,6 +1,4 @@
-import { useState, useRef, useEffect } from 'react'
 import { useAppContext } from 'contexts/AppContext'
-import { useWindowDimensions } from 'hooks/window'
 
 const c = {
   0: '', // bg-transparent
@@ -42,13 +40,11 @@ const t2 = [
   2, 0, 2
 ]
 
-const Pipe = ({x, size}) =>{
-  const { height, width } = useWindowDimensions();
-  // useEffect(() => {
-  // }, []);
+const Pipe = ({x, size}) => {
+  const { pixels } = useAppContext()
 
   return (
-    <div className="flex flex-wrap absolute w-32 bottom-0" style={{left: `${x * 64}px`, bottom: `${64}px`}}>
+    <div className="flex flex-wrap absolute w-32 bottom-0" style={{left: `${x * pixels}px`, bottom: `${pixels}px`}}>
       <div className="flex flex-wrap bg-green-light w-32 h-15 border-4 border-black pb-1">
         <div className="mt-1 w-5 mb-4 h-full border-t-4 border-r-8 border-green-dark"></div>
         <div className="flex flex-wrap mt-1 w-19 mb-4 ml-6 h-full border-t-4 border-l-4 border-green-dark">

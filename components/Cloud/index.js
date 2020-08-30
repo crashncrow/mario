@@ -1,5 +1,6 @@
-import { processFullArray } from 'libs/pixless'
 import { useState, useEffect } from 'react'
+import { useAppContext } from 'contexts/AppContext'
+import { processFullArray } from 'libs/pixless'
 
 const c = {
   0: '',//bg-transparent
@@ -90,7 +91,9 @@ const m3 =[
 
 // cons pxls = m.splite
 
-const Cloud = ({position, size}) =>{
+const Cloud = ({x, size}) =>{
+  const { pixels } = useAppContext()
+
   const [matrix1, setMatrix1 ] = useState([])
   const [matrix2, setMatrix2 ] = useState([])
   const [matrix3, setMatrix3 ] = useState([])
@@ -102,7 +105,7 @@ const Cloud = ({position, size}) =>{
   }, [])
 
   return (
-    <div className={`flex flex-wrap absolute w-${16 + (16 * size)} mb-64 pb-64 bottom-0`} style={{left: `${position * 64}px`}}>
+    <div className={`flex flex-wrap absolute w-${16 + (16 * size)} mb-64 pb-64 bottom-0`} style={{left: `${x * pixels}px`}}>
       <div className="flex flex-wrap w-8">
       {matrix1.map((x, i) => (
         x.map((y, j) => (
