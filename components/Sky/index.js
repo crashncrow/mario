@@ -1,5 +1,4 @@
 import { useAppContext } from 'contexts/AppContext'
-import { useWindowDimensions } from 'hooks/window'
 import Cloud from 'components/Cloud'
 
 const m = [
@@ -18,13 +17,12 @@ const m = [
 ]
 
 const Sky = () =>{
-  const { pixels, left } = useAppContext()
-  const { width } = useWindowDimensions();
+  const { renderLimit, pixels } = useAppContext()
 
   return (
     <>
       {
-        m.filter(el => el.x * pixels < left + width).map((cloud, i) => (
+        m.filter(el => el.x * pixels < renderLimit).map((cloud, i) => (
           <Cloud x={cloud.x} size={cloud.size} key={`cloud_${i}`}/>
         ))
       }

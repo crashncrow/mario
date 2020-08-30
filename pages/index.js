@@ -1,6 +1,5 @@
 import { useEffect, useRef, useState } from 'react'
 import useDoubleClick from 'hooks/clicks'
-import { useWindowDimensions } from 'hooks/window'
 
 import Head from 'next/head'
 import Sky from 'components/Sky'
@@ -17,11 +16,11 @@ import { elements } from 'libs/elements'
 import { useAppContext } from 'contexts/AppContext'
 
 export default function Home() {
-  const { width } = useWindowDimensions()
 
   const buttonRef = useRef()
   const {
     debug,
+    renderLimit,
     pixels,
     left,
     bottom,
@@ -104,22 +103,19 @@ export default function Home() {
 
           <div className='inline-block'>
             {debug &&
-              elements.map((o, i) => {
-                if (left + width > o.x * pixels) {
-                  return (
-                    <div
-                      key={i}
-                      className='absolute border-4 border-mario-red z-50'
-                      style={{
-                        bottom: `${o.y * pixels}px`,
-                        left: `${o.x * pixels}px`,
-                        height: `${o.height}px`,
-                        width: `${o.width}px`
-                      }}
-                    ></div>
-                  )
-                }
-              })}
+              elements.filter(el => el.x * pixels < renderLimit).map((o, i) => (
+                  <div
+                    key={i}
+                    className='absolute border-4 border-mario-red z-50'
+                    style={{
+                      bottom: `${o.y * pixels}px`,
+                      left: `${o.x * pixels}px`,
+                      height: `${o.height}px`,
+                      width: `${o.width}px`
+                    }}
+                  ></div>
+                )
+              )}
 
             {debug && (
               <div
@@ -131,34 +127,33 @@ export default function Home() {
               ></div>
             )}
 
-            {elements.map((el, i) => {
-              if (left + width > el.x * pixels) {
-                if (el.type === 'Box') {
-                  return (
-                    <Box
-                      x={el.x}
-                      y={el.y}
-                      size={el.size}
-                      touches={el.touches}
-                      key={i}
-                    />
-                  )
-                } else if (el.type === 'Brick') {
-                  return (
-                    <Brick
-                      x={el.x}
-                      y={el.y}
-                      size={el.size}
-                      touches={el.touches}
-                      key={i}
-                    />
-                  )
-                } else if (el.type === 'Pipe') {
-                  return <Pipe x={el.x} size={el.size} key={i} />
-                } else if (el.type === 'Floor') {
-                  return <Floor x={el.x} y={el.y} size={el.size} key={i} />
-                }
+            {elements.filter(el => el.x * pixels < renderLimit).map((el, i) => {
+              if (el.type === 'Box') {
+                return (
+                  <Box
+                    x={el.x}
+                    y={el.y}
+                    size={el.size}
+                    touches={el.touches}
+                    key={i}
+                  />
+                )
+              } else if (el.type === 'Brick') {
+                return (
+                  <Brick
+                    x={el.x}
+                    y={el.y}
+                    size={el.size}
+                    touches={el.touches}
+                    key={i}
+                  />
+                )
+              } else if (el.type === 'Pipe') {
+                return <Pipe x={el.x} size={el.size} key={i} />
+              } else if (el.type === 'Floor') {
+                return <Floor x={el.x} y={el.y} size={el.size} key={i} />
               }
+            
             })}
           </div>
         </main>

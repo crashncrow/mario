@@ -1,5 +1,4 @@
 import { useAppContext } from 'contexts/AppContext'
-import { useWindowDimensions } from 'hooks/window'
 import Bush from 'components/Bush'
 
 const m = [
@@ -15,17 +14,14 @@ const m = [
 ]
 
 const Plants = () =>{
-  const { pixels, left } = useAppContext()
-  const { width } = useWindowDimensions();
+  const { renderLimit, pixels } = useAppContext()
 
   return (
     <>
       {
-        m.map((plant, i) => {
-          if (plant.x * pixels < left + width) {
-            return <Bush x={plant.x} size={plant.size} key={`bush_${i}`}/>
-          }
-        })
+        m.filter(p => p.x * pixels < renderLimit).map((plant, i) => (
+          <Bush x={plant.x} size={plant.size} key={`bush_${i}`}/>
+        ))
       }
     </>
   )

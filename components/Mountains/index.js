@@ -1,5 +1,4 @@
 import { useAppContext } from 'contexts/AppContext'
-import { useWindowDimensions } from 'hooks/window'
 import Mountain from 'components/Mountain'
 
 const m = [
@@ -12,17 +11,14 @@ const m = [
 ]
 
 const Mountains = () => {
-  const { pixels, left } = useAppContext()
-  const { width } = useWindowDimensions();
+  const { renderLimit, pixels } = useAppContext()
 
   return (
     <>
       {
-        m.map((mountain, i) => {
-          if (mountain.x * pixels < left + width) {
-            return <Mountain x={mountain.x} size={mountain.size} key={`mountain_${i}`}/>
-          }
-        })
+        m.filter(el => el.x * pixels < renderLimit).map((mountain, i) => (
+          <Mountain x={mountain.x} size={mountain.size} key={`mountain_${i}`}/>
+        ))
       }
     </>
   )

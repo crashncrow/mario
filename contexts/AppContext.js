@@ -1,17 +1,19 @@
 import { createContext, useContext, useState, useEffect } from 'react'
+import { useWindowDimensions } from 'hooks/window'
 
 const AppContext = createContext(null)
 const pixels = 64
 
 export const AppContextProvider = ({ children }) => {
-  
+  const { width } = useWindowDimensions();
+
   const [ objects, setObjects ] = useState([])
 
   const [ left, setLeft ] = useState(100)
   const [ bottom, setBottom ] = useState(pixels)
   
-  // const [ scroll, setScroll ] = useState(true)
   const [ collision, setCollision ] = useState(false)
+  
   const [ canJump, setCanJump ] = useState(true)
   const [ canWalkLeft, setCanWalkLeft ] = useState(true)
   const [ canWalkRight, setCanWalkRight ] = useState(true)
@@ -65,44 +67,20 @@ export const AppContextProvider = ({ children }) => {
 
             if (x + pixels < (obj.x * pixels) + obj.width) {
               console.log('VIENE DE IZQ, NO PUEDE SEGUIR A LA DER')
-              // setCanWalk(false)
               walkRight = false
             }
   
             if (x > obj.x * pixels) {
               console.log('VIENE DE DER, NO PUEDE SEGUIR A LA IZQ')
-              // setCanWalk(false)
               walkLeft = false
             }
           }
         }
 
-        // if (obj.type === 'Brick' || obj.type === 'Box') {
-        //   if (y <= obj.y * pixels) {
-        //     obj.touches++
-        //   }
-        // } else if (obj.type === 'Pipe') {
-
-        //   if(y > obj.y + obj.height){
-        //     console.log('ARRIBA')
-        //   }
-        //   else{
-        //     if (x + pixels < (obj.x * pixels) + obj.width) {
-        //       console.log('VIENE DE IZQ, NO PUEDE SEGUIR A LA DER')
-        //       // setCanWalk(false)
-        //       walkRight = false
-        //     }
-  
-        //     if (x > obj.x * pixels) {
-        //       console.log('VIENE DE DER, NO PUEDE SEGUIR A LA IZQ')
-        //       // setCanWalk(false)
-        //       walkLeft = false
-        //     }
-        //   }
-        // }
-
-        setCollision(true)
-
+        if(!collision) {
+          setCollision(true)
+        }
+        
         if(obj.type !== 'Floor') {
           console.log('COLLISION')
         }
@@ -145,6 +123,8 @@ export const AppContextProvider = ({ children }) => {
 
         canWalkLeft: canWalkLeft,
         canWalkRight: canWalkRight,
+
+        renderLimit: left + (width * 1), 
         
         setLeft: setLeft,
         setBottom: setBottom,
