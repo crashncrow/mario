@@ -68,9 +68,9 @@ export const AppContextProvider = ({ children }) => {
       ) {
 
         if (obj.type !== 'Floor') {
-          console.log('YYY', obj.type , y, (obj.y * pixels) + obj.height)
+          // console.log('YYY', obj.type , y, (obj.y * pixels) + obj.height)
           if(y >= (obj.y * pixels) + obj.height){
-            console.log('ARRIBA')
+            // console.log('ARRIBA')
           }
           else {
             if(typeof obj.touches !== undefined){
@@ -78,12 +78,12 @@ export const AppContextProvider = ({ children }) => {
             }
 
             if (x + pixels < (obj.x * pixels) + obj.width) {
-              console.log('VIENE DE IZQ, NO PUEDE SEGUIR A LA DER')
+              // console.log('VIENE DE IZQ, NO PUEDE SEGUIR A LA DER')
               walkRight = false
             }
   
             if (x > obj.x * pixels) {
-              console.log('VIENE DE DER, NO PUEDE SEGUIR A LA IZQ')
+              // console.log('VIENE DE DER, NO PUEDE SEGUIR A LA IZQ')
               walkLeft = false
             }
           }
@@ -94,7 +94,7 @@ export const AppContextProvider = ({ children }) => {
         }
         
         if(obj.type !== 'Floor') {
-          console.log('COLLISION')
+          // console.log('COLLISION')
         }
 
         toco = true
