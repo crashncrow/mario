@@ -11,6 +11,8 @@ const m = [
   {x: 108, size: 3},
   {x: 120, size: 1},
   {x: 138, size: 2},
+  {x: 158, size: 1},
+  {x: 170, size: 1},
 ]
 
 const Plants = () =>{

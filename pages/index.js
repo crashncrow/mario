@@ -1,4 +1,6 @@
-import { useEffect, useRef, useState } from 'react'
+import { useEffect, useRef } from 'react'
+import { elements, pipes } from 'libs/elements'
+import { useAppContext } from 'contexts/AppContext'
 import useDoubleClick from 'hooks/clicks'
 
 import Head from 'next/head'
@@ -9,15 +11,14 @@ import Pipe from 'components/Pipe'
 import Plants from 'components/Plants'
 import Mountains from 'components/Mountains'
 import Brick from 'components/Brick'
+import Brick2 from 'components/Brick2'
 import Box from 'components/Box'
 import Stats from 'components/Stats'
-import { elements } from 'libs/elements'
-
-import { useAppContext } from 'contexts/AppContext'
 
 export default function Home() {
 
   const buttonRef = useRef()
+  
   const {
     debug,
     renderLimit,
@@ -32,6 +33,7 @@ export default function Home() {
   } = useAppContext()
 
   useEffect(() => {
+    // console.log(renderLimit)
     setObjects(elements)
   }, [])
 
@@ -39,7 +41,7 @@ export default function Home() {
     let j = 0
 
     for (let i = 1; i * pixels <= limit; i++) {
-      if (!checkCollision(left, bottom + i * pixels + pixels)) {
+      if (!checkCollision(left, bottom + (i * pixels) + pixels)) {
         j = i * pixels
       } else {
         break
@@ -51,10 +53,10 @@ export default function Home() {
 
   useDoubleClick({
     onSingleClick: (e) => {
-      console.log('single click')
+      // console.log('single click')
       if (canJump) {
         setJumping(true)
-        setBottom((bottom) => bottom + jump(128) + pixels)
+        setBottom(bottom => bottom + jump(128) + pixels)
 
         setTimeout(() => {
           setJumping(false)
@@ -62,10 +64,10 @@ export default function Home() {
       }
     },
     onDoubleClick: (e) => {
-      console.log('double click')
+      // console.log('double click')
       if (canJump) {
         setJumping(true)
-        setBottom((bottom) => bottom + jump(266) + pixels)
+        setBottom(bottom => bottom + jump(266) + pixels)
 
         setTimeout(() => {
           setJumping(false)
@@ -148,13 +150,44 @@ export default function Home() {
                     key={i}
                   />
                 )
-              } else if (el.type === 'Pipe') {
+              } 
+              else if (el.type === 'Brick2') {
+                return (
+                  <Brick2
+                    x={el.x}
+                    y={el.y}
+                    size={el.size}
+                    key={i}
+                  />
+                )
+              }
+              else if (el.type === 'Pipe') {
                 return <Pipe x={el.x} size={el.size} key={i} />
-              } else if (el.type === 'Floor') {
-                return <Floor x={el.x} y={el.y} size={el.size} key={i} />
               }
             
             })}
+
+            {
+              // pipes.map((el, i) => {
+                
+              //     return <Pipe x={el.x} size={el.size} key={i} />
+                
+              // })
+            }
+
+            {
+            /* 
+            {
+              elements.filter(el => el.type == 'Floor').map((el, i) => {
+                return <Floor x={el.x} size={el.size} key={i} />
+              })
+            } 
+            */
+            }
+
+            {/* <Pipe segments={elements.filter(el => el.type == 'Floor')} /> */}
+            <Floor segments={elements.filter(el => el.type == 'Floor')} />
+
           </div>
         </main>
       </div>

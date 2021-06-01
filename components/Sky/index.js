@@ -14,6 +14,9 @@ const m = [
   {x: 116, size: 1},
   {x: 125, size: 3},
   {x: 134, size: 2},
+  {x: 166, size: 1},
+  {x: 174, size: 3},
+  {x: 203, size: 1},
 ]
 
 const Sky = () =>{
