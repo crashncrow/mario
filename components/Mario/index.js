@@ -138,7 +138,7 @@ const Mario = () => {
       else if ((prevPos.x > currPos.x) && !reverse) {
         setReverse(true)
       }
-
+      // console.log('XXX', left, currPos.x + 100)
       if(left > currPos.x + 100){
         if(canWalkLeft) {
           setLeft(currPos.x + 100)
@@ -158,10 +158,6 @@ const Mario = () => {
   )
 
   // const scrollHandler = _ => {
-  //   console.log('scrollHandler', left)
-  //   const x = positionsStore.getViewportX() + 100 
-  //   const y = height - bottom - pixels
-  //   checkCollision(left, bottom + pixels)
   // }
 
   // useEffect(() => {
@@ -200,7 +196,7 @@ const Mario = () => {
     ></div>
     }
 
-    <div className="hidden fixed top-0" style={{width: '5000px'}}>
+    <div className="hidden fixed top-0">
       <div ref={viewportRef}>
         <div>Deferred Rendering: {positionsStore.renderCount}</div>
         <div>Viewport: X: {positionsStore.getViewportX()} Y: {positionsStore.getViewportY()}</div>

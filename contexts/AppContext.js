@@ -18,6 +18,13 @@ export const AppContextProvider = ({ children }) => {
   const [ canWalkLeft, setCanWalkLeft ] = useState(true)
   const [ canWalkRight, setCanWalkRight ] = useState(true)
   const [ jumping, setJumping ] = useState(false)
+  const [ renderLimit, setRenderLimit ] = useState(2000)
+
+
+  useEffect(() => {
+    console.log('W', width)
+    setRenderLimit(left + width + 500)
+  }, [])
 
   useEffect(() => {
     if (!checkCollision(left, bottom) && left > 100 && !jumping) {
@@ -29,6 +36,11 @@ export const AppContextProvider = ({ children }) => {
     if (!checkCollision(left, bottom) && left > 100 && !jumping) {
       setBottom(bottom => bottom - pixels)
     }
+
+    if(left + width + 500 > renderLimit) {
+      setRenderLimit(left + width + 50000)
+    }
+
   }, [left])
 
   useEffect(() => {
@@ -124,7 +136,7 @@ export const AppContextProvider = ({ children }) => {
         canWalkLeft: canWalkLeft,
         canWalkRight: canWalkRight,
 
-        renderLimit: left + (width * 1), 
+        renderLimit: renderLimit, 
         
         setLeft: setLeft,
         setBottom: setBottom,

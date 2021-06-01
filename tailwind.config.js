@@ -18,9 +18,6 @@ module.exports = {
         'box-yellow': '#feb600',
         'box-orange': '#db6c03'
       },
-      backgroundImage: theme => ({
-        'bg': "url('/bg.png')",
-      }) ,
       spacing: {
         '7': '1.75rem',
         '9': '2.25rem',
