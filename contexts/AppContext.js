@@ -1,5 +1,4 @@
-/* eslint-disable react-hooks/exhaustive-deps */
-import { createContext, useContext, useState, useEffect } from 'react'
+import { createContext, useCallback, useContext, useEffect, useRef, useState } from 'react'
 import { useWindowDimensions } from 'hooks/window'
 
 const AppContext = createContext(null)
@@ -21,36 +20,32 @@ export const AppContextProvider = ({ children }) => {
   const [ jumping, setJumping ] = useState(false)
   const [ renderLimit, setRenderLimit ] = useState(2000)
 
+  const stateRef = useRef({
+    left,
+    bottom,
+    jumping,
+    width,
+    renderLimit,
+  })
+
+  const checkCollisionRef = useRef(null)
+
+  useEffect(() => {
+    stateRef.current = {
+      left,
+      bottom,
+      jumping,
+      width,
+      renderLimit,
+    }
+  }, [left, bottom, jumping, width, renderLimit])
 
   useEffect(() => {
     console.log('W', width)
     setRenderLimit(left + width + 500)
   }, [left, width])
 
-  useEffect(() => {
-    if (!checkCollision(left, bottom) && left > 100 && !jumping) {
-      setBottom(bottom => bottom - pixels)
-    }
-  }, [bottom])
-
-  useEffect(() => {
-    if (!checkCollision(left, bottom) && left > 100 && !jumping) {
-      setBottom(bottom => bottom - pixels)
-    }
-
-    if(left + width + 500 > renderLimit) {
-      setRenderLimit(left + width + 50000)
-    }
-
-  }, [left])
-
-  useEffect(() => {
-    if (!checkCollision(left, bottom) && left > 100 && !jumping) {
-      setBottom(bottom => bottom - pixels)
-    }
-  }, [jumping])
-
-  function checkCollision(x, y) {
+  const checkCollision = useCallback((x, y) => {
     let toco = false
     let walkLeft = true
     let walkRight = true
@@ -119,7 +114,46 @@ export const AppContextProvider = ({ children }) => {
     }
     
     return toco
-  }
+  }, [objects, collision, canWalkLeft, canWalkRight])
+
+  useEffect(() => {
+    checkCollisionRef.current = checkCollision
+  }, [checkCollision])
+
+  const applyGravity = useCallback(() => {
+    const { left: currentLeft, bottom: currentBottom, jumping: currentJumping } = stateRef.current
+
+    if (
+      checkCollisionRef.current &&
+      !checkCollisionRef.current(currentLeft, currentBottom) &&
+      currentLeft > 100 &&
+      !currentJumping
+    ) {
+      setBottom(bottom => bottom - pixels)
+    }
+  }, [])
+
+  useEffect(() => {
+    applyGravity()
+  }, [bottom, applyGravity])
+
+  useEffect(() => {
+    applyGravity()
+
+    const {
+      left: currentLeft,
+      width: currentWidth,
+      renderLimit: currentRenderLimit,
+    } = stateRef.current
+
+    if (currentLeft + currentWidth + 500 > currentRenderLimit) {
+      setRenderLimit(currentLeft + currentWidth + 50000)
+    }
+  }, [left, applyGravity])
+
+  useEffect(() => {
+    applyGravity()
+  }, [jumping, applyGravity])
 
   return (
     <AppContext.Provider
