@@ -1,4 +1,3 @@
-import { useState, useEffect } from 'react'
 import { useAppContext } from 'contexts/AppContext'
 import { processFullArray } from 'libs/pixless'
 
@@ -42,23 +41,17 @@ const m3 = [
   [ 2, 2, 2, 2, 2, 2, 1, 0 ]
 ]
 
+const matrix1Static = processFullArray(m1)
+const matrix2Static = processFullArray(m2)
+const matrix3Static = processFullArray(m3)
+
 const Bush = ({x, size}) => {
   const { pixels } = useAppContext()
-
-  const [matrix1, setMatrix1 ] = useState([])
-  const [matrix2, setMatrix2 ] = useState([])
-  const [matrix3, setMatrix3 ] = useState([])
-  
-  useEffect(() => {
-    setMatrix1(processFullArray(m1))
-    setMatrix2(processFullArray(m2))
-    setMatrix3(processFullArray(m3))
-  }, [])
 
   return (
     <div className={`flex flex-wrap absolute w-${16 + (16 * size)} bottom-0 ml-8 mb-16`} style={{left: `${x * pixels}px`}}>
       <div className="flex flex-wrap w-8  mt-8">
-      {matrix1.map((x, i) => (
+      {matrix1Static.map((x, i) => (
         x.map((y, j) => (
           <div 
           className={`h-1 w-${y.count} border-none flex-none ${c[y.color]}`}
@@ -72,7 +65,7 @@ const Bush = ({x, size}) => {
       {
       Array(size).fill(1).map((x, i) => (
       <div className="flex flex-wrap w-16" key={`bush_2_${i}`}>
-        {matrix2.map((x, i) => (
+        {matrix2Static.map((x, i) => (
           x.map((y, j) => (
             <div 
             className={`h-1 w-${y.count} border-none flex-none ${c[y.color]}`}
@@ -87,7 +80,7 @@ const Bush = ({x, size}) => {
       }
 
       <div className="flex flex-wrap w-8 mt-8">
-      {matrix3.map((x, i) => (
+      {matrix3Static.map((x, i) => (
         x.map((y, j) => (
           <div 
           className={`h-1 w-${y.count} border-none flex-none ${c[y.color]}`}

@@ -1,7 +1,9 @@
 module.exports = {
-  purge: [
-    './components/**/*.js',
+  content: [
     './pages/**/*.js',
+    './components/**/*.js',
+    './contexts/**/*.js',
+    './hooks/**/*.js',
     './libs/**/*.js',
   ],
   theme: {
@@ -90,11 +92,5 @@ module.exports = {
       }
     }
   },
-  variants: {
-    outline: ['focus'],
-  },
   plugins: [],
-  future: {
-    removeDeprecatedGapUtilities: true,
-  }
 }

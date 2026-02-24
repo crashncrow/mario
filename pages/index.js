@@ -35,7 +35,7 @@ export default function Home() {
   useEffect(() => {
     // console.log(renderLimit)
     setObjects(elements)
-  }, [])
+  }, [setObjects])
 
   const jump = (limit) => {
     let j = 0
@@ -83,16 +83,12 @@ export default function Home() {
       <div className='w-full h-full fixed z-50' ref={buttonRef}></div>
       <div className='h-screen overflow-x-scroll'>
         <Head>
-          <title>It's Me, Mario!</title>
+          <title>It&apos;s Me, Mario!</title>
           <link rel='icon' href='/favicon.ico' />
           <meta
             name='viewport'
             content='width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no'
           />
-          <link
-            href='https://fonts.googleapis.com/css?family=Press+Start+2P'
-            rel='stylesheet'
-          ></link>
         </Head>
 
         <Stats />

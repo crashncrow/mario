@@ -1,4 +1,3 @@
-import { useState, useEffect } from 'react'
 import { useAppContext } from 'contexts/AppContext'
 import { processFullArray } from 'libs/pixless'
 
@@ -91,23 +90,17 @@ const m3 =[
 
 // cons pxls = m.splite
 
+const matrix1Static = processFullArray(m1)
+const matrix2Static = processFullArray(m2)
+const matrix3Static = processFullArray(m3)
+
 const Cloud = ({x, size}) =>{
   const { pixels } = useAppContext()
-
-  const [matrix1, setMatrix1 ] = useState([])
-  const [matrix2, setMatrix2 ] = useState([])
-  const [matrix3, setMatrix3 ] = useState([])
-  
-  useEffect(() => {
-    setMatrix1(processFullArray(m1))
-    setMatrix2(processFullArray(m2))
-    setMatrix3(processFullArray(m3))
-  }, [])
 
   return (
     <div className={`flex flex-wrap absolute w-${16 + (16 * size)} mb-64 pb-64 bottom-0`} style={{left: `${x * pixels}px`}}>
       <div className="flex flex-wrap w-8">
-      {matrix1.map((x, i) => (
+      {matrix1Static.map((x, i) => (
         x.map((y, j) => (
           <div 
           className={`h-1 w-${y.count} border-none flex-none ${c[y.color]}`}
@@ -121,7 +114,7 @@ const Cloud = ({x, size}) =>{
       {
       Array(size).fill(1).map((x, i) => (
       <div className="flex flex-wrap w-16" key={`cloud_2_${i}`}>
-      {matrix2.map((x, i) => (
+      {matrix2Static.map((x, i) => (
         x.map((y, j) => (
           <div 
           className={`h-1 w-${y.count} border-none flex-none ${c[y.color]}`}
@@ -135,7 +128,7 @@ const Cloud = ({x, size}) =>{
       }
 
       <div className="flex flex-wrap w-8">
-      {matrix3.map((x, i) => (
+      {matrix3Static.map((x, i) => (
         x.map((y, j) => (
           <div 
           className={`h-1 w-${y.count} border-none flex-none ${c[y.color]}`}

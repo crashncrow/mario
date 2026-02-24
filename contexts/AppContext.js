@@ -1,3 +1,4 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 import { createContext, useContext, useState, useEffect } from 'react'
 import { useWindowDimensions } from 'hooks/window'
 
@@ -24,7 +25,7 @@ export const AppContextProvider = ({ children }) => {
   useEffect(() => {
     console.log('W', width)
     setRenderLimit(left + width + 500)
-  }, [])
+  }, [left, width])
 
   useEffect(() => {
     if (!checkCollision(left, bottom) && left > 100 && !jumping) {
@@ -49,7 +50,7 @@ export const AppContextProvider = ({ children }) => {
     }
   }, [jumping])
 
-  const checkCollision = (x, y) => {
+  function checkCollision(x, y) {
     let toco = false
     let walkLeft = true
     let walkRight = true

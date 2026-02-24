@@ -1,4 +1,4 @@
-import { useLayoutEffect } from 'react';
+import useIsomorphicLayoutEffect from './useIsomorphicLayoutEffect';
 
 /**
  * A simple React hook for differentiating single and double clicks on the same component.
@@ -14,8 +14,9 @@ const useDoubleClick = ({
   onSingleClick = () => null,
   onDoubleClick = () => null
 }) => {
-  useLayoutEffect(() => {
+  useIsomorphicLayoutEffect(() => {
     const clickRef = ref.current;
+    if (!clickRef) return;
     let clickCount = 0;
     const handleClick = e => {
       clickCount += 1;
@@ -35,7 +36,7 @@ const useDoubleClick = ({
     return () => {
       clickRef.removeEventListener('click', handleClick);
     };
-  });
+  }, [ref, latency, onSingleClick, onDoubleClick]);
 };
 
 export default useDoubleClick;
