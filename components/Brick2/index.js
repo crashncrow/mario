@@ -20,8 +20,6 @@ const Brick2 = ({x, y}) => {
           <div className='absolute w-1 h-10 bg-brick-light mt-3 ml-2'></div>
           <div className='absolute w-1 h-8 bg-brick-light mt-4 ml-3'></div>
           
-          
-
           <div className='absolute w-1 h-1 bg-brick-dark right-0 bottom-0 mr-0 mb-0'></div>
           <div className='absolute w-1 h-1 bg-brick-dark right-0 bottom-0 mr-1 mb-1'></div>
           <div className='absolute w-1 h-1 bg-brick-dark right-0 bottom-0 mr-2 mb-2'></div>

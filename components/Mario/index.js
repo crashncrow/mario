@@ -117,11 +117,23 @@ const matrix2 = processFullArray(m2)
 const matrix3 = processFullArray(m3)
 
 const Mario = () => {
-  const { canWalkLeft, canWalkRight, pixels, debug, left, setLeft, bottom, collision } = useAppContext()
+  const {
+    canWalkLeft,
+    canWalkRight,
+    pixels,
+    debug,
+    left,
+    setLeft,
+    bottom,
+    collision,
+    gameLoopEnabled,
+    motionRef,
+  } = useAppContext()
 
   const [ reverse, setReverse ] = useState(false)
   const [ index, setIndex ] = useState(1)
   const [ currentMatrix, setCurrentMatrix ] = useState(matrix1)
+  const lastWalkAnimTickRef = useRef(0)
 
   const positionsStore = PositionStore()
   const viewportRef = useRef(null)
@@ -130,6 +142,10 @@ const Mario = () => {
   // Viewport scroll position
   useScrollPosition(
     ({ prevPos, currPos }) => {
+      if (gameLoopEnabled) {
+        return
+      }
+
       positionsStore.setViewportPosition(currPos)
 
       if((prevPos.x < currPos.x) && reverse) {
@@ -156,6 +172,24 @@ const Mario = () => {
     null,
     true
   )
+
+  useEffect(() => {
+    if (!gameLoopEnabled) return
+
+    const vx = motionRef.current?.vx || 0
+    const facing = motionRef.current?.facing || 1
+    const grounded = motionRef.current?.grounded ?? true
+
+    setReverse(facing < 0)
+
+    if (Math.abs(vx) > 10 && grounded) {
+      const now = performance.now()
+      if (now - lastWalkAnimTickRef.current > 90) {
+        lastWalkAnimTickRef.current = now
+        setIndex(index => index + 1)
+      }
+    }
+  }, [left, gameLoopEnabled, motionRef])
 
   // const scrollHandler = _ => {
   // }

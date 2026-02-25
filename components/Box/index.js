@@ -1,38 +1,45 @@
-import { useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { useAppContext } from 'contexts/AppContext'
 
 const Box = ({ x, y, touches }) => {
   const { pixels } = useAppContext()
-  const [ jumps, setJumps ] = useState(0)
+  const [ isBumping, setIsBumping ] = useState(false)
+  const prevTouchesRef = useRef(touches)
 
-  const incrementJump = () => {
-    if(!jumps) {
-      setTimeout(() => {
-        setJumps(touches)
-      }, 200)
+  useEffect(() => {
+    if (touches <= prevTouchesRef.current) return
+
+    prevTouchesRef.current = touches
+    const raf = requestAnimationFrame(() => setIsBumping(true))
+    const timer = setTimeout(() => setIsBumping(false), 180)
+    return () => {
+      cancelAnimationFrame(raf)
+      clearTimeout(timer)
     }
-    
-    return jumps ? '' : 'mb-2'
-  }
+  }, [touches])
+
+  useEffect(() => {
+    prevTouchesRef.current = touches
+  }, [touches])
 
   return (
     <>
       <div
-        className={`flex flex-wrap absolute bottom-0 ${touches !== jumps ? incrementJump() : ''}`}
+        className={`flex flex-wrap absolute bottom-0 ${isBumping ? 'mb-2' : ''}`}
         style={{left: `${x * pixels}px`, bottom: `${(y * pixels)}px`}}
       >
         <div className='flex flex-wrap w-16 h-16'>
           <div className='w-14 h-1 ml-1 mr-1 bg-brick-dark'></div>
           <div className='flex flex-wrap h-15 w-full border-r-4 border-b-4 border-black'>
             <div className='w-1 h-full bg-brick-dark'></div>
-            <div className={`flex flex-wrap w-14 h-full bg-box-yellow  ${!jumps ? 'animate-pulse' : ''}`}>
+            <div className={`flex flex-wrap w-14 h-full bg-box-yellow  ${touches === 0 ? 'animate-pulse' : ''}`}>
               <div className='w-1 h-12 border-t-4 border-b-4 border-black m-1'></div>
               <div className='w-8 h-full'></div>
               <div className='w-1 h-12 border-t-4 border-b-4 border-black m-1'></div>
             </div>
           </div>
           {
-            !jumps &&
+            touches === 0 &&
             <>
             <div className='absolute w-5 h-1 mt-3 ml-5 mr-1 bg-brick-dark'></div>
             <div className='absolute w-7 h-3 mt-4 ml-4 border-l-8 border-r-8 border-brick-dark'>

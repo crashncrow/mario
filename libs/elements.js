@@ -149,7 +149,35 @@ export const elements = [
   // 69, 2, 16, 3, 143
   { type: 'Floor', x: 0, y: 0, size: 69, width: 69 * 64, height: 64 },
   { type: 'Floor', x: 71, y: 0, size: 16, width: 16 * 64, height: 64 },
-  { type: 'Floor', x: 90, y: 0, size: 143, width: 143 * 64, height: 64 }
+  { type: 'Floor', x: 90, y: 0, size: 64, width: 64 * 64, height: 64 },
+  { type: 'Floor', x: 156, y: 0, size: 62, width: 62 * 64, height: 64 },
+
+  // // Castel
+  // { type: 'Brick', x: 205, y: 1, size: 1, width: 64, height: 64, touches: 0 },
+  // { type: 'Brick', x: 206, y: 1, size: 1, width: 64, height: 64, touches: 0 },
+  // { type: 'Brick', x: 207, y: 1, size: 1, width: 64, height: 64, touches: 0 },
+  // { type: 'Brick', x: 208, y: 1, size: 1, width: 64, height: 64, touches: 0 },
+  // { type: 'Brick', x: 209, y: 1, size: 1, width: 64, height: 64, touches: 0 },
+
+  // { type: 'Brick', x: 205, y: 2, size: 1, width: 64, height: 64, touches: 0 },
+  // { type: 'Brick', x: 206, y: 2, size: 1, width: 64, height: 64, touches: 0 },
+  // { type: 'Brick', x: 207, y: 2, size: 1, width: 64, height: 64, touches: 0 },
+  // { type: 'Brick', x: 208, y: 2, size: 1, width: 64, height: 64, touches: 0 },
+  // { type: 'Brick', x: 209, y: 2, size: 1, width: 64, height: 64, touches: 0 },
+
+  // { type: 'Brick', x: 205, y: 3, size: 1, width: 64, height: 64, touches: 0 },
+  // { type: 'Brick', x: 206, y: 3 , size: 1, width: 64, height: 64, touches: 0 },
+  // { type: 'Brick', x: 207, y: 3, size: 1, width: 64, height: 64, touches: 0 },
+  // { type: 'Brick', x: 208, y: 3, size: 1, width: 64, height: 64, touches: 0 },
+  // { type: 'Brick', x: 209, y: 3, size: 1, width: 64, height: 64, touches: 0 },
+
+  // { type: 'Brick', x: 206, y: 4, size: 1, width: 64, height: 64, touches: 0 },
+  // { type: 'Brick', x: 207, y: 4, size: 1, width: 64, height: 64, touches: 0 },
+  // { type: 'Brick', x: 208, y: 4, size: 1, width: 64, height: 64, touches: 0 },
+
+  // { type: 'Brick', x: 206, y: 5, size: 1, width: 64, height: 64, touches: 0 },
+  // { type: 'Brick', x: 207, y: 5, size: 1, width: 64, height: 64, touches: 0 },
+  // { type: 'Brick', x: 208, y: 5, size: 1, width: 64, height: 64, touches: 0 },
 ]
 
 export const pipes = [

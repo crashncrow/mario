@@ -11,6 +11,7 @@ const m = [
   {x: 145, size: 2},
   {x: 161, size: 2},
   {x: 195, size: 2},
+  {x: 211, size: 1},
 ]
 
 const Mountains = () => {
