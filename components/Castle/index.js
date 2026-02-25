@@ -7,39 +7,40 @@ import { useAppContext } from 'contexts/AppContext'
 
 const Castle = ({ x }) => {
   const { renderLimit, pixels } = useAppContext()
+  const originX = x ?? 205
 
   const base = [
-    { x: 205, y: 1 },
-    { x: 206, y: 1 },
-    { x: 208, y: 1 },
-    { x: 209, y: 1 },
+    { x: originX + 0, y: 1 },
+    { x: originX + 1, y: 1 },
+    { x: originX + 3, y: 1 },
+    { x: originX + 4, y: 1 },
 
-    { x: 205, y: 2 },
-    { x: 206, y: 2 },
-    { x: 207, y: 2 },
-    { x: 208, y: 2 },
-    { x: 209, y: 2 },
+    { x: originX + 0, y: 2 },
+    { x: originX + 1, y: 2 },
+    { x: originX + 2, y: 2 },
+    { x: originX + 3, y: 2 },
+    { x: originX + 4, y: 2 },
 
-    { x: 206, y: 4 },
-    { x: 207, y: 4 },
-    { x: 208, y: 4 },
+    { x: originX + 1, y: 4 },
+    { x: originX + 2, y: 4 },
+    { x: originX + 3, y: 4 },
   ]
 
   const roof = [
-    { x: 205, y: 3 },
-    { x: 206, y: 3, bg: 1 },
-    { x: 207, y: 3, bg: 1 },
-    { x: 208, y: 3, bg: 1 },
-    { x: 209, y: 3 },
+    { x: originX + 0, y: 3 },
+    { x: originX + 1, y: 3, bg: 1 },
+    { x: originX + 2, y: 3, bg: 1 },
+    { x: originX + 3, y: 3, bg: 1 },
+    { x: originX + 4, y: 3 },
 
-    { x: 206, y: 5 },
-    { x: 207, y: 5 },
-    { x: 208, y: 5 },
+    { x: originX + 1, y: 5 },
+    { x: originX + 2, y: 5 },
+    { x: originX + 3, y: 5 },
   ]
 
   const windows = [
-    { x: 206, y: 4, left: 1 },
-    { x: 208, y: 4, left: 0 },
+    { x: originX + 1, y: 4, left: 1 },
+    { x: originX + 3, y: 4, left: 0 },
   ]
   
   return (
@@ -61,7 +62,7 @@ const Castle = ({ x }) => {
          ))
       }
 
-      <Door x={207} y={1} />
+      <Door x={originX + 2} y={1} />
     </>
   )
 }

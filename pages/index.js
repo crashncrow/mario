@@ -315,7 +315,7 @@ export default function Home() {
 
             {/* <Pipe segments={elements.filter(el => el.type == 'Floor')} /> */}
             <Floor segments={objects.filter(el => el.type == 'Floor')} />
-            <Castle x={221} />
+            <Castle x={205} />
             </div>
           </div>
         </main>
