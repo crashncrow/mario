@@ -16,9 +16,6 @@ const Door = ({x, y}) => {
           <div className={`absolute w-14 h-3 bg-black mt-3 ml-1`}></div>
           <div className={`absolute w-16 h-10 bg-black mt-6 ml-0`}></div>
         </div>
-        {/* <div className="w-16 h-16" >          
-          <div className={`absolute w-16 h-16 bg-black`}></div>
-        </div> */}
         <div className="w-16 h-16" >          
           <div className={`absolute w-16 h-16 bg-black`}></div>
         </div>
