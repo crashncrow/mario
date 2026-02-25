@@ -46,7 +46,7 @@ const Castle = ({ x }) => {
     <>
       {
         base.filter(el => el.x * pixels < renderLimit).map((el, i) => (
-          <Brick key={`castle-brick-${el.x}-${el.y}-${i}`} x={el.x} y={el.y} touches={0} border={el.border} black={el.black}/>
+          <Brick key={`castle-brick-${el.x}-${el.y}-${i}`} x={el.x} y={el.y} touches={0} border={el.border} />
         ))
       }
 

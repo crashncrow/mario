@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from 'react'
 import { useAppContext } from 'contexts/AppContext'
 
-const Brick = ({x, y, touches, black = false, border = true}) => {
+const Brick = ({x, y, touches, border = true}) => {
   const { pixels } = useAppContext()
   const [ isBumping, setIsBumping ] = useState(false)
   const prevTouchesRef = useRef(touches)
@@ -25,7 +25,7 @@ const Brick = ({x, y, touches, black = false, border = true}) => {
   return (
     <>
       <div 
-        className={`flex flex-wrap absolute ${black ? 'bg-black' : 'bg-brick-dark'} border-b-4 border-black bottom-0 ${isBumping ? 'mb-2' : ''}`} 
+        className={`flex flex-wrap absolute bg-brick-dark border-b-4 border-black bottom-0 ${isBumping ? 'mb-2' : ''}`} 
         style={{left: `${x * pixels}px`, bottom: `${(y * pixels)}px`}}>
 
         <div className="flex flex-wrap w-16 h-15" >
