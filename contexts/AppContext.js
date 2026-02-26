@@ -19,8 +19,8 @@ export const AppContextProvider = ({ children }) => {
   const [ canWalkLeft, setCanWalkLeft ] = useState(true)
   const [ canWalkRight, setCanWalkRight ] = useState(true)
   const [ jumping, setJumping ] = useState(false)
-  const [ renderLimit, setRenderLimit ] = useState(2000)
   const [ gameLoopEnabled, setGameLoopEnabled ] = useState(true)
+  const renderLimit = left + (width ?? 0) + 500
 
   const stateRef = useRef({
     left,
@@ -55,6 +55,7 @@ export const AppContextProvider = ({ children }) => {
     x: left,
     y: bottom,
   })
+  const publishPendingRef = useRef(false)
 
   useEffect(() => {
     stateRef.current = {
@@ -67,15 +68,14 @@ export const AppContextProvider = ({ children }) => {
   }, [left, bottom, jumping, width, renderLimit])
 
   useEffect(() => {
+    publishPendingRef.current = false
+  }, [left, bottom])
+
+  useEffect(() => {
     if (gameLoopEnabled) return
     motionRef.current.x = left
     motionRef.current.y = bottom
   }, [left, bottom, gameLoopEnabled])
-
-  useEffect(() => {
-    console.log('W', width)
-    setRenderLimit(left + width + 500)
-  }, [left, width])
 
   const checkCollision = useCallback((x, y) => {
     let toco = false
@@ -271,12 +271,14 @@ export const AppContextProvider = ({ children }) => {
   }, [checkCollision])
 
   const setLeftSafe = useCallback(nextValue => {
+    if (!Number.isFinite(nextValue)) return
     if (stateRef.current.left === nextValue) return
     stateRef.current.left = nextValue
     setLeft(nextValue)
   }, [])
 
   const setBottomSafe = useCallback(nextValue => {
+    if (!Number.isFinite(nextValue)) return
     if (stateRef.current.bottom === nextValue) return
     stateRef.current.bottom = nextValue
     setBottom(nextValue)
@@ -296,34 +298,20 @@ export const AppContextProvider = ({ children }) => {
   }, [])
 
   useEffect(() => {
-    if (!gameLoopEnabled) {
+    if (gameLoopEnabled) return
+
+    const rafId = window.requestAnimationFrame(() => {
       applyGravity()
-    }
-  }, [bottom, applyGravity, gameLoopEnabled])
+    })
 
-  useEffect(() => {
-    if (!gameLoopEnabled) {
-      applyGravity()
+    return () => {
+      window.cancelAnimationFrame(rafId)
     }
-
-    const {
-      left: currentLeft,
-      width: currentWidth,
-      renderLimit: currentRenderLimit,
-    } = stateRef.current
-
-    if (currentLeft + currentWidth + 500 > currentRenderLimit) {
-      setRenderLimit(currentLeft + currentWidth + 50000)
-    }
-  }, [left, applyGravity, gameLoopEnabled])
-
-  useEffect(() => {
-    if (!gameLoopEnabled) {
-      applyGravity()
-    }
-  }, [jumping, applyGravity, gameLoopEnabled])
+  }, [left, bottom, jumping, applyGravity, gameLoopEnabled])
 
   useGameLoop((dt, now) => {
+    if (!Number.isFinite(dt) || dt < 0) return
+
     const motion = motionRef.current
     let nextX = motion.x
     let nextY = motion.y
@@ -493,12 +481,33 @@ export const AppContextProvider = ({ children }) => {
     motion.x = nextX
     motion.y = nextY
 
-    setLeftSafe(Math.round(nextX))
-    setBottomSafe(nextY)
+    if (!Number.isFinite(nextX) || !Number.isFinite(nextY)) {
+      return
+    }
 
     lastPositionRef.current = {
       x: nextX,
       y: nextY,
+    }
+
+    const nextLeftRounded = Math.round(nextX)
+    const shouldPublishLeft = stateRef.current.left !== nextLeftRounded
+    const shouldPublishBottom = stateRef.current.bottom !== nextY
+
+    if (!shouldPublishLeft && !shouldPublishBottom) {
+      return
+    }
+
+    if (publishPendingRef.current) {
+      return
+    }
+
+    publishPendingRef.current = true
+    if (shouldPublishLeft) {
+      setLeftSafe(nextLeftRounded)
+    }
+    if (shouldPublishBottom) {
+      setBottomSafe(nextY)
     }
   }, gameLoopEnabled)
 
@@ -536,8 +545,9 @@ export const AppContextProvider = ({ children }) => {
   return (
     <AppContext.Provider
       value={{
-        debug: false,
+        debug: true,
         pixels: pixels,
+        width: width,
 
         left: left,
         bottom: bottom,

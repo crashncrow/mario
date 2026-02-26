@@ -1,21 +1,32 @@
 import { useAppContext } from 'contexts/AppContext'
 
-const Floor = ({ segments }) => {
+const Floor = ({ segments, minPx = 0, maxPx }) => {
   const { renderLimit, pixels } = useAppContext()
+  const visibleMaxPx = typeof maxPx === 'number' ? maxPx : renderLimit
 
   return segments.map((el, i) => (
-    <div
-      className='absolute bottom-0'
-      style={{ left: `${el.x * pixels}px` }}
-      key={i}
-    >
-      <div className='inline-flex'>
-        {Array(Math.min(el.size, parseInt(renderLimit / pixels)))
-          .fill(1)
-          .map((ele, j) => (
+    (() => {
+      const segmentLeftPx = el.x * pixels
+      const totalTiles = el.size
+      const startTile = Math.max(0, Math.floor((minPx - segmentLeftPx) / pixels))
+      const endTile = Math.min(totalTiles, Math.ceil((visibleMaxPx - segmentLeftPx) / pixels))
+      const tileCount = Math.max(0, endTile - startTile)
+
+      if (tileCount === 0) return null
+
+      return (
+        <div
+          className='absolute bottom-0'
+          style={{ left: `${segmentLeftPx + (startTile * pixels)}px` }}
+          key={i}
+        >
+          <div className='inline-flex'>
+            {Array(tileCount)
+              .fill(1)
+              .map((ele, j) => (
             <div
               className={`flex flex-wrap w-16 bg-brick-dark mb-0`}
-              key={`floor_${j}}`}
+              key={`floor_${el.x}_${startTile + j}`}
             >
               <div className='flex flex-wrap w-16 h-16'>
                 <div className='w-10 h-15 b'>
@@ -61,9 +72,11 @@ const Floor = ({ segments }) => {
                 </div>
               </div>
             </div>
-          ))}
-      </div>
-    </div>
+            ))}
+          </div>
+        </div>
+      )
+    })()
   ))
 }
 

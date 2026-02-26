@@ -154,7 +154,7 @@ const Mario = () => {
       else if ((prevPos.x > currPos.x) && !reverse) {
         setReverse(true)
       }
-      // console.log('XXX', left, currPos.x + 100)
+
       if(left > currPos.x + 100){
         if(canWalkLeft) {
           setLeft(currPos.x + 100)
@@ -168,7 +168,7 @@ const Mario = () => {
       
       setIndex(index => index + 1)
     },
-    [positionsStore],
+    [positionsStore, gameLoopEnabled, reverse, left, canWalkLeft, canWalkRight, setLeft],
     null,
     true
   )
@@ -190,16 +190,6 @@ const Mario = () => {
       }
     }
   }, [left, gameLoopEnabled, motionRef])
-
-  // const scrollHandler = _ => {
-  // }
-
-  // useEffect(() => {
-  //   window.addEventListener("scroll", scrollHandler, true);
-  //   return () => {
-  //     window.removeEventListener("scroll", scrollHandler, true);
-  //   };
-  // }, [left]);
 
   useEffect(() => {
     if(index % 4 == 1){

@@ -143,8 +143,8 @@ export const elements = [
   { type: 'Pipe', x: 39, y: 1, size: 2, width: 128, height: 192 },
   { type: 'Pipe', x: 47, y: 1, size: 3, width: 128, height: 256 },
   { type: 'Pipe', x: 58, y: 1, size: 3, width: 128, height: 256 },
-  { type: 'Pipe', x: 166, y: 1, size: 1, width: 128, height: 256 },
-  { type: 'Pipe', x: 182, y: 1, size: 1, width: 128, height: 256 },
+  { type: 'Pipe', x: 166, y: 1, size: 1, width: 128, height: 128 },
+  { type: 'Pipe', x: 182, y: 1, size: 1, width: 128, height: 128 },
   
   { type: 'Floor', x: 0, y: 0, size: 69, width: 69 * 64, height: 64 },
   { type: 'Floor', x: 71, y: 0, size: 16, width: 16 * 64, height: 64 },

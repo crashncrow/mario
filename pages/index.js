@@ -1,4 +1,4 @@
-import { useEffect, useRef } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { elements, pipes } from 'libs/elements'
 import { useAppContext } from 'contexts/AppContext'
 import useDoubleClick from 'hooks/clicks'
@@ -22,12 +22,15 @@ export default function Home() {
   const buttonRef = useRef()
   const worldRef = useRef(null)
   const cameraXRef = useRef(0)
+  const [ domCount, setDomCount ] = useState(0)
+  const [ worldDomCount, setWorldDomCount ] = useState(0)
   
   const {
     debug,
     gameLoopEnabled,
     renderLimit,
     pixels,
+    width,
     left,
     bottom,
     objects,
@@ -127,6 +130,20 @@ export default function Home() {
     }
   }, [gameLoopEnabled])
 
+  useEffect(() => {
+    const updateDomCounts = () => {
+      setDomCount(document.querySelectorAll('*').length)
+      setWorldDomCount(worldRef.current ? worldRef.current.querySelectorAll('*').length : 0)
+    }
+
+    updateDomCounts()
+    const interval = setInterval(updateDomCounts, 500)
+
+    return () => {
+      clearInterval(interval)
+    }
+  }, [])
+
   const jump = (limit) => {
     let j = 0
 
@@ -142,6 +159,24 @@ export default function Home() {
   }
 
   const getElementKey = el => `${el.type}_${el.x}_${el.y}_${el.size ?? 1}`
+  const worldPreloadTiles = 12
+  const visibleMinPx = Math.max(0, left - 112 - (worldPreloadTiles * pixels))
+  const visibleMaxPx = left + (width || 0) + (worldPreloadTiles * pixels)
+  const visibleObjects = objects.filter(el => {
+    const elLeft = el.x * pixels
+    const elRight = elLeft + (el.width ?? pixels)
+    return elRight > visibleMinPx && elLeft < visibleMaxPx
+  })
+  const visibleObjectsCount = visibleObjects.length
+  const visibleSpritesApprox = visibleObjects.filter(el => el.type !== 'Floor').length
+  const visibleFloorTiles = objects
+    .filter(el => el.type === 'Floor')
+    .reduce((total, el) => {
+      const segmentLeftPx = el.x * pixels
+      const startTile = Math.max(0, Math.floor((visibleMinPx - segmentLeftPx) / pixels))
+      const endTile = Math.min(el.size, Math.ceil((visibleMaxPx - segmentLeftPx) / pixels))
+      return total + Math.max(0, endTile - startTile)
+    }, 0)
 
   useDoubleClick({
     onSingleClick: (e) => {
@@ -208,6 +243,21 @@ export default function Home() {
           </div>
         )}
       </div>
+      {debug && (
+        <div
+          className='fixed top-4 left-4 p-2 bg-black/80 border-2 border-white text-[10px] leading-4 text-white'
+          style={{ zIndex: 60 }}
+        >
+          <div>Debug DOM</div>
+          <div>Total: {domCount}</div>
+          <div>Mundo: {worldDomCount}</div>
+          <div>renderLimit: {Math.round(renderLimit)}</div>
+          <div>Mario: x {Math.round(left)} / y {Math.round(bottom)}</div>
+          <div>Objetos render: {visibleObjectsCount}</div>
+          <div>Sprites aprox: {visibleSpritesApprox}</div>
+          <div>Floor tiles: {visibleFloorTiles}</div>
+        </div>
+      )}
       <div className='w-full h-full fixed z-50' ref={buttonRef}></div>
       <div className={gameLoopEnabled ? 'h-screen overflow-hidden' : 'h-screen overflow-x-scroll'}>
         <Head>
@@ -227,13 +277,13 @@ export default function Home() {
             className='h-full w-full'
           >
             <Mario />
-            <Sky />
-            <Plants />
-            <Mountains />
+            {renderLimit > (9 - worldPreloadTiles) * pixels && <Sky />}
+            {renderLimit > (0 - worldPreloadTiles) * pixels && <Mountains />}
+            {renderLimit > (12 - worldPreloadTiles) * pixels && <Plants />}
 
             <div className='inline-block'>
             {debug &&
-              objects.filter(el => el.x * pixels < renderLimit).map((o, i) => (
+              visibleObjects.map((o, i) => (
                   <div
                     key={`debug_${getElementKey(o)}_${i}`}
                     className='absolute border-4 border-mario-red z-50'
@@ -257,7 +307,7 @@ export default function Home() {
               ></div>
             )}
 
-            {objects.filter(el => el.x * pixels < renderLimit).map((el, i) => {
+            {visibleObjects.map((el, i) => {
               if (el.type === 'Box') {
                 return (
                   <Box
@@ -314,8 +364,12 @@ export default function Home() {
             }
 
             {/* <Pipe segments={elements.filter(el => el.type == 'Floor')} /> */}
-            <Floor segments={objects.filter(el => el.type == 'Floor')} />
-            <Castle x={205} />
+            <Floor
+              segments={objects.filter(el => el.type == 'Floor')}
+              minPx={visibleMinPx}
+              maxPx={visibleMaxPx}
+            />
+            {renderLimit > (205 - worldPreloadTiles) * pixels && <Castle x={205} />}
             </div>
           </div>
         </main>
