@@ -39,10 +39,10 @@ const TouchControls = ({ gameLoopEnabled, setLoopInput }) => {
       <div className='flex gap-3 pointer-events-auto'>
         <button
           type='button'
-          className={`w-14 h-14 border-2 text-xl transition-colors ${
+          className={`w-14 h-14 border-2 text-xl transition-colors select-none ${
             pressed.left ? 'bg-white text-black border-white' : 'bg-black/80 text-white border-white'
           }`}
-          style={{ touchAction: 'none' }}
+          style={{ touchAction: 'none', userSelect: 'none', WebkitUserSelect: 'none', WebkitTouchCallout: 'none' }}
           onTouchStart={press('left', { left: true })}
           onTouchEnd={press('left', { left: false })}
           onTouchCancel={press('left', { left: false })}
@@ -54,10 +54,10 @@ const TouchControls = ({ gameLoopEnabled, setLoopInput }) => {
         </button>
         <button
           type='button'
-          className={`w-14 h-14 border-2 text-xl transition-colors ${
+          className={`w-14 h-14 border-2 text-xl transition-colors select-none ${
             pressed.right ? 'bg-white text-black border-white' : 'bg-black/80 text-white border-white'
           }`}
-          style={{ touchAction: 'none' }}
+          style={{ touchAction: 'none', userSelect: 'none', WebkitUserSelect: 'none', WebkitTouchCallout: 'none' }}
           onTouchStart={press('right', { right: true })}
           onTouchEnd={press('right', { right: false })}
           onTouchCancel={press('right', { right: false })}
@@ -72,10 +72,10 @@ const TouchControls = ({ gameLoopEnabled, setLoopInput }) => {
       <div className='pointer-events-auto'>
         <button
           type='button'
-          className={`min-w-20 h-14 px-4 border-2 text-sm transition-colors ${
+          className={`min-w-20 h-14 px-4 border-2 text-sm transition-colors select-none ${
             pressed.jump ? 'bg-white text-black border-white' : 'bg-black/80 text-white border-white'
           }`}
-          style={{ touchAction: 'none' }}
+          style={{ touchAction: 'none', userSelect: 'none', WebkitUserSelect: 'none', WebkitTouchCallout: 'none' }}
           onTouchStart={press('jump', { jump: true })}
           onTouchEnd={press('jump', { jump: false })}
           onTouchCancel={press('jump', { jump: false })}
