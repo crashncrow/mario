@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from 'react'
 import { useAppContext } from 'contexts/AppContext'
 
-const Box = ({ x, y, touches }) => {
+const Box = ({ x, y, touches = 0 }) => {
   const { pixels } = useAppContext()
   const [ isBumping, setIsBumping ] = useState(false)
   const prevTouchesRef = useRef(touches)

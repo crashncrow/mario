@@ -2,7 +2,9 @@ export const bumpInteractiveBlockAtPosition = ({ objects, pixels, x, y }) => {
   let bumped = false
 
   const nextObjects = objects.map(obj => {
-    if (bumped || obj.type === 'Floor' || typeof obj.touches === 'undefined') {
+    const isInteractive = obj.type === 'Box' || obj.type === 'Brick'
+
+    if (bumped || obj.type === 'Floor' || !isInteractive) {
       return obj
     }
 

@@ -11,9 +11,10 @@ import {
   isGroundedAtPosition,
 } from 'libs/collision'
 import { bumpInteractiveBlockAtPosition } from 'libs/interaction'
+import { TILE_SIZE } from 'libs/worldConstants'
 
 const AppContext = createContext(null)
-const pixels = 64
+const pixels = TILE_SIZE
 
 export const AppContextProvider = ({ children }) => {
   const { width } = useWindowDimensions();
