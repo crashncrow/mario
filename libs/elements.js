@@ -151,6 +151,3 @@ export const elements = [
   { type: 'Floor', x: 90, y: 0, size: 64, width: 64 * 64, height: 64 },
   { type: 'Floor', x: 156, y: 0, size: 62, width: 62 * 64, height: 64 },
 ]
-
-export const pipes = [
-]

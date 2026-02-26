@@ -55,6 +55,7 @@ export default function useDebugMetrics({
   const visibleBrickCount = visibleObjects.filter(el => el.type === 'Brick').length
   const visibleBlockCount = visibleObjects.filter(el => el.type === 'Block').length
   const visibleBoxCount = visibleObjects.filter(el => el.type === 'Box').length
+  const visiblePipeCount = visibleObjects.filter(el => el.type === 'Pipe').length
 
   const visibleFloorTiles = objects
     .filter(el => el.type === 'Floor')
@@ -98,6 +99,7 @@ export default function useDebugMetrics({
     visibleBrickCount,
     visibleBlockCount,
     visibleBoxCount,
+    visiblePipeCount,
     visibleFloorTiles,
     visibleBushCount,
     visibleCloudCount,
@@ -113,6 +115,7 @@ export default function useDebugMetrics({
       visibleBrickCount,
       visibleBlockCount,
       visibleBoxCount,
+      visiblePipeCount,
       visibleFloorTiles,
       visibleBushCount,
       visibleCloudCount,

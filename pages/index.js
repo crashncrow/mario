@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useRef } from 'react'
-import { elements, pipes } from 'libs/elements'
+import { elements } from 'libs/elements'
 import { useAppContext } from 'contexts/AppContext'
 import useDebugMetrics from 'hooks/useDebugMetrics'
 import useVisibleWorldWindow from 'hooks/useVisibleWorldWindow'
@@ -10,22 +10,19 @@ import Head from 'next/head'
 import Sky from 'components/Sky'
 import Mario from 'components/Mario'
 import Floor from 'components/Floor'
-import Pipe from 'components/Pipe'
 import Plants from 'components/Plants'
 import Mountains from 'components/Mountains'
-import Brick from 'components/Brick'
-import Block from 'components/Block'
-import Box from 'components/Box'
 import Stats from 'components/Stats'
 import Castle from 'components/Castle'
 import DebugPanel from 'components/DebugPanel'
+import WorldObjectsLayer from 'components/WorldObjectsLayer'
 
 export default function Home() {
 
   const buttonRef = useRef()
   const worldRef = useRef(null)
   const cameraXRef = useRef(0)
-  
+
   const {
     debug,
     gameLoopEnabled,
@@ -87,7 +84,6 @@ export default function Home() {
     return j
   }, [pixels, checkCollision, left, bottom])
 
-  const getElementKey = el => `${el.type}_${el.x}_${el.y}_${el.size ?? 1}`
   const {
     visibleObjects,
     debugPanelProps,
@@ -155,104 +151,27 @@ export default function Home() {
         <Stats />
 
         <main className='h-full w-full overflow-hidden'>
-          <div
-            ref={worldRef}
-            className='h-full w-full'
-          >
+          <div ref={worldRef} className='h-full w-full'>
             <Mario />
-            {renderLimit > (9 - worldPreloadTiles) * pixels && <Sky cameraX={cameraXForMetrics} />}
-            {renderLimit > (0 - worldPreloadTiles) * pixels && <Mountains cameraX={cameraXForMetrics} />}
-            {renderLimit > (12 - worldPreloadTiles) * pixels && <Plants cameraX={cameraXForMetrics} />}
+            
+            <Sky cameraX={cameraXForMetrics} />
+            <Mountains cameraX={cameraXForMetrics} />
+            <Plants cameraX={cameraXForMetrics} />
 
             <div className='inline-block'>
-            {debug &&
-              visibleObjects.map((o, i) => (
-                  <div
-                    key={`debug_${getElementKey(o)}_${i}`}
-                    className='absolute border-4 border-mario-red z-50'
-                    style={{
-                      bottom: `${o.y * pixels}px`,
-                      left: `${o.x * pixels}px`,
-                      height: `${o.height}px`,
-                      width: `${o.width}px`
-                    }}
-                  ></div>
-                )
-              )}
+              <WorldObjectsLayer
+                visibleObjects={visibleObjects}
+                pixels={pixels}
+                debug={debug}
+              />
 
-            {debug && (
-              <div
-                className='absolute border-4 border-mario-brown z-50 w-1 h-1'
-                style={{
-                  bottom: `${bottom}px`,
-                  left: `${left}px`
-                }}
-              ></div>
-            )}
+              <Floor
+                segments={objects.filter(el => el.type == 'Floor')}
+                minPx={visibleMinPx}
+                maxPx={visibleMaxPx}
+              />
 
-            {visibleObjects.map((el, i) => {
-              if (el.type === 'Box') {
-                return (
-                  <Box
-                    x={el.x}
-                    y={el.y}
-                    size={el.size}
-                    touches={el.touches}
-                    key={getElementKey(el)}
-                  />
-                )
-              } else if (el.type === 'Brick') {
-                return (
-                  <Brick
-                    x={el.x}
-                    y={el.y}
-                    size={el.size}
-                    touches={el.touches}
-                    key={getElementKey(el)}
-                  />
-                )
-              } 
-              else if (el.type === 'Block') {
-                return (
-                  <Block
-                    x={el.x}
-                    y={el.y}
-                    size={el.size}
-                    key={getElementKey(el)}
-                  />
-                )
-              }
-              else if (el.type === 'Pipe') {
-                return <Pipe x={el.x} size={el.size} key={getElementKey(el)} />
-              }
-            
-            })}
-
-            {
-              // pipes.map((el, i) => {
-                
-              //     return <Pipe x={el.x} size={el.size} key={i} />
-                
-              // })
-            }
-
-            {
-            /* 
-            {
-              elements.filter(el => el.type == 'Floor').map((el, i) => {
-                return <Floor x={el.x} size={el.size} key={i} />
-              })
-            } 
-            */
-            }
-
-            {/* <Pipe segments={elements.filter(el => el.type == 'Floor')} /> */}
-            <Floor
-              segments={objects.filter(el => el.type == 'Floor')}
-              minPx={visibleMinPx}
-              maxPx={visibleMaxPx}
-            />
-            {renderLimit > (205 - worldPreloadTiles) * pixels && <Castle x={205} />}
+              {renderLimit > (205 - worldPreloadTiles) * pixels && <Castle x={205} />}
             </div>
           </div>
         </main>

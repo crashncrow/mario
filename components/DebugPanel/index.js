@@ -9,6 +9,7 @@ const DebugPanel = ({
   visibleBrickCount,
   visibleBlockCount,
   visibleBoxCount,
+  visiblePipeCount,
   visibleFloorTiles,
   visibleBushCount,
   visibleCloudCount,
@@ -33,6 +34,7 @@ const DebugPanel = ({
       <div>Bricks: {visibleBrickCount}</div>
       <div>Blocks: {visibleBlockCount}</div>
       <div>Boxes: {visibleBoxCount}</div>
+      <div>Pipes: {visiblePipeCount}</div>
       <div>Floor: {visibleFloorTiles}</div>
       <div>Bushes: {visibleBushCount}</div>
       <div>Clouds: {visibleCloudCount}</div>

@@ -30,7 +30,7 @@ const Mountains = ({ cameraX = null }) => {
           const mountainRight = mountainLeft + mountainWidth
           return mountainRight > minPx && mountainLeft < maxPx
         }).map((mountain, i) => (
-          <Mountain x={mountain.x} size={mountain.size} key={`mountain_${i}`}/>
+          <Mountain x={mountain.x} size={mountain.size} pixels={pixels} key={`mountain_${i}`}/>
         ))
       }
     </>

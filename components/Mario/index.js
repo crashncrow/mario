@@ -130,9 +130,9 @@ const Mario = () => {
     motionRef,
   } = useAppContext()
 
-  const [ reverse, setReverse ] = useState(false)
-  const [ index, setIndex ] = useState(1)
-  const [ currentMatrix, setCurrentMatrix ] = useState(matrix1)
+  const [reverse, setReverse] = useState(false)
+  const [index, setIndex] = useState(1)
+  const [currentMatrix, setCurrentMatrix] = useState(matrix1)
   const lastWalkAnimTickRef = useRef(0)
 
   const positionsStore = PositionStore()
@@ -148,24 +148,24 @@ const Mario = () => {
 
       positionsStore.setViewportPosition(currPos)
 
-      if((prevPos.x < currPos.x) && reverse) {
+      if ((prevPos.x < currPos.x) && reverse) {
         setReverse(false)
       }
       else if ((prevPos.x > currPos.x) && !reverse) {
         setReverse(true)
       }
 
-      if(left > currPos.x + 100){
-        if(canWalkLeft) {
+      if (left > currPos.x + 100) {
+        if (canWalkLeft) {
           setLeft(currPos.x + 100)
         }
       }
-      else{
-        if(canWalkRight) {
+      else {
+        if (canWalkRight) {
           setLeft(currPos.x + 100)
         }
       }
-      
+
       setIndex(index => index + 1)
     },
     [positionsStore, gameLoopEnabled, reverse, left, canWalkLeft, canWalkRight, setLeft],
@@ -192,69 +192,81 @@ const Mario = () => {
   }, [left, gameLoopEnabled, motionRef])
 
   useEffect(() => {
-    if(index % 4 == 1){
+    if (index % 4 == 1) {
       setCurrentMatrix(matrix2)
     }
-    else if(index % 4 == 2){
+    else if (index % 4 == 2) {
       setCurrentMatrix(matrix3)
     }
-    else if(index % 4 == 3){
+    else if (index % 4 == 3) {
       setCurrentMatrix(matrix2)
     }
-    else{
+    else {
       setCurrentMatrix(matrix1)
     }
   }, [index])
 
   return (
     <>
-    { 
-      debug && <div id="border_mario"
-      className='absolute border-4 border-mario-red z-50'
-      style={{
-        bottom: `${bottom}px`,
-        left: `${left + 10}px`,
-        height: `${pixels}px`,
-        width: `${pixels - 20}px`
-      }}
-    ></div>
-    }
-
-    <div className="hidden fixed top-0">
-      <div ref={viewportRef}>
-        <div>Deferred Rendering: {positionsStore.renderCount}</div>
-        <div>Viewport: X: {positionsStore.getViewportX()} Y: {positionsStore.getViewportY()}</div>
-        <div>Mario: X:{positionsStore.getElementX()} Y:{positionsStore.getElementY()}</div>
-      </div>
-    </div>
-
-    <div 
-      className={`flex flex-wrap w-16 absolute bottom-0 z-40 ${collision && debug? 'bg-black' : ''}`}
-      style={{left: `${left}px`, bottom: `${bottom}px`}}>
-
-      {currentMatrix.map((x, i) => {
-        if(reverse){
-          // reverse without mutate
-          return x.slice().reverse().map((y, j) => (
-            <div 
-            className={`h-1 w-${y.count} flex-none ${c[y.color]}`}
-            key={`mario_${i}${j}`}
-            >
-            </div>
-          ))
-        }
-        else{
-          return x.map((y, j) => (
-            <div 
-            className={`h-1 w-${y.count} flex-none ${c[y.color]}`}
-            key={`mario_${i}${j}`}
-            >
-            </div>
-          ))
-        }
+      {
+        debug && <div id="border_mario"
+          className='absolute border-4 border-mario-red z-50'
+          style={{
+            bottom: `${bottom}px`,
+            left: `${left + 10}px`,
+            height: `${pixels}px`,
+            width: `${pixels - 20}px`
+          }}
+        ></div>
       }
-      )}
-    </div>
+
+      {
+        debug && (
+          <div
+            className='absolute border-4 border-mario-brown z-50 w-1 h-1'
+            style={{
+              bottom: `${bottom}px`,
+              left: `${left}px`
+            }}
+          ></div>
+        )
+      }
+
+      <div className="hidden fixed top-0">
+        <div ref={viewportRef}>
+          <div>Deferred Rendering: {positionsStore.renderCount}</div>
+          <div>Viewport: X: {positionsStore.getViewportX()} Y: {positionsStore.getViewportY()}</div>
+          <div>Mario: X:{positionsStore.getElementX()} Y:{positionsStore.getElementY()}</div>
+        </div>
+      </div>
+
+      <div
+        className={`flex flex-wrap w-16 absolute bottom-0 z-40 ${collision && debug ? 'bg-black' : ''}`}
+        style={{ left: `${left}px`, bottom: `${bottom}px` }}>
+
+        {currentMatrix.map((x, i) => {
+          if (reverse) {
+            // reverse without mutate
+            return x.slice().reverse().map((y, j) => (
+              <div
+                className={`h-1 w-${y.count} flex-none ${c[y.color]}`}
+                key={`mario_${i}${j}`}
+              >
+              </div>
+            ))
+          }
+          else {
+            return x.map((y, j) => (
+              <div
+                className={`h-1 w-${y.count} flex-none ${c[y.color]}`}
+                key={`mario_${i}${j}`}
+              >
+              </div>
+            ))
+          }
+        }
+        )}
+      </div>
     </>
   )
 }
