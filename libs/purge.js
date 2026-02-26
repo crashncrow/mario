@@ -1,4 +1,4 @@
-// Usado manualmente al exportar CSS de Tailwind (no importado por la app)
+// Used manually when exporting Tailwind CSS (not imported by the app)
 const purge = [
   'w-1',  'w-2',  'w-3',  'w-4',  'w-5',  'w-6',  'w-7', 'w-8', 
   'w-9',  'w-10', 'w-11', 'w-12', 'w-13', 'w-14', 'w-15', 
