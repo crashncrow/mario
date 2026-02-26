@@ -559,7 +559,7 @@ export const AppContextProvider = ({ children }) => {
   return (
     <AppContext.Provider
       value={{
-        debug: false,
+        debug: true,
         pixels: pixels,
         width: width,
 

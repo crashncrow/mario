@@ -1,16 +1,17 @@
-import { useEffect, useRef, useState } from 'react'
+import { useEffect, useRef } from 'react'
 import { elements, pipes } from 'libs/elements'
 import { useAppContext } from 'contexts/AppContext'
 import useDoubleClick from 'hooks/clicks'
 import useIsomorphicLayoutEffect from 'hooks/useIsomorphicLayoutEffect'
+import useDebugMetrics from 'hooks/useDebugMetrics'
 
 import Head from 'next/head'
-import Sky, { SKY_CLOUDS } from 'components/Sky'
+import Sky from 'components/Sky'
 import Mario from 'components/Mario'
 import Floor from 'components/Floor'
 import Pipe from 'components/Pipe'
-import Plants, { PLANTS_BUSHES } from 'components/Plants'
-import Mountains, { MOUNTAINS_LIST } from 'components/Mountains'
+import Plants from 'components/Plants'
+import Mountains from 'components/Mountains'
 import Brick from 'components/Brick'
 import Block from 'components/Block'
 import Box from 'components/Box'
@@ -23,9 +24,6 @@ export default function Home() {
   const buttonRef = useRef()
   const worldRef = useRef(null)
   const cameraXRef = useRef(0)
-  const [ domCount, setDomCount ] = useState(0)
-  const [ worldDomCount, setWorldDomCount ] = useState(0)
-  const [ memoryStats, setMemoryStats ] = useState(null)
   
   const {
     debug,
@@ -138,30 +136,6 @@ export default function Home() {
     }
   }, [gameLoopEnabled])
 
-  useEffect(() => {
-    const updateDomCounts = () => {
-      setDomCount(document.querySelectorAll('*').length)
-      setWorldDomCount(worldRef.current ? worldRef.current.querySelectorAll('*').length : 0)
-
-      if (typeof performance !== 'undefined' && performance.memory) {
-        setMemoryStats({
-          used: performance.memory.usedJSHeapSize,
-          total: performance.memory.totalJSHeapSize,
-          limit: performance.memory.jsHeapSizeLimit,
-        })
-      } else {
-        setMemoryStats(null)
-      }
-    }
-
-    updateDomCounts()
-    const interval = setInterval(updateDomCounts, 500)
-
-    return () => {
-      clearInterval(interval)
-    }
-  }, [])
-
   const jump = (limit) => {
     let j = 0
 
@@ -177,54 +151,25 @@ export default function Home() {
   }
 
   const getElementKey = el => `${el.type}_${el.x}_${el.y}_${el.size ?? 1}`
-  const worldPreloadTiles = 12
-  const cameraXForMetrics = gameLoopEnabled
-    ? Math.max(0, Math.min(maxCameraX, Math.round(left - 112)))
-    : 0
-  const visibleMinPx = Math.max(0, cameraXForMetrics - (worldPreloadTiles * pixels))
-  const visibleMaxPx = cameraXForMetrics + (width || 0) + (worldPreloadTiles * pixels)
-  const visibleObjects = objects.filter(el => {
-    const elLeft = el.x * pixels
-    const elRight = elLeft + (el.width ?? pixels)
-    return elRight > visibleMinPx && elLeft < visibleMaxPx
+  const {
+    worldPreloadTiles,
+    cameraXForMetrics,
+    visibleMinPx,
+    visibleMaxPx,
+    visibleObjects,
+    debugPanelProps,
+  } = useDebugMetrics({
+    debug,
+    worldRef,
+    objects,
+    pixels,
+    width,
+    left,
+    bottom,
+    renderLimit,
+    gameLoopEnabled,
+    maxCameraX,
   })
-  const visibleObjectsCount = visibleObjects.length
-  const visibleSpritesApprox = visibleObjects.filter(el => el.type !== 'Floor').length
-  const visibleBrickCount = visibleObjects.filter(el => el.type === 'Brick').length
-  const visibleBlockCount = visibleObjects.filter(el => el.type === 'Block').length
-  const visibleBoxCount = visibleObjects.filter(el => el.type === 'Box').length
-  const visibleFloorTiles = objects
-    .filter(el => el.type === 'Floor')
-    .reduce((total, el) => {
-      const segmentLeftPx = el.x * pixels
-      const startTile = Math.max(0, Math.floor((visibleMinPx - segmentLeftPx) / pixels))
-      const endTile = Math.min(el.size, Math.ceil((visibleMaxPx - segmentLeftPx) / pixels))
-      return total + Math.max(0, endTile - startTile)
-    }, 0)
-  const decorPreloadPx = pixels * 8
-  const decorMinPx = Math.max(0, cameraXForMetrics - decorPreloadPx)
-  const decorMaxPx = cameraXForMetrics + (width || 0) + decorPreloadPx
-  const visibleBushCount = PLANTS_BUSHES.filter(p => {
-    // Bush has `ml-8` (32px = pixels/2) and width `w-(16 + 16*size)` => (1 + size) * pixels.
-    const plantLeft = (p.x * pixels) + (pixels / 2)
-    const plantWidth = (1 + p.size) * pixels
-    const plantRight = plantLeft + plantWidth
-    return plantRight > decorMinPx && plantLeft < decorMaxPx
-  }).length
-  const visibleCloudCount = SKY_CLOUDS.filter(cloud => {
-    // Cloud width is `w-(16 + 16*size)` => (1 + size) * pixels.
-    const cloudLeft = cloud.x * pixels
-    const cloudWidth = (1 + cloud.size) * pixels
-    const cloudRight = cloudLeft + cloudWidth
-    return cloudRight > decorMinPx && cloudLeft < decorMaxPx
-  }).length
-  const visibleMountainCount = MOUNTAINS_LIST.filter(mountain => {
-    const mountainLeft = mountain.x * pixels
-    // Mountain sprite real width is wider than tile size due to its pixel-art shape.
-    const mountainWidth = mountain.size === 2 ? 320 : 168
-    const mountainRight = mountainLeft + mountainWidth
-    return mountainRight > decorMinPx && mountainLeft < decorMaxPx
-  }).length
 
   useDoubleClick({
     onSingleClick: (e) => {
@@ -292,23 +237,7 @@ export default function Home() {
         )}
       </div>
       {debug && (
-        <DebugPanel
-          domCount={domCount}
-          worldDomCount={worldDomCount}
-          renderLimit={renderLimit}
-          left={left}
-          bottom={bottom}
-          visibleObjectsCount={visibleObjectsCount}
-          visibleSpritesApprox={visibleSpritesApprox}
-          visibleBrickCount={visibleBrickCount}
-          visibleBlockCount={visibleBlockCount}
-          visibleBoxCount={visibleBoxCount}
-          visibleFloorTiles={visibleFloorTiles}
-          visibleBushCount={visibleBushCount}
-          visibleCloudCount={visibleCloudCount}
-          visibleMountainCount={visibleMountainCount}
-          memoryStats={memoryStats}
-        />
+        <DebugPanel {...debugPanelProps} />
       )}
       <div className='w-full h-full fixed z-50' ref={buttonRef}></div>
       <div className={gameLoopEnabled ? 'h-screen overflow-hidden' : 'h-screen overflow-x-scroll'}>
