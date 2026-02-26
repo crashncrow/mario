@@ -16,6 +16,7 @@ import Brick2 from 'components/Brick2'
 import Box from 'components/Box'
 import Stats from 'components/Stats'
 import Castle from 'components/Castle'
+import DebugPanel from 'components/DebugPanel'
 
 export default function Home() {
 
@@ -244,19 +245,16 @@ export default function Home() {
         )}
       </div>
       {debug && (
-        <div
-          className='fixed top-4 left-4 p-2 bg-black/80 border-2 border-white text-[10px] leading-4 text-white'
-          style={{ zIndex: 60 }}
-        >
-          <div>Debug DOM</div>
-          <div>Total: {domCount}</div>
-          <div>Mundo: {worldDomCount}</div>
-          <div>renderLimit: {Math.round(renderLimit)}</div>
-          <div>Mario: x {Math.round(left)} / y {Math.round(bottom)}</div>
-          <div>Objetos render: {visibleObjectsCount}</div>
-          <div>Sprites aprox: {visibleSpritesApprox}</div>
-          <div>Floor tiles: {visibleFloorTiles}</div>
-        </div>
+        <DebugPanel
+          domCount={domCount}
+          worldDomCount={worldDomCount}
+          renderLimit={renderLimit}
+          left={left}
+          bottom={bottom}
+          visibleObjectsCount={visibleObjectsCount}
+          visibleSpritesApprox={visibleSpritesApprox}
+          visibleFloorTiles={visibleFloorTiles}
+        />
       )}
       <div className='w-full h-full fixed z-50' ref={buttonRef}></div>
       <div className={gameLoopEnabled ? 'h-screen overflow-hidden' : 'h-screen overflow-x-scroll'}>
