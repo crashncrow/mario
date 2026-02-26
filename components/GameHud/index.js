@@ -14,7 +14,7 @@ const GameHud = ({
 
     <div
       className='fixed top-4 left-1/2 -translate-x-1/2 text-white flex flex-col items-center'
-      style={{ zIndex: 60 }}
+      style={{ zIndex: 60, top: 'max(1rem, env(safe-area-inset-top))' }}
     >
       <button
         type='button'
