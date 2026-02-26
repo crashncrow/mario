@@ -1,6 +1,14 @@
 import { createContext, useCallback, useContext, useEffect, useRef, useState } from 'react'
 import { useWindowDimensions } from 'hooks/window'
 import useMarioPhysics from 'hooks/useMarioPhysics'
+import {
+  getLandingYAtPosition,
+  getMaxWalkXForObjects,
+  hasCeilingCollisionAtPosition,
+  hasCollisionAtPosition,
+  hasSideCollisionAtPosition,
+  isGroundedAtPosition,
+} from 'libs/collision'
 
 const AppContext = createContext(null)
 const pixels = 64
@@ -149,96 +157,27 @@ export const AppContextProvider = ({ children }) => {
   }, [objects, collision, canWalkLeft, canWalkRight])
 
   const hasCollisionAt = useCallback((x, y) => {
-    return objects.some(obj => (
-      x + 10 < obj.x * pixels + obj.width &&
-      x + pixels - 20 > obj.x * pixels &&
-      y >= obj.y * pixels &&
-      y <= obj.y * pixels + obj.height
-    ))
+    return hasCollisionAtPosition({ objects, pixels, x, y })
   }, [objects])
 
   const isGroundedAt = useCallback((x, y) => {
-    // Probe a couple pixels below the feet so fractional positions don't lose ground contact.
-    return hasCollisionAt(x, Math.max(0, y - 2))
-  }, [hasCollisionAt])
+    return isGroundedAtPosition({ objects, pixels, x, y })
+  }, [objects])
 
   const getLandingYAt = useCallback((x, fromY, toY) => {
-    let landingY = null
-
-    objects.forEach(obj => {
-      const objLeft = obj.x * pixels
-      const objRight = objLeft + obj.width
-      const objTop = (obj.y * pixels) + obj.height
-
-      const overlapsX =
-        x + 10 < objRight &&
-        x + pixels - 20 > objLeft
-
-      if (!overlapsX) return
-
-      if (objTop <= fromY && objTop >= toY) {
-        landingY = landingY === null ? objTop : Math.max(landingY, objTop)
-      }
-    })
-
-    return landingY
+    return getLandingYAtPosition({ objects, pixels, x, fromY, toY })
   }, [objects])
 
   const hasSideCollisionAt = useCallback((x, y) => {
-    const marioLeft = x + 10
-    const marioRight = x + pixels - 20
-    const marioBottom = y + 2
-    const marioTop = y + pixels - 2
-
-    return objects.some(obj => {
-      const objLeft = obj.x * pixels
-      const objRight = objLeft + obj.width
-      const objBottom = obj.y * pixels
-      const objTop = objBottom + obj.height
-
-      return (
-        marioLeft < objRight &&
-        marioRight > objLeft &&
-        marioBottom < objTop &&
-        marioTop > objBottom
-      )
-    })
+    return hasSideCollisionAtPosition({ objects, pixels, x, y })
   }, [objects])
 
   const hasCeilingCollisionAt = useCallback((x, y) => {
-    const marioLeft = x + 12
-    const marioRight = x + pixels - 22
-    const headBottom = y + pixels - 4
-    const headTop = y + pixels
-
-    return objects.some(obj => {
-      if (obj.type === 'Floor') return false
-
-      const objLeft = obj.x * pixels
-      const objRight = objLeft + obj.width
-      const objBottom = obj.y * pixels
-      const objTop = objBottom + obj.height
-
-      return (
-        marioLeft < objRight &&
-        marioRight > objLeft &&
-        headBottom < objTop &&
-        headTop > objBottom
-      )
-    })
+    return hasCeilingCollisionAtPosition({ objects, pixels, x, y })
   }, [objects])
 
   const getMaxWalkX = useCallback(() => {
-    const floorSegments = objects.filter(obj => obj.type === 'Floor')
-    if (floorSegments.length === 0) return Infinity
-
-    const floorEndPx = floorSegments.reduce((max, obj) => {
-      const end = (obj.x * pixels) + obj.width
-      return Math.max(max, end)
-    }, 0)
-
-    // Keep Mario's body inside the floor bounds.
-    return Math.max(0, floorEndPx - (pixels - 20))
+    return getMaxWalkXForObjects({ objects, pixels })
   }, [objects])
 
   const bumpInteractiveBlockAt = useCallback((x, y) => {
