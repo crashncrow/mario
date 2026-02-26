@@ -1,11 +1,13 @@
 import DebugPanel from 'components/DebugPanel'
 import Stats from 'components/Stats'
+import TouchControls from 'components/TouchControls'
 
 const GameHud = ({
   debug,
   debugPanelProps,
   gameLoopEnabled,
   setGameLoopEnabled,
+  setLoopInput,
 }) => (
   <>
     <Stats />
@@ -32,6 +34,7 @@ const GameHud = ({
     </div>
 
     {debug && <DebugPanel {...debugPanelProps} />}
+    <TouchControls gameLoopEnabled={gameLoopEnabled} setLoopInput={setLoopInput} />
   </>
 )
 

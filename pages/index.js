@@ -82,6 +82,7 @@ export default function Home() {
         debugPanelProps={debugPanelProps}
         gameLoopEnabled={gameLoopEnabled}
         setGameLoopEnabled={setGameLoopEnabled}
+        setLoopInput={setLoopInput}
       />
       <div className='w-full h-full fixed z-50' ref={buttonRef}></div>
       <div className={gameLoopEnabled ? 'h-screen overflow-hidden' : 'h-screen overflow-x-scroll'}>
