@@ -1,29 +1,23 @@
 import { useEffect } from 'react'
 
 import useIsomorphicLayoutEffect from 'hooks/useIsomorphicLayoutEffect'
+import { TILE_SIZE } from 'libs/worldConstants'
 
 export default function useCameraFollow({
   gameLoopEnabled,
   worldRef,
   cameraXRef,
   left,
+  width,
   maxCameraX,
 }) {
   useIsomorphicLayoutEffect(() => {
     if (!gameLoopEnabled || !worldRef.current) return
+    if (!width) return
 
     const currentCameraX = cameraXRef.current
-    const screenX = left - currentCameraX
-    const deadZoneLeft = 88
-    const deadZoneRight = 112
-
-    let nextCameraX = currentCameraX
-
-    if (screenX < deadZoneLeft) {
-      nextCameraX = left - deadZoneLeft
-    } else if (screenX > deadZoneRight) {
-      nextCameraX = left - deadZoneRight
-    }
+    const followX = (width / 2) - TILE_SIZE
+    let nextCameraX = left - followX
 
     nextCameraX = Math.max(0, Math.round(nextCameraX))
     nextCameraX = Math.min(nextCameraX, maxCameraX)
@@ -32,7 +26,7 @@ export default function useCameraFollow({
       cameraXRef.current = nextCameraX
       worldRef.current.style.transform = `translate3d(${-nextCameraX}px, 0, 0)`
     }
-  }, [gameLoopEnabled, worldRef, cameraXRef, left, maxCameraX])
+  }, [gameLoopEnabled, worldRef, cameraXRef, left, width, maxCameraX])
 
   useEffect(() => {
     if (gameLoopEnabled) return

@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react'
+import { TILE_SIZE } from 'libs/worldConstants'
 
 export default function useVisibleWorldWindow({
   objects,
@@ -33,7 +34,7 @@ export default function useVisibleWorldWindow({
   const maxCameraX = Math.max(0, floorEndPx - (width || 0))
 
   const cameraXForMetrics = gameLoopEnabled
-    ? Math.max(0, Math.min(maxCameraX, Math.round(left - 112)))
+    ? Math.max(0, Math.min(maxCameraX, Math.round(left - (((width || 0) / 2) - TILE_SIZE))))
     : Math.max(0, Math.min(maxCameraX, Math.round(scrollX)))
 
   const visibleMinPx = Math.max(0, cameraXForMetrics - (worldPreloadTiles * pixels))

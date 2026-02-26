@@ -49,6 +49,7 @@ export default function Home() {
     worldRef,
     cameraXRef,
     left,
+    width,
     maxCameraX,
   })
 
