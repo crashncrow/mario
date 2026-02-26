@@ -1,6 +1,7 @@
 import { createContext, useCallback, useContext, useEffect, useRef, useState } from 'react'
 import { useWindowDimensions } from 'hooks/window'
 import useMarioPhysics from 'hooks/useMarioPhysics'
+import { elements } from 'libs/elements'
 import {
   getLandingYAtPosition,
   getMaxWalkXForObjects,
@@ -9,6 +10,7 @@ import {
   hasSideCollisionAtPosition,
   isGroundedAtPosition,
 } from 'libs/collision'
+import { bumpInteractiveBlockAtPosition } from 'libs/interaction'
 
 const AppContext = createContext(null)
 const pixels = 64
@@ -17,29 +19,21 @@ export const AppContextProvider = ({ children }) => {
   const { width } = useWindowDimensions();
   const debugEnabled = process.env.NEXT_PUBLIC_DEBUG === '1'
 
-  const [ objects, setObjects ] = useState([])
+  const [ objects, setObjects ] = useState(elements)
 
   const [ left, setLeft ] = useState(100)
   const [ bottom, setBottom ] = useState(pixels)
   
-  const [ collision, setCollision ] = useState(false)
-  
-  const [ canJump, setCanJump ] = useState(true)
-  const [ canWalkLeft, setCanWalkLeft ] = useState(true)
-  const [ canWalkRight, setCanWalkRight ] = useState(true)
-  const [ jumping, setJumping ] = useState(false)
   const [ gameLoopEnabled, setGameLoopEnabled ] = useState(true)
   const renderLimit = left + (width ?? 0) + 500
 
   const stateRef = useRef({
     left,
     bottom,
-    jumping,
     width,
     renderLimit,
   })
 
-  const checkCollisionRef = useRef(null)
   const motionRef = useRef({
     x: left,
     y: bottom,
@@ -70,11 +64,10 @@ export const AppContextProvider = ({ children }) => {
     stateRef.current = {
       left,
       bottom,
-      jumping,
       width,
       renderLimit,
     }
-  }, [left, bottom, jumping, width, renderLimit])
+  }, [left, bottom, width, renderLimit])
 
   useEffect(() => {
     publishPendingRef.current = false
@@ -85,77 +78,6 @@ export const AppContextProvider = ({ children }) => {
     motionRef.current.x = left
     motionRef.current.y = bottom
   }, [left, bottom, gameLoopEnabled])
-
-  const checkCollision = useCallback((x, y) => {
-    let toco = false
-    let walkLeft = true
-    let walkRight = true
-
-    let objs = [...objects]
-
-    objs.map((obj, i) => {
-      // console.log('X', x, (obj.x * pixels),  (obj.x * pixels) + obj.width)
-      // console.log('Y', y, (obj.y * pixels),  (obj.y * pixels) + obj.height)
-
-      if (
-        x + 10 < obj.x * pixels + obj.width &&
-        x + pixels - 20 > obj.x * pixels &&
-        y >= obj.y * pixels &&
-        y <= obj.y * pixels + obj.height
-      ) {
-
-        if (obj.type !== 'Floor') {
-          console.log('YYY', obj.type , y, (obj.y * pixels) + obj.height)
-          if(y >= (obj.y * pixels) + obj.height){
-            console.log('ARRIBA')
-          }
-          else {
-            if (typeof obj.touches !== 'undefined') {
-              obj.touches++
-            }
-
-            if (x + pixels < (obj.x * pixels) + obj.width) {
-              console.log('VIENE DE IZQ, NO PUEDE SEGUIR A LA DER')
-              walkRight = false
-            }
-  
-            if (x > obj.x * pixels) {
-              console.log('VIENE DE DER, NO PUEDE SEGUIR A LA IZQ')
-              walkLeft = false
-            }
-          }
-        }
-
-        if(!collision) {
-          setCollision(true)
-        }
-        
-        if(obj.type !== 'Floor') {
-          console.log('COLLISION')
-        }
-
-        toco = true
-      }
-    })
-
-    if (!toco) {
-      setCollision(false)
-      setCanJump(false)
-    } else {
-      setObjects(objs)
-      setCanJump(true)
-    }
-
-    if(walkLeft !== canWalkLeft){
-      setCanWalkLeft(walkLeft)
-    }
-
-    if(walkRight !== canWalkRight){
-      setCanWalkRight(walkRight)
-    }
-    
-    return toco
-  }, [objects, collision, canWalkLeft, canWalkRight])
 
   const hasCollisionAt = useCallback((x, y) => {
     return hasCollisionAtPosition({ objects, pixels, x, y })
@@ -182,46 +104,12 @@ export const AppContextProvider = ({ children }) => {
   }, [objects])
 
   const bumpInteractiveBlockAt = useCallback((x, y) => {
-    let bumped = false
-
-    const nextObjects = objects.map(obj => {
-      if (bumped || obj.type === 'Floor' || typeof obj.touches === 'undefined') {
-        return obj
-      }
-
-      const objLeft = obj.x * pixels
-      const objRight = objLeft + obj.width
-      const objBottom = obj.y * pixels
-      const objTop = objBottom + obj.height
-
-      const marioLeft = x + 12
-      const marioRight = x + pixels - 22
-      const headBottom = y + pixels - 4
-      const headTop = y + pixels
-
-      const hit =
-        marioLeft < objRight &&
-        marioRight > objLeft &&
-        headBottom < objTop &&
-        headTop > objBottom
-
-      if (!hit) return obj
-
-      bumped = true
-      return {
-        ...obj,
-        touches: (obj.touches || 0) + 1,
-      }
-    })
+    const { nextObjects, bumped } = bumpInteractiveBlockAtPosition({ objects, pixels, x, y })
 
     if (bumped) {
       setObjects(nextObjects)
     }
   }, [objects])
-
-  useEffect(() => {
-    checkCollisionRef.current = checkCollision
-  }, [checkCollision])
 
   const setLeftSafe = useCallback(nextValue => {
     if (!Number.isFinite(nextValue)) return
@@ -237,31 +125,7 @@ export const AppContextProvider = ({ children }) => {
     setBottom(nextValue)
   }, [])
 
-  const applyGravity = useCallback(() => {
-    const { left: currentLeft, bottom: currentBottom, jumping: currentJumping } = stateRef.current
-
-    if (
-      checkCollisionRef.current &&
-      !checkCollisionRef.current(currentLeft, currentBottom) &&
-      currentLeft > 100 &&
-      !currentJumping
-    ) {
-      setBottom(bottom => bottom - pixels)
-    }
-  }, [])
-
-  useEffect(() => {
-    if (gameLoopEnabled) return
-
-    const rafId = window.requestAnimationFrame(() => {
-      applyGravity()
-    })
-
-    return () => {
-      window.cancelAnimationFrame(rafId)
-    }
-  }, [left, bottom, jumping, applyGravity, gameLoopEnabled])
-
+  // Modern mode: requestAnimationFrame physics loop.
   useMarioPhysics({
     enabled: gameLoopEnabled,
     motionRef,
@@ -321,12 +185,6 @@ export const AppContextProvider = ({ children }) => {
         bottom: bottom,
         objects: objects,
 
-        canJump: canJump,
-        collision: collision,
-
-        canWalkLeft: canWalkLeft,
-        canWalkRight: canWalkRight,
-
         renderLimit: renderLimit, 
         motionRef: motionRef,
         gameLoopEnabled: gameLoopEnabled,
@@ -334,8 +192,6 @@ export const AppContextProvider = ({ children }) => {
         setLeft: setLeft,
         setBottom: setBottom,
         setObjects: setObjects,
-        checkCollision: checkCollision,
-        setJumping: setJumping,
         setLoopInput: setLoopInput,
         setGameLoopEnabled: setGameLoopEnabled
       }}

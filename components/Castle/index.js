@@ -3,10 +3,7 @@ import Roof from 'components/Roof'
 import Window from 'components/Window'
 import Door from 'components/Door'
 
-import { useAppContext } from 'contexts/AppContext'
-
 const Castle = ({ x }) => {
-  const { renderLimit, pixels } = useAppContext()
   const originX = x ?? 205
 
   const base = [
@@ -46,18 +43,18 @@ const Castle = ({ x }) => {
   return (
     <>
       {
-        base.filter(el => el.x * pixels < renderLimit).map((el, i) => (
+        base.map((el, i) => (
           <Brick key={`castle-brick-${el.x}-${el.y}-${i}`} x={el.x} y={el.y} touches={0} border={0} />
         ))
       }
 
       {
-        roof.filter(el => el.x * pixels < renderLimit).map((el, i) => (
+        roof.map((el, i) => (
           <Roof key={`castle-roof-${el.x}-${el.y}-${i}`} x={el.x} y={el.y} bg={el.bg} />
         ))
       }
       {
-        windows.filter(el => el.x * pixels < renderLimit).map((el, i) => (
+        windows.map((el, i) => (
           <Window key={`castle-window-${el.x}-${el.y}-${i}`} x={el.x} y={el.y} left={el.left} />
          ))
       }

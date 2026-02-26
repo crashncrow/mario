@@ -6,11 +6,6 @@ export default function useGameInput({
   buttonRef,
   gameLoopEnabled,
   setLoopInput,
-  canJump,
-  setJumping,
-  setBottom,
-  jump,
-  pixels,
 }) {
   useEffect(() => {
     if (!gameLoopEnabled) return
@@ -69,34 +64,15 @@ export default function useGameInput({
     }, 60)
   }, [setLoopInput])
 
-  const triggerLegacyJump = useCallback((limit) => {
-    if (!canJump) return
-
-    setJumping(true)
-    setBottom(bottom => bottom + jump(limit) + pixels)
-
-    setTimeout(() => {
-      setJumping(false)
-    }, 200)
-  }, [canJump, setJumping, setBottom, jump, pixels])
-
   const onSingleClick = useCallback(() => {
-    if (gameLoopEnabled) {
-      triggerLoopJump()
-      return
-    }
-
-    triggerLegacyJump(128)
-  }, [gameLoopEnabled, triggerLoopJump, triggerLegacyJump])
+    if (!gameLoopEnabled) return
+    triggerLoopJump()
+  }, [gameLoopEnabled, triggerLoopJump])
 
   const onDoubleClick = useCallback(() => {
-    if (gameLoopEnabled) {
-      triggerLoopJump()
-      return
-    }
-
-    triggerLegacyJump(266)
-  }, [gameLoopEnabled, triggerLoopJump, triggerLegacyJump])
+    if (!gameLoopEnabled) return
+    triggerLoopJump()
+  }, [gameLoopEnabled, triggerLoopJump])
 
   useDoubleClick({
     onSingleClick,

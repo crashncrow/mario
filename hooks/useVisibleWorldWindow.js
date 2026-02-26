@@ -1,3 +1,5 @@
+import { useEffect, useState } from 'react'
+
 export default function useVisibleWorldWindow({
   objects,
   pixels,
@@ -5,8 +7,24 @@ export default function useVisibleWorldWindow({
   left,
   gameLoopEnabled,
 }) {
+  const [scrollX, setScrollX] = useState(0)
   const worldPreloadTiles = 12
   const decorPreloadTiles = 8
+
+  useEffect(() => {
+    if (typeof window === 'undefined') return
+
+    const updateScroll = () => {
+      setScrollX(window.scrollX || 0)
+    }
+
+    updateScroll()
+    window.addEventListener('scroll', updateScroll, { passive: true })
+
+    return () => {
+      window.removeEventListener('scroll', updateScroll)
+    }
+  }, [])
 
   const floorEndPx = objects
     .filter(el => el.type === 'Floor')
@@ -16,7 +34,7 @@ export default function useVisibleWorldWindow({
 
   const cameraXForMetrics = gameLoopEnabled
     ? Math.max(0, Math.min(maxCameraX, Math.round(left - 112)))
-    : 0
+    : Math.max(0, Math.min(maxCameraX, Math.round(scrollX)))
 
   const visibleMinPx = Math.max(0, cameraXForMetrics - (worldPreloadTiles * pixels))
   const visibleMaxPx = cameraXForMetrics + (width || 0) + (worldPreloadTiles * pixels)

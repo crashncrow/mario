@@ -1,5 +1,4 @@
-import { useCallback, useEffect, useRef } from 'react'
-import { elements } from 'libs/elements'
+import { useRef } from 'react'
 import { useAppContext } from 'contexts/AppContext'
 import useDebugMetrics from 'hooks/useDebugMetrics'
 import useVisibleWorldWindow from 'hooks/useVisibleWorldWindow'
@@ -7,14 +6,8 @@ import useGameInput from 'hooks/useGameInput'
 import useCameraFollow from 'hooks/useCameraFollow'
 
 import Head from 'next/head'
-import Sky from 'components/Sky'
-import Mario from 'components/Mario'
-import Floor from 'components/Floor'
-import Plants from 'components/Plants'
-import Mountains from 'components/Mountains'
-import Castle from 'components/Castle'
 import GameHud from 'components/GameHud'
-import WorldObjectsLayer from 'components/WorldObjectsLayer'
+import WorldScene from 'components/WorldScene'
 
 export default function Home() {
 
@@ -31,13 +24,8 @@ export default function Home() {
     left,
     bottom,
     objects,
-    setBottom,
-    setObjects,
     setLoopInput,
     setGameLoopEnabled,
-    canJump,
-    checkCollision,
-    setJumping
   } = useAppContext()
 
   const {
@@ -56,11 +44,6 @@ export default function Home() {
     gameLoopEnabled,
   })
 
-  useEffect(() => {
-    // console.log(renderLimit)
-    setObjects(elements)
-  }, [setObjects])
-
   useCameraFollow({
     gameLoopEnabled,
     worldRef,
@@ -68,20 +51,6 @@ export default function Home() {
     left,
     maxCameraX,
   })
-
-  const jump = useCallback((limit) => {
-    let j = 0
-
-    for (let i = 1; i * pixels <= limit; i++) {
-      if (!checkCollision(left, bottom + (i * pixels) + pixels)) {
-        j = i * pixels
-      } else {
-        break
-      }
-    }
-
-    return j
-  }, [pixels, checkCollision, left, bottom])
 
   const {
     visibleObjects,
@@ -104,11 +73,6 @@ export default function Home() {
     buttonRef,
     gameLoopEnabled,
     setLoopInput,
-    canJump,
-    setJumping,
-    setBottom,
-    jump,
-    pixels,
   })
 
   return (
@@ -130,31 +94,17 @@ export default function Home() {
           />
         </Head>
 
-        <main className='h-full w-full overflow-hidden'>
-          <div ref={worldRef} className='h-full w-full'>
-            <Mario />
-            
-            <Sky cameraX={cameraXForMetrics} />
-            <Mountains cameraX={cameraXForMetrics} />
-            <Plants cameraX={cameraXForMetrics} />
-
-            <div className='inline-block'>
-              <WorldObjectsLayer
-                visibleObjects={visibleObjects}
-                pixels={pixels}
-                debug={debug}
-              />
-
-              <Floor
-                segments={objects.filter(el => el.type == 'Floor')}
-                minPx={visibleMinPx}
-                maxPx={visibleMaxPx}
-              />
-
-              {renderLimit > (205 - worldPreloadTiles) * pixels && <Castle x={205} />}
-            </div>
-          </div>
-        </main>
+        <WorldScene
+          worldRef={worldRef}
+          cameraXForMetrics={cameraXForMetrics}
+          visibleObjects={visibleObjects}
+          pixels={pixels}
+          debug={debug}
+          objects={objects}
+          visibleMinPx={visibleMinPx}
+          visibleMaxPx={visibleMaxPx}
+          worldPreloadTiles={worldPreloadTiles}
+        />
       </div>
     </>
   )
