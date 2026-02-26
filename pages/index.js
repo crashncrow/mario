@@ -12,9 +12,8 @@ import Mario from 'components/Mario'
 import Floor from 'components/Floor'
 import Plants from 'components/Plants'
 import Mountains from 'components/Mountains'
-import Stats from 'components/Stats'
 import Castle from 'components/Castle'
-import DebugPanel from 'components/DebugPanel'
+import GameHud from 'components/GameHud'
 import WorldObjectsLayer from 'components/WorldObjectsLayer'
 
 export default function Home() {
@@ -114,29 +113,12 @@ export default function Home() {
 
   return (
     <>
-      <div
-        className='fixed top-4 left-1/2 -translate-x-1/2 text-white flex flex-col items-center'
-        style={{ zIndex: 60 }}
-      >
-        <button
-          type='button'
-          className='px-3 py-2 bg-black/80 border-2 border-white text-xs'
-          onClick={() => setGameLoopEnabled(enabled => !enabled)}
-        >
-          {gameLoopEnabled ? 'Juego ON' : 'Scroll libre'}
-        </button>
-        {gameLoopEnabled && (
-          <div className='mt-2 p-2 bg-black/80 border-2 border-white text-[10px] leading-4 text-white text-center'>
-            <div>Controles</div>
-            <div>← → mover</div>
-            <div>Space saltar</div>
-            <div>Click / doble click tambien</div>
-          </div>
-        )}
-      </div>
-      {debug && (
-        <DebugPanel {...debugPanelProps} />
-      )}
+      <GameHud
+        debug={debug}
+        debugPanelProps={debugPanelProps}
+        gameLoopEnabled={gameLoopEnabled}
+        setGameLoopEnabled={setGameLoopEnabled}
+      />
       <div className='w-full h-full fixed z-50' ref={buttonRef}></div>
       <div className={gameLoopEnabled ? 'h-screen overflow-hidden' : 'h-screen overflow-x-scroll'}>
         <Head>
@@ -147,8 +129,6 @@ export default function Home() {
             content='width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no'
           />
         </Head>
-
-        <Stats />
 
         <main className='h-full w-full overflow-hidden'>
           <div ref={worldRef} className='h-full w-full'>
