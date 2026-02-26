@@ -15,6 +15,7 @@ const pixels = 64
 
 export const AppContextProvider = ({ children }) => {
   const { width } = useWindowDimensions();
+  const debugEnabled = process.env.NEXT_PUBLIC_DEBUG === '1'
 
   const [ objects, setObjects ] = useState([])
 
@@ -312,7 +313,7 @@ export const AppContextProvider = ({ children }) => {
   return (
     <AppContext.Provider
       value={{
-        debug: false,
+        debug: debugEnabled,
         pixels: pixels,
         width: width,
 
