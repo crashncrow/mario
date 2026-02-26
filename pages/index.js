@@ -5,14 +5,14 @@ import useDoubleClick from 'hooks/clicks'
 import useIsomorphicLayoutEffect from 'hooks/useIsomorphicLayoutEffect'
 
 import Head from 'next/head'
-import Sky from 'components/Sky'
+import Sky, { SKY_CLOUDS } from 'components/Sky'
 import Mario from 'components/Mario'
 import Floor from 'components/Floor'
 import Pipe from 'components/Pipe'
-import Plants from 'components/Plants'
-import Mountains from 'components/Mountains'
+import Plants, { PLANTS_BUSHES } from 'components/Plants'
+import Mountains, { MOUNTAINS_LIST } from 'components/Mountains'
 import Brick from 'components/Brick'
-import Brick2 from 'components/Brick2'
+import Block from 'components/Block'
 import Box from 'components/Box'
 import Stats from 'components/Stats'
 import Castle from 'components/Castle'
@@ -25,6 +25,7 @@ export default function Home() {
   const cameraXRef = useRef(0)
   const [ domCount, setDomCount ] = useState(0)
   const [ worldDomCount, setWorldDomCount ] = useState(0)
+  const [ memoryStats, setMemoryStats ] = useState(null)
   
   const {
     debug,
@@ -43,6 +44,11 @@ export default function Home() {
     checkCollision,
     setJumping
   } = useAppContext()
+
+  const floorEndPx = objects
+    .filter(el => el.type === 'Floor')
+    .reduce((max, el) => Math.max(max, (el.x * pixels) + el.width), 0)
+  const maxCameraX = Math.max(0, floorEndPx - (width || 0))
 
   useEffect(() => {
     // console.log(renderLimit)
@@ -116,12 +122,13 @@ export default function Home() {
     }
 
     nextCameraX = Math.max(0, Math.round(nextCameraX))
+    nextCameraX = Math.min(nextCameraX, maxCameraX)
 
     if (Math.abs(currentCameraX - nextCameraX) > 0) {
       cameraXRef.current = nextCameraX
       worldRef.current.style.transform = `translate3d(${-nextCameraX}px, 0, 0)`
     }
-  }, [gameLoopEnabled, left])
+  }, [gameLoopEnabled, left, maxCameraX])
 
   useEffect(() => {
     if (gameLoopEnabled) return
@@ -135,6 +142,16 @@ export default function Home() {
     const updateDomCounts = () => {
       setDomCount(document.querySelectorAll('*').length)
       setWorldDomCount(worldRef.current ? worldRef.current.querySelectorAll('*').length : 0)
+
+      if (typeof performance !== 'undefined' && performance.memory) {
+        setMemoryStats({
+          used: performance.memory.usedJSHeapSize,
+          total: performance.memory.totalJSHeapSize,
+          limit: performance.memory.jsHeapSizeLimit,
+        })
+      } else {
+        setMemoryStats(null)
+      }
     }
 
     updateDomCounts()
@@ -161,8 +178,11 @@ export default function Home() {
 
   const getElementKey = el => `${el.type}_${el.x}_${el.y}_${el.size ?? 1}`
   const worldPreloadTiles = 12
-  const visibleMinPx = Math.max(0, left - 112 - (worldPreloadTiles * pixels))
-  const visibleMaxPx = left + (width || 0) + (worldPreloadTiles * pixels)
+  const cameraXForMetrics = gameLoopEnabled
+    ? Math.max(0, Math.min(maxCameraX, Math.round(left - 112)))
+    : 0
+  const visibleMinPx = Math.max(0, cameraXForMetrics - (worldPreloadTiles * pixels))
+  const visibleMaxPx = cameraXForMetrics + (width || 0) + (worldPreloadTiles * pixels)
   const visibleObjects = objects.filter(el => {
     const elLeft = el.x * pixels
     const elRight = elLeft + (el.width ?? pixels)
@@ -170,6 +190,9 @@ export default function Home() {
   })
   const visibleObjectsCount = visibleObjects.length
   const visibleSpritesApprox = visibleObjects.filter(el => el.type !== 'Floor').length
+  const visibleBrickCount = visibleObjects.filter(el => el.type === 'Brick').length
+  const visibleBlockCount = visibleObjects.filter(el => el.type === 'Block').length
+  const visibleBoxCount = visibleObjects.filter(el => el.type === 'Box').length
   const visibleFloorTiles = objects
     .filter(el => el.type === 'Floor')
     .reduce((total, el) => {
@@ -178,6 +201,30 @@ export default function Home() {
       const endTile = Math.min(el.size, Math.ceil((visibleMaxPx - segmentLeftPx) / pixels))
       return total + Math.max(0, endTile - startTile)
     }, 0)
+  const decorPreloadPx = pixels * 8
+  const decorMinPx = Math.max(0, cameraXForMetrics - decorPreloadPx)
+  const decorMaxPx = cameraXForMetrics + (width || 0) + decorPreloadPx
+  const visibleBushCount = PLANTS_BUSHES.filter(p => {
+    // Bush has `ml-8` (32px = pixels/2) and width `w-(16 + 16*size)` => (1 + size) * pixels.
+    const plantLeft = (p.x * pixels) + (pixels / 2)
+    const plantWidth = (1 + p.size) * pixels
+    const plantRight = plantLeft + plantWidth
+    return plantRight > decorMinPx && plantLeft < decorMaxPx
+  }).length
+  const visibleCloudCount = SKY_CLOUDS.filter(cloud => {
+    // Cloud width is `w-(16 + 16*size)` => (1 + size) * pixels.
+    const cloudLeft = cloud.x * pixels
+    const cloudWidth = (1 + cloud.size) * pixels
+    const cloudRight = cloudLeft + cloudWidth
+    return cloudRight > decorMinPx && cloudLeft < decorMaxPx
+  }).length
+  const visibleMountainCount = MOUNTAINS_LIST.filter(mountain => {
+    const mountainLeft = mountain.x * pixels
+    // Mountain sprite real width is wider than tile size due to its pixel-art shape.
+    const mountainWidth = mountain.size === 2 ? 320 : 168
+    const mountainRight = mountainLeft + mountainWidth
+    return mountainRight > decorMinPx && mountainLeft < decorMaxPx
+  }).length
 
   useDoubleClick({
     onSingleClick: (e) => {
@@ -253,7 +300,14 @@ export default function Home() {
           bottom={bottom}
           visibleObjectsCount={visibleObjectsCount}
           visibleSpritesApprox={visibleSpritesApprox}
+          visibleBrickCount={visibleBrickCount}
+          visibleBlockCount={visibleBlockCount}
+          visibleBoxCount={visibleBoxCount}
           visibleFloorTiles={visibleFloorTiles}
+          visibleBushCount={visibleBushCount}
+          visibleCloudCount={visibleCloudCount}
+          visibleMountainCount={visibleMountainCount}
+          memoryStats={memoryStats}
         />
       )}
       <div className='w-full h-full fixed z-50' ref={buttonRef}></div>
@@ -275,9 +329,9 @@ export default function Home() {
             className='h-full w-full'
           >
             <Mario />
-            {renderLimit > (9 - worldPreloadTiles) * pixels && <Sky />}
-            {renderLimit > (0 - worldPreloadTiles) * pixels && <Mountains />}
-            {renderLimit > (12 - worldPreloadTiles) * pixels && <Plants />}
+            {renderLimit > (9 - worldPreloadTiles) * pixels && <Sky cameraX={cameraXForMetrics} />}
+            {renderLimit > (0 - worldPreloadTiles) * pixels && <Mountains cameraX={cameraXForMetrics} />}
+            {renderLimit > (12 - worldPreloadTiles) * pixels && <Plants cameraX={cameraXForMetrics} />}
 
             <div className='inline-block'>
             {debug &&
@@ -327,9 +381,9 @@ export default function Home() {
                   />
                 )
               } 
-              else if (el.type === 'Brick2') {
+              else if (el.type === 'Block') {
                 return (
-                  <Brick2
+                  <Block
                     x={el.x}
                     y={el.y}
                     size={el.size}

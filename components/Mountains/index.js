@@ -1,7 +1,7 @@
 import { useAppContext } from 'contexts/AppContext'
 import Mountain from 'components/Mountain'
 
-const m = [
+export const MOUNTAINS_LIST = [
   {x: 0, size: 2},
   {x: 17, size: 1},
   {x: 49, size: 2},
@@ -14,13 +14,22 @@ const m = [
   {x: 211, size: 1},
 ]
 
-const Mountains = () => {
-  const { renderLimit, pixels } = useAppContext()
+const Mountains = ({ cameraX = null }) => {
+  const { left, width, pixels } = useAppContext()
+  const preloadPx = pixels * 8
+  const cameraLeft = cameraX ?? left
+  const minPx = Math.max(0, cameraLeft - preloadPx)
+  const maxPx = cameraLeft + (width || 0) + preloadPx
 
   return (
     <>
       {
-        m.filter(el => el.x * pixels < renderLimit).map((mountain, i) => (
+        MOUNTAINS_LIST.filter(mountain => {
+          const mountainLeft = mountain.x * pixels
+          const mountainWidth = mountain.size === 2 ? 320 : 168
+          const mountainRight = mountainLeft + mountainWidth
+          return mountainRight > minPx && mountainLeft < maxPx
+        }).map((mountain, i) => (
           <Mountain x={mountain.x} size={mountain.size} key={`mountain_${i}`}/>
         ))
       }

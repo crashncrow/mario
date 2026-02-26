@@ -228,6 +228,19 @@ export const AppContextProvider = ({ children }) => {
     })
   }, [objects])
 
+  const getMaxWalkX = useCallback(() => {
+    const floorSegments = objects.filter(obj => obj.type === 'Floor')
+    if (floorSegments.length === 0) return Infinity
+
+    const floorEndPx = floorSegments.reduce((max, obj) => {
+      const end = (obj.x * pixels) + obj.width
+      return Math.max(max, end)
+    }, 0)
+
+    // Keep Mario's body inside the floor bounds.
+    return Math.max(0, floorEndPx - (pixels - 20))
+  }, [objects])
+
   const bumpInteractiveBlockAt = useCallback((x, y) => {
     let bumped = false
 
@@ -468,8 +481,9 @@ export const AppContextProvider = ({ children }) => {
       nextX = probeX
     }
 
-    // Keep Mario inside the visible left boundary in game mode.
+    // Keep Mario inside the world bounds in game mode.
     nextX = Math.max(0, nextX)
+    nextX = Math.min(nextX, getMaxWalkX())
 
     motion.vy = dt > 0 ? (nextY - prev.y) / dt : motion.vy
     if (motion.vy === 0) {

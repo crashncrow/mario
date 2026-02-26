@@ -1,6 +1,6 @@
 import { useAppContext } from 'contexts/AppContext'
 
-const Brick2 = ({x, y}) => {
+const Block = ({x, y}) => {
   const { pixels } = useAppContext()
 
   return (
@@ -32,4 +32,4 @@ const Brick2 = ({x, y}) => {
   )
 }
 
-export default Brick2
+export default Block
