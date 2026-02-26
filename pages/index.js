@@ -84,14 +84,14 @@ export default function Home() {
         setGameLoopEnabled={setGameLoopEnabled}
         setLoopInput={setLoopInput}
       />
-      <div className='w-full h-full fixed z-50' ref={buttonRef}></div>
-      <div className={gameLoopEnabled ? 'h-screen overflow-hidden' : 'h-screen overflow-x-scroll'}>
+      <div className='fixed inset-0 h-dvh w-full z-50' ref={buttonRef}></div>
+      <div className={gameLoopEnabled ? 'fixed inset-0 h-dvh overflow-hidden overscroll-none' : 'fixed inset-0 h-dvh overflow-x-scroll overflow-y-hidden overscroll-none'}>
         <Head>
           <title>It&apos;s Me, Mario!</title>
           <link rel='icon' href='/favicon.ico' />
           <meta
             name='viewport'
-            content='width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no'
+            content='width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover'
           />
         </Head>
 

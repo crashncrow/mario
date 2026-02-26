@@ -35,7 +35,10 @@ const TouchControls = ({ gameLoopEnabled, setLoopInput }) => {
   }
 
   return (
-    <div className='fixed inset-x-0 bottom-4 px-4 flex items-end justify-between pointer-events-none' style={{ zIndex: 70 }}>
+    <div
+      className='fixed inset-x-0 px-4 flex items-end justify-between pointer-events-none'
+      style={{ zIndex: 70, bottom: 'max(1rem, env(safe-area-inset-bottom))' }}
+    >
       <div className='flex gap-3 pointer-events-auto'>
         <button
           type='button'

@@ -17,8 +17,8 @@ const WorldScene = ({
   visibleMaxPx,
   worldPreloadTiles,
 }) => (
-  <main className='h-full w-full overflow-hidden'>
-    <div ref={worldRef} className='h-full w-full'>
+  <main className='relative h-full w-full overflow-hidden'>
+    <div ref={worldRef} className='absolute inset-x-0 bottom-0 h-full w-full'>
       <Mario />
 
       <Sky cameraX={cameraXForMetrics} />
