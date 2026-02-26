@@ -7,6 +7,7 @@ export default function useVisibleWorldWindow({
   width,
   left,
   gameLoopEnabled,
+  scrollContainerRef,
 }) {
   const [scrollX, setScrollX] = useState(0)
   const worldPreloadTiles = 12
@@ -14,18 +15,22 @@ export default function useVisibleWorldWindow({
 
   useEffect(() => {
     if (typeof window === 'undefined') return
+    const scrollContainerNode = scrollContainerRef?.current
 
     const updateScroll = () => {
-      setScrollX(window.scrollX || 0)
+      const containerScrollLeft = scrollContainerNode?.scrollLeft
+      setScrollX(typeof containerScrollLeft === 'number' ? containerScrollLeft : (window.scrollX || 0))
     }
 
     updateScroll()
     window.addEventListener('scroll', updateScroll, { passive: true })
+    scrollContainerNode?.addEventListener('scroll', updateScroll, { passive: true })
 
     return () => {
       window.removeEventListener('scroll', updateScroll)
+      scrollContainerNode?.removeEventListener('scroll', updateScroll)
     }
-  }, [])
+  }, [scrollContainerRef])
 
   const floorEndPx = objects
     .filter(el => el.type === 'Floor')

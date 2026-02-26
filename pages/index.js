@@ -14,6 +14,7 @@ export default function Home() {
   const buttonRef = useRef()
   const worldRef = useRef(null)
   const cameraXRef = useRef(0)
+  const scrollContainerRef = useRef(null)
 
   const {
     debug,
@@ -29,6 +30,7 @@ export default function Home() {
   } = useAppContext()
 
   const {
+    floorEndPx,
     maxCameraX,
     worldPreloadTiles,
     cameraXForMetrics,
@@ -42,7 +44,9 @@ export default function Home() {
     width,
     left,
     gameLoopEnabled,
+    scrollContainerRef,
   })
+  const scrollWorldWidthPx = Math.max(width || 0, floorEndPx || 0)
 
   useCameraFollow({
     gameLoopEnabled,
@@ -85,8 +89,14 @@ export default function Home() {
         setGameLoopEnabled={setGameLoopEnabled}
         setLoopInput={setLoopInput}
       />
-      <div className='fixed inset-0 h-dvh w-full z-50' ref={buttonRef}></div>
-      <div className={gameLoopEnabled ? 'fixed inset-0 h-dvh overflow-hidden overscroll-none' : 'fixed inset-0 h-dvh overflow-x-scroll overflow-y-hidden overscroll-none'}>
+      <div
+        className={`fixed inset-0 h-dvh w-full z-50 ${gameLoopEnabled ? 'pointer-events-auto' : 'pointer-events-none'}`}
+        ref={buttonRef}
+      ></div>
+      <div
+        ref={scrollContainerRef}
+        className={gameLoopEnabled ? 'fixed inset-0 h-dvh overflow-hidden overscroll-none' : 'fixed inset-0 h-dvh overflow-x-scroll overflow-y-hidden overscroll-none'}
+      >
         <Head>
           <title>It&apos;s Me, Mario!</title>
           <link rel='icon' href='/favicon.ico' />
@@ -96,17 +106,19 @@ export default function Home() {
           />
         </Head>
 
-        <WorldScene
-          worldRef={worldRef}
-          cameraXForMetrics={cameraXForMetrics}
-          visibleObjects={visibleObjects}
-          pixels={pixels}
-          debug={debug}
-          objects={objects}
-          visibleMinPx={visibleMinPx}
-          visibleMaxPx={visibleMaxPx}
-          worldPreloadTiles={worldPreloadTiles}
-        />
+        <div style={{ width: `${scrollWorldWidthPx}px`, height: '100%' }}>
+          <WorldScene
+            worldRef={worldRef}
+            cameraXForMetrics={cameraXForMetrics}
+            visibleObjects={visibleObjects}
+            pixels={pixels}
+            debug={debug}
+            objects={objects}
+            visibleMinPx={visibleMinPx}
+            visibleMaxPx={visibleMaxPx}
+            worldPreloadTiles={worldPreloadTiles}
+          />
+        </div>
       </div>
     </>
   )

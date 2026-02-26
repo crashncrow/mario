@@ -16,15 +16,17 @@ const GameHud = ({
       className='fixed top-4 left-1/2 -translate-x-1/2 text-white flex flex-col items-center'
       style={{ zIndex: 60, top: 'max(1rem, env(safe-area-inset-top))' }}
     >
-      <button
-        type='button'
-        className='px-3 py-2 bg-black/80 border-2 border-white text-xs'
-        onClick={() => setGameLoopEnabled(enabled => !enabled)}
-      >
-        {gameLoopEnabled ? 'Juego ON' : 'Scroll libre'}
-      </button>
+      {debug && (
+        <button
+          type='button'
+          className='px-3 py-2 bg-black/80 border-2 border-white text-xs'
+          onClick={() => setGameLoopEnabled(enabled => !enabled)}
+        >
+          {gameLoopEnabled ? 'Juego ON' : 'Scroll libre'}
+        </button>
+      )}
       {gameLoopEnabled && (
-        <div className='mt-2 p-2 bg-black/80 border-2 border-white text-[10px] leading-4 text-white text-center'>
+        <div className={`${debug ? 'mt-2' : ''} p-2 bg-black/80 border-2 border-white text-[10px] leading-4 text-white text-center`}>
           <div>Controles</div>
           <div>← → mover</div>
           <div>Space saltar</div>
