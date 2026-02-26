@@ -1,7 +1,6 @@
-import { useAppContext } from 'contexts/AppContext'
+import { memo } from 'react'
 
-const Mountain = ({x, size}) => {
-  const { pixels } = useAppContext()
+const Mountain = ({x, size, pixels}) => {
 
   return (
     <div className="absolute bottom-0 left-0 mb-16 " style={{left: `${x * pixels}px` }}>
@@ -50,4 +49,4 @@ const Mountain = ({x, size}) => {
   )
 }
 
-export default Mountain
+export default memo(Mountain)

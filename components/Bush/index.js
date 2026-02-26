@@ -1,4 +1,4 @@
-import { useAppContext } from 'contexts/AppContext'
+import { memo } from 'react'
 import { processFullArray } from 'libs/pixless'
 
 const c = {
@@ -45,9 +45,7 @@ const matrix1Static = processFullArray(m1)
 const matrix2Static = processFullArray(m2)
 const matrix3Static = processFullArray(m3)
 
-const Bush = ({x, size}) => {
-  const { pixels } = useAppContext()
-
+const Bush = ({x, size, pixels}) => {
   return (
     <div className={`flex flex-wrap absolute w-${16 + (16 * size)} bottom-0 ml-8 mb-16`} style={{left: `${x * pixels}px`}}>
       <div className="flex flex-wrap w-8  mt-8">
@@ -94,4 +92,4 @@ const Bush = ({x, size}) => {
   )
 }
 
-export default Bush
+export default memo(Bush)

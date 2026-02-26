@@ -1,4 +1,4 @@
-import { useAppContext } from 'contexts/AppContext'
+import { memo } from 'react'
 import { processFullArray } from 'libs/pixless'
 
 const c = {
@@ -94,11 +94,12 @@ const matrix1Static = processFullArray(m1)
 const matrix2Static = processFullArray(m2)
 const matrix3Static = processFullArray(m3)
 
-const Cloud = ({x, size}) =>{
-  const { pixels } = useAppContext()
-
+const Cloud = ({x, y = 1, size, pixels}) =>{
   return (
-    <div className={`flex flex-wrap absolute w-${16 + (16 * size)} mb-64 pb-64 bottom-0`} style={{left: `${x * pixels}px`}}>
+    <div
+      className={`flex flex-wrap absolute w-${16 + (16 * size)} mb-64 pb-64 bottom-0`}
+      style={{left: `${x * pixels}px`, bottom: `${y * pixels}px`}}
+    >
       <div className="flex flex-wrap w-8">
       {matrix1Static.map((x, i) => (
         x.map((y, j) => (
@@ -142,4 +143,4 @@ const Cloud = ({x, size}) =>{
   )
 }
 
-export default Cloud
+export default memo(Cloud)

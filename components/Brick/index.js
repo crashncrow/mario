@@ -1,27 +1,36 @@
-import { useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { useAppContext } from 'contexts/AppContext'
 
-const Brick = ({x, y, touches}) => {
+const Brick = ({x, y, touches, border = true}) => {
   const { pixels } = useAppContext()
-  const [ jumps, setJumps ] = useState(0)
+  const [ isBumping, setIsBumping ] = useState(false)
+  const prevTouchesRef = useRef(touches)
 
-  const incrementJump = () => {
-    setTimeout(() => {
-      setJumps(touches)
-    }, 200)
-    
-    return 'mb-2'
-  }
+  useEffect(() => {
+    if (touches <= prevTouchesRef.current) return
+
+    prevTouchesRef.current = touches
+    const raf = requestAnimationFrame(() => setIsBumping(true))
+    const timer = setTimeout(() => setIsBumping(false), 180)
+    return () => {
+      cancelAnimationFrame(raf)
+      clearTimeout(timer)
+    }
+  }, [touches])
+
+  useEffect(() => {
+    prevTouchesRef.current = touches
+  }, [touches])
 
   return (
     <>
       <div 
-        className={`flex flex-wrap absolute bg-brick-dark border-b-4 border-black bottom-0 ${touches !== jumps ? incrementJump() : ''}`} 
+        className={`flex flex-wrap absolute bg-brick-dark border-b-4 border-black bottom-0 ${isBumping ? 'mb-2' : ''}`} 
         style={{left: `${x * pixels}px`, bottom: `${(y * pixels)}px`}}>
 
         <div className="flex flex-wrap w-16 h-15" >
-          <div className="h-full w-full border-t-4 border-brick-light">
-            <div className="h-3 w-full border-r-4 border-b-4 border-black">
+          <div className={`h-full w-full ${border ? 'border-t-4 border-brick-light' : 'border-t-0'}`}>
+            <div className={`${border ? 'h-3' : 'h-4'} w-full border-r-4 border-b-4 border-black`}>
               <div className="h-full w-8 border-r-4 border-black">
               </div>
             </div>  

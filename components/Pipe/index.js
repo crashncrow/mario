@@ -1,4 +1,4 @@
-import { useAppContext } from 'contexts/AppContext'
+import { memo } from 'react'
 
 const c = {
   0: '', // bg-transparent
@@ -40,8 +40,7 @@ const t2 = [
   2, 0, 2
 ]
 
-const Pipe = ({x, size}) => {
-  const { pixels } = useAppContext()
+const Pipe = ({x, size, pixels}) => {
 
   return (
     <div className="flex flex-wrap absolute w-32 bottom-0" style={{left: `${x * pixels}px`, bottom: `${pixels}px`}}>
@@ -89,4 +88,4 @@ const Pipe = ({x, size}) => {
   )
 }
 
-export default Pipe
+export default memo(Pipe)

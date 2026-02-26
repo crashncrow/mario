@@ -1,33 +1,6 @@
 import { useState, useRef, useEffect } from 'react'
-import { useScrollPosition } from 'hooks/scroll'
 import { useAppContext } from 'contexts/AppContext'
 import { processFullArray } from 'libs/pixless'
-
-const PositionStore = () => {
-  const [renderCount, triggerReRender] = useState(0)
-  const elementPosition = useRef({ x: 10, y: 150 })
-  const viewportPosition = useRef({ x: 0, y: 0 })
-  let throttleTimeout = null
-
-  const getPos = (el, axis) => Math.round(el.current[axis])
-
-  const setPos = (el, pos) => {
-    el.current = pos
-    if (throttleTimeout !== null) return
-    // Only re-render the component every 0.3s
-    throttleTimeout = setTimeout(() => triggerReRender(renderCount + 1), 300)
-  }
-
-  return {
-    getElementX: () => getPos(elementPosition, 'x'),
-    getElementY: () => getPos(elementPosition, 'y'),
-    getViewportX: () => getPos(viewportPosition, 'x'),
-    getViewportY: () => getPos(viewportPosition, 'y'),
-    setElementPosition: pos => setPos(elementPosition, pos),
-    setViewportPosition: pos => setPos(viewportPosition, pos),
-    renderCount
-  }
-}
 
 const c = {
   0: '', // bg-transparent
@@ -117,120 +90,101 @@ const matrix2 = processFullArray(m2)
 const matrix3 = processFullArray(m3)
 
 const Mario = () => {
-  const { canWalkLeft, canWalkRight, pixels, debug, left, setLeft, bottom, collision } = useAppContext()
+  const {
+    pixels,
+    debug,
+    left,
+    bottom,
+    gameLoopEnabled,
+    motionRef,
+  } = useAppContext()
 
-  const [ reverse, setReverse ] = useState(false)
-  const [ index, setIndex ] = useState(1)
-  const [ currentMatrix, setCurrentMatrix ] = useState(matrix1)
-
-  const positionsStore = PositionStore()
-  const viewportRef = useRef(null)
-
-
-  // Viewport scroll position
-  useScrollPosition(
-    ({ prevPos, currPos }) => {
-      positionsStore.setViewportPosition(currPos)
-
-      if((prevPos.x < currPos.x) && reverse) {
-        setReverse(false)
-      }
-      else if ((prevPos.x > currPos.x) && !reverse) {
-        setReverse(true)
-      }
-      // console.log('XXX', left, currPos.x + 100)
-      if(left > currPos.x + 100){
-        if(canWalkLeft) {
-          setLeft(currPos.x + 100)
-        }
-      }
-      else{
-        if(canWalkRight) {
-          setLeft(currPos.x + 100)
-        }
-      }
-      
-      setIndex(index => index + 1)
-    },
-    [positionsStore],
-    null,
-    true
-  )
-
-  // const scrollHandler = _ => {
-  // }
-
-  // useEffect(() => {
-  //   window.addEventListener("scroll", scrollHandler, true);
-  //   return () => {
-  //     window.removeEventListener("scroll", scrollHandler, true);
-  //   };
-  // }, [left]);
+  const [reverse, setReverse] = useState(false)
+  const [index, setIndex] = useState(1)
+  const lastWalkAnimTickRef = useRef(0)
+  const currentMatrix =
+    index % 4 === 1 ? matrix2
+      : index % 4 === 2 ? matrix3
+        : index % 4 === 3 ? matrix2
+          : matrix1
 
   useEffect(() => {
-    if(index % 4 == 1){
-      setCurrentMatrix(matrix2)
+    if (!gameLoopEnabled) return
+
+    const rafId = window.requestAnimationFrame(() => {
+      const vx = motionRef.current?.vx || 0
+      const grounded = motionRef.current?.grounded ?? true
+      const facing = motionRef.current?.facing || 1
+
+      setReverse(facing < 0)
+
+      if (Math.abs(vx) > 10 && grounded) {
+        const now = performance.now()
+        if (now - lastWalkAnimTickRef.current > 90) {
+          lastWalkAnimTickRef.current = now
+          setIndex(index => index + 1)
+        }
+      }
+    })
+
+    return () => {
+      window.cancelAnimationFrame(rafId)
     }
-    else if(index % 4 == 2){
-      setCurrentMatrix(matrix3)
-    }
-    else if(index % 4 == 3){
-      setCurrentMatrix(matrix2)
-    }
-    else{
-      setCurrentMatrix(matrix1)
-    }
-  }, [index])
+  }, [left, gameLoopEnabled, motionRef])
 
   return (
     <>
-    { 
-      debug && <div id="border_mario"
-      className='absolute border-4 border-mario-red z-50'
-      style={{
-        bottom: `${bottom}px`,
-        left: `${left + 10}px`,
-        height: `${pixels}px`,
-        width: `${pixels - 20}px`
-      }}
-    ></div>
-    }
-
-    <div className="hidden fixed top-0">
-      <div ref={viewportRef}>
-        <div>Deferred Rendering: {positionsStore.renderCount}</div>
-        <div>Viewport: X: {positionsStore.getViewportX()} Y: {positionsStore.getViewportY()}</div>
-        <div>Mario: X:{positionsStore.getElementX()} Y:{positionsStore.getElementY()}</div>
-      </div>
-    </div>
-
-    <div 
-      className={`flex flex-wrap w-16 absolute bottom-0 z-40 ${collision && debug? 'bg-black' : ''}`}
-      style={{left: `${left}px`, bottom: `${bottom}px`}}>
-
-      {currentMatrix.map((x, i) => {
-        if(reverse){
-          // reverse without mutate
-          return x.slice().reverse().map((y, j) => (
-            <div 
-            className={`h-1 w-${y.count} flex-none ${c[y.color]}`}
-            key={`mario_${i}${j}`}
-            >
-            </div>
-          ))
-        }
-        else{
-          return x.map((y, j) => (
-            <div 
-            className={`h-1 w-${y.count} flex-none ${c[y.color]}`}
-            key={`mario_${i}${j}`}
-            >
-            </div>
-          ))
-        }
+      {
+        debug && <div id="border_mario"
+          className='absolute border-4 border-mario-red z-50'
+          style={{
+            bottom: `${bottom}px`,
+            left: `${left + 10}px`,
+            height: `${pixels}px`,
+            width: `${pixels - 20}px`
+          }}
+        ></div>
       }
-      )}
-    </div>
+
+      {
+        debug && (
+          <div
+            className='absolute border-4 border-mario-brown z-50 w-1 h-1'
+            style={{
+              bottom: `${bottom}px`,
+              left: `${left}px`
+            }}
+          ></div>
+        )
+      }
+
+      <div
+        className='flex flex-wrap w-16 absolute bottom-0 z-40'
+        style={{ left: `${left}px`, bottom: `${bottom}px` }}>
+
+        {currentMatrix.map((x, i) => {
+          if (reverse) {
+            // reverse without mutate
+            return x.slice().reverse().map((y, j) => (
+              <div
+                className={`h-1 w-${y.count} flex-none ${c[y.color]}`}
+                key={`mario_${i}${j}`}
+              >
+              </div>
+            ))
+          }
+          else {
+            return x.map((y, j) => (
+              <div
+                className={`h-1 w-${y.count} flex-none ${c[y.color]}`}
+                key={`mario_${i}${j}`}
+              >
+              </div>
+            ))
+          }
+        }
+        )}
+      </div>
     </>
   )
 }
