@@ -1,9 +1,10 @@
-import { useEffect, useRef } from 'react'
+import { useCallback, useEffect, useRef } from 'react'
 import { elements, pipes } from 'libs/elements'
 import { useAppContext } from 'contexts/AppContext'
-import useDoubleClick from 'hooks/clicks'
 import useIsomorphicLayoutEffect from 'hooks/useIsomorphicLayoutEffect'
 import useDebugMetrics from 'hooks/useDebugMetrics'
+import useVisibleWorldWindow from 'hooks/useVisibleWorldWindow'
+import useGameInput from 'hooks/useGameInput'
 
 import Head from 'next/head'
 import Sky from 'components/Sky'
@@ -43,65 +44,26 @@ export default function Home() {
     setJumping
   } = useAppContext()
 
-  const floorEndPx = objects
-    .filter(el => el.type === 'Floor')
-    .reduce((max, el) => Math.max(max, (el.x * pixels) + el.width), 0)
-  const maxCameraX = Math.max(0, floorEndPx - (width || 0))
+  const {
+    maxCameraX,
+    worldPreloadTiles,
+    cameraXForMetrics,
+    visibleMinPx,
+    visibleMaxPx,
+    decorMinPx,
+    decorMaxPx,
+  } = useVisibleWorldWindow({
+    objects,
+    pixels,
+    width,
+    left,
+    gameLoopEnabled,
+  })
 
   useEffect(() => {
     // console.log(renderLimit)
     setObjects(elements)
   }, [setObjects])
-
-  useEffect(() => {
-    if (!gameLoopEnabled) return
-
-    const onKeyDown = e => {
-      if (e.code === 'ArrowLeft') {
-        e.preventDefault()
-        setLoopInput({ left: true })
-      } else if (e.code === 'ArrowRight') {
-        e.preventDefault()
-        setLoopInput({ right: true })
-      } else if (e.code === 'Space') {
-        e.preventDefault()
-        setLoopInput({ jump: true })
-      }
-    }
-
-    const onKeyUp = e => {
-      if (e.code === 'ArrowLeft') {
-        setLoopInput({ left: false })
-      } else if (e.code === 'ArrowRight') {
-        setLoopInput({ right: false })
-      } else if (e.code === 'Space') {
-        setLoopInput({ jump: false })
-      }
-    }
-
-    window.addEventListener('keydown', onKeyDown)
-    window.addEventListener('keyup', onKeyUp)
-
-    return () => {
-      window.removeEventListener('keydown', onKeyDown)
-      window.removeEventListener('keyup', onKeyUp)
-    }
-  }, [gameLoopEnabled, setLoopInput])
-
-  useEffect(() => {
-    if (!gameLoopEnabled) return
-
-    const onWheel = e => {
-      // The camera follows Mario in the game loop; manual wheel scroll fights it and causes shaking.
-      e.preventDefault()
-    }
-
-    window.addEventListener('wheel', onWheel, { passive: false })
-
-    return () => {
-      window.removeEventListener('wheel', onWheel)
-    }
-  }, [gameLoopEnabled])
 
   useIsomorphicLayoutEffect(() => {
     if (!gameLoopEnabled || !worldRef.current) return
@@ -136,7 +98,7 @@ export default function Home() {
     }
   }, [gameLoopEnabled])
 
-  const jump = (limit) => {
+  const jump = useCallback((limit) => {
     let j = 0
 
     for (let i = 1; i * pixels <= limit; i++) {
@@ -148,14 +110,10 @@ export default function Home() {
     }
 
     return j
-  }
+  }, [pixels, checkCollision, left, bottom])
 
   const getElementKey = el => `${el.type}_${el.x}_${el.y}_${el.size ?? 1}`
   const {
-    worldPreloadTiles,
-    cameraXForMetrics,
-    visibleMinPx,
-    visibleMaxPx,
     visibleObjects,
     debugPanelProps,
   } = useDebugMetrics({
@@ -163,55 +121,24 @@ export default function Home() {
     worldRef,
     objects,
     pixels,
-    width,
     left,
     bottom,
     renderLimit,
-    gameLoopEnabled,
-    maxCameraX,
+    visibleMinPx,
+    visibleMaxPx,
+    decorMinPx,
+    decorMaxPx,
   })
 
-  useDoubleClick({
-    onSingleClick: (e) => {
-      // console.log('single click')
-      if (gameLoopEnabled) {
-        setLoopInput({ jump: true })
-        setTimeout(() => {
-          setLoopInput({ jump: false })
-        }, 60)
-        return
-      }
-
-      if (canJump) {
-        setJumping(true)
-        setBottom(bottom => bottom + jump(128) + pixels)
-
-        setTimeout(() => {
-          setJumping(false)
-        }, 200)
-      }
-    },
-    onDoubleClick: (e) => {
-      // console.log('double click')
-      if (gameLoopEnabled) {
-        setLoopInput({ jump: true })
-        setTimeout(() => {
-          setLoopInput({ jump: false })
-        }, 60)
-        return
-      }
-
-      if (canJump) {
-        setJumping(true)
-        setBottom(bottom => bottom + jump(266) + pixels)
-
-        setTimeout(() => {
-          setJumping(false)
-        }, 200)
-      }
-    },
-    ref: buttonRef,
-    latency: 250
+  useGameInput({
+    buttonRef,
+    gameLoopEnabled,
+    setLoopInput,
+    canJump,
+    setJumping,
+    setBottom,
+    jump,
+    pixels,
   })
 
   return (

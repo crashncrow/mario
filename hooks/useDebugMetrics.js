@@ -9,12 +9,13 @@ export default function useDebugMetrics({
   worldRef,
   objects,
   pixels,
-  width,
   left,
   bottom,
   renderLimit,
-  gameLoopEnabled,
-  maxCameraX,
+  visibleMinPx,
+  visibleMaxPx,
+  decorMinPx,
+  decorMaxPx,
 }) {
   const [ domCount, setDomCount ] = useState(0)
   const [ worldDomCount, setWorldDomCount ] = useState(0)
@@ -43,13 +44,6 @@ export default function useDebugMetrics({
     return () => clearInterval(interval)
   }, [debug, worldRef])
 
-  const worldPreloadTiles = 12
-  const cameraXForMetrics = gameLoopEnabled
-    ? Math.max(0, Math.min(maxCameraX, Math.round(left - 112)))
-    : 0
-  const visibleMinPx = Math.max(0, cameraXForMetrics - (worldPreloadTiles * pixels))
-  const visibleMaxPx = cameraXForMetrics + (width || 0) + (worldPreloadTiles * pixels)
-
   const visibleObjects = objects.filter(el => {
     const elLeft = el.x * pixels
     const elRight = elLeft + (el.width ?? pixels)
@@ -70,10 +64,6 @@ export default function useDebugMetrics({
       const endTile = Math.min(el.size, Math.ceil((visibleMaxPx - segmentLeftPx) / pixels))
       return total + Math.max(0, endTile - startTile)
     }, 0)
-
-  const decorPreloadPx = pixels * 8
-  const decorMinPx = Math.max(0, cameraXForMetrics - decorPreloadPx)
-  const decorMaxPx = cameraXForMetrics + (width || 0) + decorPreloadPx
 
   const visibleBushCount = PLANTS_BUSHES.filter(p => {
     const plantLeft = (p.x * pixels) + (pixels / 2)
@@ -100,8 +90,6 @@ export default function useDebugMetrics({
     domCount,
     worldDomCount,
     memoryStats,
-    worldPreloadTiles,
-    cameraXForMetrics,
     visibleMinPx,
     visibleMaxPx,
     visibleObjects,
