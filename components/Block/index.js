@@ -4,6 +4,7 @@ import { TILE_SIZE } from 'libs/worldConstants'
 import Mushroom from 'components/Mushroom'
 import Star from 'components/Star'
 import Flower from 'components/Flower'
+import Coin from 'components/Coin'
 
 const INTERACTIVE_VARIANTS = ['mystery', 'brick']
 
@@ -25,7 +26,7 @@ const normalizeContent = value => {
 
 const BlockContentPreview = ({ content, moving = false }) => {
   if (content === 'coin') {
-    return <div className='w-6 h-8 border-4 border-amber-300 rounded-full bg-amber-400'></div>
+    return <Coin variant='pickup' />
   }
 
   if (content === 'star') {

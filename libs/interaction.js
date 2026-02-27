@@ -18,7 +18,7 @@ const getRewardForHit = ({ obj, previousTouches }) => {
   const isFirstHit = previousTouches === 0
 
   if (variant === 'brick') {
-    return { scoreDelta: 50, coinsDelta: 0, item: null }
+    return { scoreDelta: 0, coinsDelta: 0, item: null }
   }
 
   if (variant === 'mystery') {

@@ -1,5 +1,5 @@
 const Star = () => (
-  <div className='w-16 h-16'>    
+  <div className='w-16 h-16 animate-pulse'>    
   <div className=" absolute top-7 left-6 h-3 w-4 border-l-4 border-r-4 border-green-dark"></div>
     <div className='w-full h-1'></div>
     <div className='w-full h-2 px-7'>

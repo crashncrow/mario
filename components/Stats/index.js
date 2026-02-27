@@ -1,3 +1,5 @@
+import Coin from 'components/Coin'
+
 const Stats = ({ time = 400, coins = 0, score = 0 }) => {
   const coinsText = String(coins).padStart(2, '0')
   const scoreText = String(score).padStart(6, '0')
@@ -13,40 +15,7 @@ const Stats = ({ time = 400, coins = 0, score = 0 }) => {
         <div className='text-center'>
           <div>COINS</div>
           <div className='inline-flex items-center gap-1'>
-            {/* COIN */}
-            <div className='inline-flex flex-col leading-none'>
-              <div className='flex justify-center'>
-                <div className='w-1 h-1 bg-amber-300'></div>
-                <div className='w-2 h-1 bg-amber-300'></div>
-                <div className='w-1 h-1 bg-black'></div>
-              </div>
-              <div className='flex'>
-                <div className='w-1 h-1 bg-amber-300'></div>
-                <div className='w-1 h-1 bg-amber-200'></div>
-                <div className='w-1 h-1 bg-amber-300'></div>
-                <div className='w-1 h-1 bg-amber-200'></div>
-                <div className='w-1 h-1 bg-black'></div>
-              </div>
-              <div className='flex'>
-                <div className='w-1 h-1 bg-amber-300'></div>
-                <div className='w-1 h-1 bg-amber-300'></div>
-                <div className='w-1 h-1 bg-amber-400'></div>
-                <div className='w-1 h-1 bg-amber-300'></div>
-                <div className='w-1 h-1 bg-black'></div>
-              </div>
-              <div className='flex'>
-                <div className='w-1 h-1 bg-amber-300'></div>
-                <div className='w-1 h-1 bg-amber-200'></div>
-                <div className='w-1 h-1 bg-amber-300'></div>
-                <div className='w-1 h-1 bg-amber-200'></div>
-                <div className='w-1 h-1 bg-black'></div>
-              </div>
-              <div className='flex justify-center'>
-                <div className='w-1 h-1 bg-amber-300'></div>
-                <div className='w-2 h-1 bg-amber-300'></div>
-                <div className='w-1 h-1 bg-black'></div>
-              </div>
-            </div>
+            <Coin />
             x {coinsText}
           </div>
         </div>
