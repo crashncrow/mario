@@ -53,7 +53,7 @@ const TouchControls = ({ gameLoopEnabled, setLoopInput }) => {
           onMouseUp={press('left', { left: false })}
           onMouseLeave={press('left', { left: false })}
         >
-          ←
+          {'<'}
         </button>
         <button
           type='button'
@@ -68,7 +68,7 @@ const TouchControls = ({ gameLoopEnabled, setLoopInput }) => {
           onMouseUp={press('right', { right: false })}
           onMouseLeave={press('right', { right: false })}
         >
-          →
+          {'>'}
         </button>
       </div>
 
