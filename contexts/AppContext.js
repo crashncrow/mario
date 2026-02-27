@@ -1,6 +1,7 @@
 import { createContext, useCallback, useContext, useEffect, useRef, useState } from 'react'
 import { useWindowDimensions } from 'hooks/window'
 import useMarioPhysics from 'hooks/useMarioPhysics'
+import useMushroomPhysics, { MUSHROOM_HORIZONTAL_SPEED, MUSHROOM_SIZE } from 'hooks/useMushroomPhysics'
 import useGameSession from 'hooks/useGameSession'
 import { elements } from 'libs/elements'
 import {
@@ -25,6 +26,7 @@ export const AppContextProvider = ({ children }) => {
   const debugEnabled = process.env.NEXT_PUBLIC_DEBUG === '1'
 
   const [ objects, setObjects ] = useState(elements)
+  const [ mushrooms, setMushrooms ] = useState([])
 
   const [ left, setLeft ] = useState(100)
   const [ bottom, setBottom ] = useState(pixels)
@@ -66,6 +68,7 @@ export const AppContextProvider = ({ children }) => {
     y: bottom,
   })
   const publishPendingRef = useRef(false)
+  const mushroomsRef = useRef(mushrooms)
 
   useEffect(() => {
     stateRef.current = {
@@ -79,6 +82,10 @@ export const AppContextProvider = ({ children }) => {
   useEffect(() => {
     publishPendingRef.current = false
   }, [left, bottom])
+
+  useEffect(() => {
+    mushroomsRef.current = mushrooms
+  }, [mushrooms])
 
   useEffect(() => {
     if (gameLoopEnabled) return
@@ -111,12 +118,28 @@ export const AppContextProvider = ({ children }) => {
   }, [objects])
 
   const bumpInteractiveBlockAt = useCallback((x, y) => {
-    const { nextObjects, bumped, reward } = bumpInteractiveBlockAtPosition({ objects, pixels, x, y })
+    const { nextObjects, bumped, reward, spawnedItem } = bumpInteractiveBlockAtPosition({ objects, pixels, x, y })
 
     if (bumped) {
       setObjects(nextObjects)
       if (reward?.scoreDelta) setScore(prev => prev + reward.scoreDelta)
       if (reward?.coinsDelta) setCoins(prev => prev + reward.coinsDelta)
+      if (spawnedItem?.type === 'mushroom') {
+        setMushrooms(prev => ([
+          ...prev,
+          {
+            id: `mushroom_${spawnedItem.x}_${spawnedItem.y}_${Date.now()}`,
+            x: spawnedItem.x * pixels,
+            y: spawnedItem.y * pixels,
+            emergeToY: (spawnedItem.y + 1) * pixels,
+            phase: 'emerging',
+            vx: MUSHROOM_HORIZONTAL_SPEED,
+            vy: 0,
+            width: MUSHROOM_SIZE,
+            height: MUSHROOM_SIZE,
+          },
+        ]))
+      }
     }
   }, [objects])
 
@@ -180,6 +203,17 @@ export const AppContextProvider = ({ children }) => {
     setBottomSafe,
   })
 
+  useMushroomPhysics({
+    enabled: gameLoopEnabled && gameStatus === 'playing',
+    objects,
+    pixels,
+    marioLeft: left,
+    marioBottom: bottom,
+    mushroomsRef,
+    setMushrooms,
+    setScore,
+  })
+
   const setLoopInput = useCallback(nextInput => {
     if (gameStatus !== 'playing') return
     motionRef.current.input = {
@@ -235,6 +269,7 @@ export const AppContextProvider = ({ children }) => {
         left: left,
         bottom: bottom,
         objects: objects,
+        mushrooms: mushrooms,
         coins: coins,
         score: score,
         time: time,

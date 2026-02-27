@@ -48,7 +48,6 @@ const MysteryBlock = ({ x, y, touches, content, isBumping, hidden = false, itemC
   const normalizedContent = normalizeContent(content)
   const [showCoin, setShowCoin] = useState(false)
   const [revealedContent, setRevealedContent] = useState(null)
-  const [mushroomMoving, setMushroomMoving] = useState(false)
   const prevTouchesRef = useRef(touches)
 
   useEffect(() => {
@@ -59,12 +58,8 @@ const MysteryBlock = ({ x, y, touches, content, isBumping, hidden = false, itemC
     if (!isFirstHit) return
 
     if (normalizedContent === 'coin') {
-      const raf = requestAnimationFrame(() => setShowCoin(true))
-      const timer = setTimeout(() => setShowCoin(false), 450)
-      return () => {
-        cancelAnimationFrame(raf)
-        clearTimeout(timer)
-      }
+      const timer = setTimeout(() => setShowCoin(true), 0)
+      return () => clearTimeout(timer)
     }
 
     if (normalizedContent === 'star' || normalizedContent === 'flower') {
@@ -72,20 +67,18 @@ const MysteryBlock = ({ x, y, touches, content, isBumping, hidden = false, itemC
       return () => cancelAnimationFrame(raf)
     }
 
-    if (normalizedContent === 'mushroom') {
-      const raf1 = requestAnimationFrame(() => setRevealedContent('mushroom'))
-      const raf2 = requestAnimationFrame(() => setMushroomMoving(true))
-      return () => {
-        cancelAnimationFrame(raf1)
-        cancelAnimationFrame(raf2)
-      }
-    }
   }, [touches, normalizedContent])
+
+  useEffect(() => {
+    if (!showCoin) return
+    const timer = setTimeout(() => setShowCoin(false), 450)
+    return () => clearTimeout(timer)
+  }, [showCoin])
 
   if (hidden && touches === 0) return null
 
   const shouldShowPickup =
-    (revealedContent === 'mushroom' || revealedContent === 'flower' || revealedContent === 'star') &&
+    (revealedContent === 'flower' || revealedContent === 'star') &&
     !itemCollected
 
   return (
@@ -94,7 +87,7 @@ const MysteryBlock = ({ x, y, touches, content, isBumping, hidden = false, itemC
         <div className='absolute bottom-full left-1/2 -translate-x-1/2 mb-1 pointer-events-none z-30'>
           <BlockContentPreview
             content={showCoin ? 'coin' : revealedContent}
-            moving={shouldShowPickup && revealedContent === 'mushroom' && mushroomMoving}
+            moving={false}
           />
         </div>
       )}

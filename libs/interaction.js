@@ -38,10 +38,6 @@ const getRewardForHit = ({ obj, previousTouches }) => {
 const getRewardForPickup = content => {
   const normalized = (content || '').toLowerCase()
 
-  if (normalized === 'mushroom') {
-    return { scoreDelta: 1000, coinsDelta: 0, item: 'mushroom' }
-  }
-
   if (normalized === 'flower') {
     return { scoreDelta: 1000, coinsDelta: 0, item: 'flower' }
   }
@@ -56,6 +52,7 @@ const getRewardForPickup = content => {
 export const bumpInteractiveBlockAtPosition = ({ objects, pixels, x, y }) => {
   let bumped = false
   let reward = { scoreDelta: 0, coinsDelta: 0, item: null }
+  let spawnedItem = null
 
   const nextObjects = objects.map(obj => {
     if (bumped || obj.type === 'Floor' || !isInteractiveBlock(obj)) {
@@ -83,13 +80,25 @@ export const bumpInteractiveBlockAtPosition = ({ objects, pixels, x, y }) => {
     bumped = true
     const previousTouches = obj.touches || 0
     reward = getRewardForHit({ obj, previousTouches })
+
+    const isFirstHit = previousTouches === 0
+    const variant = getBlockVariant(obj)
+    const content = getBlockContent(obj).toLowerCase()
+    if (isFirstHit && variant === 'mystery' && content === 'mushroom') {
+      spawnedItem = {
+        type: 'mushroom',
+        x: obj.x,
+        y: obj.y,
+      }
+    }
+
     return {
       ...obj,
       touches: previousTouches + 1,
     }
   })
 
-  return { nextObjects, bumped, reward }
+  return { nextObjects, bumped, reward, spawnedItem }
 }
 export const collectRevealedMysteryItemAtPosition = ({ objects, pixels, x, y }) => {
   let collected = false
@@ -105,7 +114,7 @@ export const collectRevealedMysteryItemAtPosition = ({ objects, pixels, x, y }) 
 
     const content = getBlockContent(obj)
     const normalizedContent = (content || '').toLowerCase()
-    const hasPickup = normalizedContent === 'mushroom' || normalizedContent === 'flower' || normalizedContent === 'star'
+    const hasPickup = normalizedContent === 'flower' || normalizedContent === 'star'
     const touched = (obj.touches || 0) > 0
     const alreadyCollected = Boolean(obj.itemCollected)
 
