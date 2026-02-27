@@ -13,6 +13,7 @@ export default function useGameSession({
 }) {
   const [time, setTime] = useState(initialTime)
   const [gameStatus, setGameStatus] = useState('playing')
+  const [loseReason, setLoseReason] = useState(null)
   const terminalStateRef = useRef(null)
 
   const floorEndPx = objects
@@ -51,9 +52,10 @@ export default function useGameSession({
       marioBottom < flagTop &&
       marioTop > flagBottom
     )
+    const fellOffLevel = gameLoopEnabled && bottom <= 0
 
     const terminalState =
-      time <= 0
+      time <= 0 || fellOffLevel
         ? 'lost'
         : touchesFlag
           ? 'won'
@@ -64,6 +66,7 @@ export default function useGameSession({
       if (gameStatus !== 'playing') {
         const rafId = window.requestAnimationFrame(() => {
           setGameStatus('playing')
+          setLoseReason(null)
         })
         return () => window.cancelAnimationFrame(rafId)
       }
@@ -77,17 +80,23 @@ export default function useGameSession({
     terminalStateRef.current = terminalState
     const rafId = window.requestAnimationFrame(() => {
       setGameStatus(terminalState)
+      setLoseReason(
+        terminalState === 'lost'
+          ? (time <= 0 ? 'time' : 'fall')
+          : null
+      )
       setTime(initialTime)
     })
 
     return () => {
       window.cancelAnimationFrame(rafId)
     }
-  }, [time, left, bottom, pixels, floorEndPx, initialTime, gameStatus])
+  }, [time, left, bottom, pixels, floorEndPx, initialTime, gameStatus, gameLoopEnabled])
 
   return {
     time,
     gameStatus,
+    loseReason,
     floorEndPx,
   }
 }

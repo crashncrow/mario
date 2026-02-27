@@ -127,9 +127,21 @@ export const AppContextProvider = ({ children }) => {
     setBottom(nextValue)
   }, [])
 
+  const {
+    time,
+    gameStatus,
+    loseReason,
+  } = useGameSession({
+    gameLoopEnabled,
+    left,
+    bottom,
+    pixels,
+    objects,
+  })
+
   // Modern mode: requestAnimationFrame physics loop.
   useMarioPhysics({
-    enabled: gameLoopEnabled,
+    enabled: gameLoopEnabled && gameStatus === 'playing',
     motionRef,
     lastPositionRef,
     stateRef,
@@ -146,11 +158,12 @@ export const AppContextProvider = ({ children }) => {
   })
 
   const setLoopInput = useCallback(nextInput => {
+    if (gameStatus !== 'playing') return
     motionRef.current.input = {
       ...motionRef.current.input,
       ...nextInput,
     }
-  }, [])
+  }, [gameStatus])
 
   useEffect(() => {
     if (gameLoopEnabled) return
@@ -166,6 +179,19 @@ export const AppContextProvider = ({ children }) => {
   }, [gameLoopEnabled])
 
   useEffect(() => {
+    if (gameStatus === 'playing') return
+
+    motionRef.current.input = {
+      left: false,
+      right: false,
+      jump: false,
+    }
+    motionRef.current.jumpHeld = false
+    motionRef.current.vx = 0
+    motionRef.current.vy = 0
+  }, [gameStatus])
+
+  useEffect(() => {
     if (!gameLoopEnabled) return
 
     motionRef.current.x = stateRef.current.left
@@ -175,17 +201,6 @@ export const AppContextProvider = ({ children }) => {
       y: stateRef.current.bottom,
     }
   }, [gameLoopEnabled])
-
-  const {
-    time,
-    gameStatus,
-  } = useGameSession({
-    gameLoopEnabled,
-    left,
-    bottom,
-    pixels,
-    objects,
-  })
 
   return (
     <AppContext.Provider
@@ -199,6 +214,7 @@ export const AppContextProvider = ({ children }) => {
         objects: objects,
         time: time,
         gameStatus: gameStatus,
+        loseReason: loseReason,
 
         renderLimit: renderLimit, 
         motionRef: motionRef,

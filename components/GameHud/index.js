@@ -10,6 +10,7 @@ const GameHud = ({
   setLoopInput,
   time,
   gameStatus,
+  loseReason,
 }) => (
   <>
     <Stats time={time} />
@@ -37,7 +38,11 @@ const GameHud = ({
       )}
       {gameStatus !== 'playing' && (
         <div className='mt-2 px-4 py-2 bg-black/85 border-2 border-white text-white text-sm'>
-          {gameStatus === 'won' ? 'WIN' : 'TIME UP'}
+          {gameStatus === 'won'
+            ? 'WIN'
+            : loseReason === 'fall'
+              ? 'GAME OVER'
+              : 'TIME UP'}
         </div>
       )}
     </div>
