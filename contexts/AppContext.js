@@ -25,6 +25,7 @@ export const AppContextProvider = ({ children }) => {
 
   const [ left, setLeft ] = useState(100)
   const [ bottom, setBottom ] = useState(pixels)
+  const [ coins, setCoins ] = useState(0)
   
   const [ gameLoopEnabled, setGameLoopEnabled ] = useState(true)
   const renderLimit = left + (width ?? 0) + 500
@@ -212,6 +213,7 @@ export const AppContextProvider = ({ children }) => {
         left: left,
         bottom: bottom,
         objects: objects,
+        coins: coins,
         time: time,
         gameStatus: gameStatus,
         loseReason: loseReason,
@@ -223,6 +225,7 @@ export const AppContextProvider = ({ children }) => {
         setLeft: setLeft,
         setBottom: setBottom,
         setObjects: setObjects,
+        setCoins: setCoins,
         setLoopInput: setLoopInput,
         setGameLoopEnabled: setGameLoopEnabled
       }}
