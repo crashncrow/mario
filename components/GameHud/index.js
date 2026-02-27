@@ -8,9 +8,11 @@ const GameHud = ({
   gameLoopEnabled,
   setGameLoopEnabled,
   setLoopInput,
+  time,
+  gameStatus,
 }) => (
   <>
-    <Stats />
+    <Stats time={time} />
 
     <div
       className='fixed top-4 left-1/2 -translate-x-1/2 text-white flex flex-col items-center'
@@ -31,6 +33,11 @@ const GameHud = ({
           <div>← → mover</div>
           <div>Space saltar</div>
           <div>Click / doble click tambien</div>
+        </div>
+      )}
+      {gameStatus !== 'playing' && (
+        <div className='mt-2 px-4 py-2 bg-black/85 border-2 border-white text-white text-sm'>
+          {gameStatus === 'won' ? 'WIN' : 'TIME UP'}
         </div>
       )}
     </div>

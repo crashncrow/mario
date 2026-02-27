@@ -25,6 +25,8 @@ export default function Home() {
     left,
     bottom,
     objects,
+    time,
+    gameStatus,
     setLoopInput,
     setGameLoopEnabled,
   } = useAppContext()
@@ -88,6 +90,8 @@ export default function Home() {
         gameLoopEnabled={gameLoopEnabled}
         setGameLoopEnabled={setGameLoopEnabled}
         setLoopInput={setLoopInput}
+        time={time}
+        gameStatus={gameStatus}
       />
       <div
         className={`fixed inset-0 h-dvh w-full z-50 ${gameLoopEnabled ? 'pointer-events-auto' : 'pointer-events-none'}`}

@@ -1,6 +1,7 @@
 import { createContext, useCallback, useContext, useEffect, useRef, useState } from 'react'
 import { useWindowDimensions } from 'hooks/window'
 import useMarioPhysics from 'hooks/useMarioPhysics'
+import useGameSession from 'hooks/useGameSession'
 import { elements } from 'libs/elements'
 import {
   getLandingYAtPosition,
@@ -175,6 +176,17 @@ export const AppContextProvider = ({ children }) => {
     }
   }, [gameLoopEnabled])
 
+  const {
+    time,
+    gameStatus,
+  } = useGameSession({
+    gameLoopEnabled,
+    left,
+    bottom,
+    pixels,
+    objects,
+  })
+
   return (
     <AppContext.Provider
       value={{
@@ -185,6 +197,8 @@ export const AppContextProvider = ({ children }) => {
         left: left,
         bottom: bottom,
         objects: objects,
+        time: time,
+        gameStatus: gameStatus,
 
         renderLimit: renderLimit, 
         motionRef: motionRef,

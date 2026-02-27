@@ -1,4 +1,5 @@
 import Castle from 'components/Castle'
+import Flag from 'components/Flag'
 import Floor from 'components/Floor'
 import Mario from 'components/Mario'
 import Mountains from 'components/Mountains'
@@ -38,6 +39,7 @@ const WorldScene = ({
           maxPx={visibleMaxPx}
         />
 
+        {visibleMaxPx > (205 - worldPreloadTiles) * pixels && <Flag x={201} y={2} debug={debug} />}
         {visibleMaxPx > (205 - worldPreloadTiles) * pixels && <Castle x={205} />}
       </div>
     </div>

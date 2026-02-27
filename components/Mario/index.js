@@ -135,18 +135,6 @@ const Mario = () => {
   return (
     <>
       {
-        debug && <div id="border_mario"
-          className='absolute border-4 border-mario-red z-50'
-          style={{
-            bottom: `${bottom}px`,
-            left: `${left + 10}px`,
-            height: `${pixels}px`,
-            width: `${pixels - 20}px`
-          }}
-        ></div>
-      }
-
-      {
         debug && (
           <div
             className='absolute border-4 border-mario-brown z-50 w-1 h-1'
@@ -161,6 +149,11 @@ const Mario = () => {
       <div
         className='flex flex-wrap w-16 absolute bottom-0 z-40'
         style={{ left: `${left}px`, bottom: `${bottom}px` }}>
+
+        {
+          debug &&
+          <div className='absolute w-full h-full border-4 border-mario-red z-50 pointer-events-none'></div>
+        }
 
         {currentMatrix.map((x, i) => {
           if (reverse) {

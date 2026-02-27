@@ -10,14 +10,16 @@ const WorldObjectsLayer = ({ visibleObjects, pixels, debug }) => (
     {debug && visibleObjects.map((o, i) => (
       <div
         key={`debug_${getElementKey(o)}_${i}`}
-        className='absolute border-4 border-mario-red z-50'
+        className='absolute'
         style={{
           bottom: `${o.y * pixels}px`,
           left: `${o.x * pixels}px`,
           height: `${o.height}px`,
           width: `${o.width}px`
         }}
-      ></div>
+      >
+        <div className='absolute w-full h-full border-4 border-mario-red z-50 pointer-events-none'></div>
+      </div>
     ))}
 
     {visibleObjects.map(el => {
