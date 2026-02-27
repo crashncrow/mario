@@ -26,6 +26,7 @@ export default function Home() {
     bottom,
     objects,
     coins,
+    score,
     time,
     gameStatus,
     loseReason,
@@ -93,6 +94,7 @@ export default function Home() {
         setGameLoopEnabled={setGameLoopEnabled}
         setLoopInput={setLoopInput}
         coins={coins}
+        score={score}
         time={time}
         gameStatus={gameStatus}
         loseReason={loseReason}

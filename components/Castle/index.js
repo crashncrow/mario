@@ -1,4 +1,4 @@
-import Brick from 'components/Brick'
+import Block from 'components/Block'
 import Roof from 'components/Roof'
 import Window from 'components/Window'
 import Door from 'components/Door'
@@ -44,7 +44,14 @@ const Castle = ({ x }) => {
     <>
       {
         base.map((el, i) => (
-          <Brick key={`castle-brick-${el.x}-${el.y}-${i}`} x={el.x} y={el.y} touches={0} border={0} />
+          <Block
+            key={`castle-brick-${el.x}-${el.y}-${i}`}
+            variant='brick'
+            x={el.x}
+            y={el.y}
+            touches={0}
+            border={false}
+          />
         ))
       }
 

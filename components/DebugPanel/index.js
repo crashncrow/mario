@@ -7,8 +7,8 @@ const DebugPanel = ({
   visibleObjectsCount,
   visibleSpritesApprox,
   visibleBrickCount,
-  visibleBlockCount,
-  visibleBoxCount,
+  visibleSolidCount,
+  visibleMysteryCount,
   visiblePipeCount,
   visibleFloorTiles,
   visibleBushCount,
@@ -32,8 +32,8 @@ const DebugPanel = ({
       <div>Sprites aprox: {visibleSpritesApprox}</div>
       <br/>
       <div>Bricks: {visibleBrickCount}</div>
-      <div>Blocks: {visibleBlockCount}</div>
-      <div>Boxes: {visibleBoxCount}</div>
+      <div>Solids: {visibleSolidCount}</div>
+      <div>Mystery: {visibleMysteryCount}</div>
       <div>Pipes: {visiblePipeCount}</div>
       <div>Floor: {visibleFloorTiles}</div>
       <div>Bushes: {visibleBushCount}</div>

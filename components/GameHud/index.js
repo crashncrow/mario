@@ -9,16 +9,17 @@ const GameHud = ({
   setGameLoopEnabled,
   setLoopInput,
   coins,
+  score,
   time,
   gameStatus,
   loseReason,
 }) => (
   <>
-    <Stats time={time} coins={coins} />
+    <Stats time={time} coins={coins} score={score} />
 
     <div
       className='fixed top-4 left-1/2 -translate-x-1/2 text-white flex flex-col items-center'
-      style={{ zIndex: 60, top: 'max(4.5rem, calc(env(safe-area-inset-top) + 4rem))' }}
+      style={{ zIndex: 60, top: 'max(5.5rem, calc(env(safe-area-inset-top) + 4rem))' }}
     >
       {debug && (
         <button

@@ -1,7 +1,5 @@
-import Block from 'components/Block'
-import Box from 'components/Box'
-import Brick from 'components/Brick'
 import Pipe from 'components/Pipe'
+import Block from 'components/Block'
 
 const getElementKey = el => `${el.type}_${el.x}_${el.y}_${el.size ?? 1}`
 
@@ -26,12 +24,22 @@ const WorldObjectsLayer = ({ visibleObjects, pixels, debug }) => (
       const key = getElementKey(el)
 
       switch (el.type) {
-        case 'Box':
-          return <Box key={key} x={el.x} y={el.y} size={el.size} touches={el.touches} />
+        case 'Mystery':
+          return (
+            <Block
+              key={key}
+              variant='mystery'
+              x={el.x}
+              y={el.y}
+              touches={el.touches}
+              content={el.content ?? 'coin'}
+              hidden={Boolean(el.hidden)}
+            />
+          )
         case 'Brick':
-          return <Brick key={key} x={el.x} y={el.y} size={el.size} touches={el.touches} />
-        case 'Block':
-          return <Block key={key} x={el.x} y={el.y} size={el.size} />
+          return <Block key={key} variant='brick' x={el.x} y={el.y} touches={el.touches} />
+        case 'Solid':
+          return <Block key={key} variant='solid' x={el.x} y={el.y} />
         case 'Pipe':
           return <Pipe key={key} x={el.x} size={el.size} pixels={pixels} />
         default:

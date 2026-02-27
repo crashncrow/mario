@@ -26,6 +26,7 @@ export const AppContextProvider = ({ children }) => {
   const [ left, setLeft ] = useState(100)
   const [ bottom, setBottom ] = useState(pixels)
   const [ coins, setCoins ] = useState(0)
+  const [ score, setScore ] = useState(0)
   
   const [ gameLoopEnabled, setGameLoopEnabled ] = useState(true)
   const renderLimit = left + (width ?? 0) + 500
@@ -107,10 +108,12 @@ export const AppContextProvider = ({ children }) => {
   }, [objects])
 
   const bumpInteractiveBlockAt = useCallback((x, y) => {
-    const { nextObjects, bumped } = bumpInteractiveBlockAtPosition({ objects, pixels, x, y })
+    const { nextObjects, bumped, reward } = bumpInteractiveBlockAtPosition({ objects, pixels, x, y })
 
     if (bumped) {
       setObjects(nextObjects)
+      if (reward?.scoreDelta) setScore(prev => prev + reward.scoreDelta)
+      if (reward?.coinsDelta) setCoins(prev => prev + reward.coinsDelta)
     }
   }, [objects])
 
@@ -214,6 +217,7 @@ export const AppContextProvider = ({ children }) => {
         bottom: bottom,
         objects: objects,
         coins: coins,
+        score: score,
         time: time,
         gameStatus: gameStatus,
         loseReason: loseReason,
@@ -226,6 +230,7 @@ export const AppContextProvider = ({ children }) => {
         setBottom: setBottom,
         setObjects: setObjects,
         setCoins: setCoins,
+        setScore: setScore,
         setLoopInput: setLoopInput,
         setGameLoopEnabled: setGameLoopEnabled
       }}
