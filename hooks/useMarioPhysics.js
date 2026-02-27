@@ -60,15 +60,17 @@ export default function useMarioPhysics({
     }
 
     if (motion.jumpBufferTimer > 0 && (motion.grounded || motion.coyoteTimer > 0)) {
-      motion.vy = 1300
+      // Tuned closer to classic platformer feel (SMB-like):
+      // medium-high jump when held, short jump when released early.
+      motion.vy = 1270
       motion.grounded = false
       motion.coyoteTimer = 0
       motion.jumpBufferTimer = 0
     }
 
-    const baseGravity = 2200
-    const fallMultiplier = 1.7
-    const lowJumpMultiplier = 1.35
+    const baseGravity = 3000
+    const fallMultiplier = 1.8
+    const lowJumpMultiplier = 2.4
     const gravityMultiplier =
       motion.vy < 0
         ? fallMultiplier
