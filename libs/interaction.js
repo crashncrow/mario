@@ -28,11 +28,26 @@ const getRewardForHit = ({ obj, previousTouches }) => {
       return { scoreDelta: 200, coinsDelta: 1, item: 'coin' }
     }
 
-    if (content === 'mushroom') {
-      return { scoreDelta: 1000, coinsDelta: 0, item: 'mushroom' }
-    }
+    // Non-coin mystery rewards are granted on pickup, not on bump.
+    return { scoreDelta: 0, coinsDelta: 0, item: null }
+  }
 
-    return { scoreDelta: 200, coinsDelta: 0, item: null }
+  return { scoreDelta: 0, coinsDelta: 0, item: null }
+}
+
+const getRewardForPickup = content => {
+  const normalized = (content || '').toLowerCase()
+
+  if (normalized === 'mushroom') {
+    return { scoreDelta: 1000, coinsDelta: 0, item: 'mushroom' }
+  }
+
+  if (normalized === 'flower') {
+    return { scoreDelta: 1000, coinsDelta: 0, item: 'flower' }
+  }
+
+  if (normalized === 'star') {
+    return { scoreDelta: 1000, coinsDelta: 0, item: 'star' }
   }
 
   return { scoreDelta: 0, coinsDelta: 0, item: null }
@@ -75,4 +90,47 @@ export const bumpInteractiveBlockAtPosition = ({ objects, pixels, x, y }) => {
   })
 
   return { nextObjects, bumped, reward }
+}
+export const collectRevealedMysteryItemAtPosition = ({ objects, pixels, x, y }) => {
+  let collected = false
+  let reward = { scoreDelta: 0, coinsDelta: 0, item: null }
+
+  const marioLeft = x + 12
+  const marioRight = x + pixels - 22
+  const marioBottom = y
+  const marioTop = y + pixels
+
+  const nextObjects = objects.map(obj => {
+    if (collected || getBlockVariant(obj) !== 'mystery') return obj
+
+    const content = getBlockContent(obj)
+    const normalizedContent = (content || '').toLowerCase()
+    const hasPickup = normalizedContent === 'mushroom' || normalizedContent === 'flower' || normalizedContent === 'star'
+    const touched = (obj.touches || 0) > 0
+    const alreadyCollected = Boolean(obj.itemCollected)
+
+    if (!hasPickup || !touched || alreadyCollected) return obj
+
+    const itemLeft = obj.x * pixels
+    const itemRight = itemLeft + pixels
+    const itemBottom = (obj.y + 1) * pixels
+    const itemTop = itemBottom + pixels
+
+    const overlaps =
+      marioLeft < itemRight &&
+      marioRight > itemLeft &&
+      marioBottom < itemTop &&
+      marioTop > itemBottom
+
+    if (!overlaps) return obj
+
+    collected = true
+    reward = getRewardForPickup(content)
+    return {
+      ...obj,
+      itemCollected: true,
+    }
+  })
+
+  return { nextObjects, collected, reward }
 }

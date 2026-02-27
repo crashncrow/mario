@@ -97,9 +97,9 @@ export const elements = [
   { type: 'Solid', x: 201, y: 1, size: 1, width: TILE_SIZE, height: TILE_SIZE },
 
   { type: 'Mystery', x: 17,  y: 4, size: 1, width: TILE_SIZE, height: TILE_SIZE },
-  { type: 'Mystery', x: 22,  y: 4, size: 1, width: TILE_SIZE, height: TILE_SIZE },
-  { type: 'Mystery', x: 23,  y: 7, size: 1, width: TILE_SIZE, height: TILE_SIZE },
-  { type: 'Mystery', x: 24,  y: 4, size: 1, width: TILE_SIZE, height: TILE_SIZE },
+  { type: 'Mystery', x: 22,  y: 4, size: 1, width: TILE_SIZE, height: TILE_SIZE, content: 'mushroom' },
+  { type: 'Mystery', x: 23,  y: 7, size: 1, width: TILE_SIZE, height: TILE_SIZE, content: 'flower' },
+  { type: 'Mystery', x: 24,  y: 4, size: 1, width: TILE_SIZE, height: TILE_SIZE, content: 'star' },
   { type: 'Mystery', x: 81,  y: 7, size: 1, width: TILE_SIZE, height: TILE_SIZE },
   { type: 'Mystery', x: 95,  y: 7, size: 1, width: TILE_SIZE, height: TILE_SIZE },
   { type: 'Mystery', x: 107, y: 4, size: 1, width: TILE_SIZE, height: TILE_SIZE },

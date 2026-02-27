@@ -11,7 +11,10 @@ import {
   hasSideCollisionAtPosition,
   isGroundedAtPosition,
 } from 'libs/collision'
-import { bumpInteractiveBlockAtPosition } from 'libs/interaction'
+import {
+  bumpInteractiveBlockAtPosition,
+  collectRevealedMysteryItemAtPosition,
+} from 'libs/interaction'
 import { TILE_SIZE } from 'libs/worldConstants'
 
 const AppContext = createContext(null)
@@ -117,6 +120,21 @@ export const AppContextProvider = ({ children }) => {
     }
   }, [objects])
 
+  const collectRevealedMysteryItemAt = useCallback((x, y) => {
+    const { nextObjects, collected, reward } = collectRevealedMysteryItemAtPosition({
+      objects,
+      pixels,
+      x,
+      y,
+    })
+
+    if (!collected) return
+
+    setObjects(nextObjects)
+    if (reward?.scoreDelta) setScore(prev => prev + reward.scoreDelta)
+    if (reward?.coinsDelta) setCoins(prev => prev + reward.coinsDelta)
+  }, [objects])
+
   const setLeftSafe = useCallback(nextValue => {
     if (!Number.isFinite(nextValue)) return
     if (stateRef.current.left === nextValue) return
@@ -155,6 +173,7 @@ export const AppContextProvider = ({ children }) => {
     hasCeilingCollisionAt,
     getLandingYAt,
     bumpInteractiveBlockAt,
+    collectRevealedMysteryItemAt,
     hasSideCollisionAt,
     getMaxWalkX,
     setLeftSafe,

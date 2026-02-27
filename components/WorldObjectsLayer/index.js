@@ -34,6 +34,7 @@ const WorldObjectsLayer = ({ visibleObjects, pixels, debug }) => (
               touches={el.touches}
               content={el.content ?? 'coin'}
               hidden={Boolean(el.hidden)}
+              itemCollected={Boolean(el.itemCollected)}
             />
           )
         case 'Brick':

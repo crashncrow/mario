@@ -11,6 +11,7 @@ export default function useMarioPhysics({
   hasCeilingCollisionAt,
   getLandingYAt,
   bumpInteractiveBlockAt,
+  collectRevealedMysteryItemAt,
   hasSideCollisionAt,
   getMaxWalkX,
   setLeftSafe,
@@ -189,6 +190,8 @@ export default function useMarioPhysics({
     }
     motion.x = nextX
     motion.y = nextY
+
+    collectRevealedMysteryItemAt(nextX, nextY)
 
     if (!Number.isFinite(nextX) || !Number.isFinite(nextY)) {
       return

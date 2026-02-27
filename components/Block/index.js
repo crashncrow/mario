@@ -1,6 +1,9 @@
-import { memo } from 'react'
+import { memo, useEffect, useRef, useState } from 'react'
 import useBlockBump from 'hooks/useBlockBump'
 import { TILE_SIZE } from 'libs/worldConstants'
+import Mushroom from 'components/Mushroom'
+import Star from 'components/Star'
+import Flower from 'components/Flower'
 
 const INTERACTIVE_VARIANTS = ['mystery', 'brick']
 
@@ -9,17 +12,91 @@ const BlockShell = ({ x, y, isBumping = false, className = '', children }) => (
     className={`absolute ${isBumping ? 'mb-2' : ''}`}
     style={{ left: `${x * TILE_SIZE}px`, bottom: `${y * TILE_SIZE}px` }}
   >
-    <div className={`flex flex-wrap w-16 h-16 ${className}`}>
+    <div className={`relative flex flex-wrap w-16 h-16 ${className}`}>
     {children}
     </div>  
   </div>
 )
 
-const MysteryBlock = ({ x, y, touches, content, isBumping, hidden = false }) => {
+const normalizeContent = value => {
+  const content = (value || 'none').toLowerCase()
+  return content
+}
+
+const BlockContentPreview = ({ content, moving = false }) => {
+  if (content === 'coin') {
+    return <div className='w-6 h-8 border-4 border-amber-300 rounded-full bg-amber-400'></div>
+  }
+
+  if (content === 'star') {
+    return <Star />
+  }
+
+  if (content === 'flower') {
+    return <Flower />
+  }
+
+  if (content === 'mushroom') {
+    return <Mushroom moving={moving} />
+  }
+
+  return null
+}
+
+const MysteryBlock = ({ x, y, touches, content, isBumping, hidden = false, itemCollected = false }) => {
+  const normalizedContent = normalizeContent(content)
+  const [showCoin, setShowCoin] = useState(false)
+  const [revealedContent, setRevealedContent] = useState(null)
+  const [mushroomMoving, setMushroomMoving] = useState(false)
+  const prevTouchesRef = useRef(touches)
+
+  useEffect(() => {
+    if (touches <= prevTouchesRef.current) return
+
+    const isFirstHit = prevTouchesRef.current === 0
+    prevTouchesRef.current = touches
+    if (!isFirstHit) return
+
+    if (normalizedContent === 'coin') {
+      const raf = requestAnimationFrame(() => setShowCoin(true))
+      const timer = setTimeout(() => setShowCoin(false), 450)
+      return () => {
+        cancelAnimationFrame(raf)
+        clearTimeout(timer)
+      }
+    }
+
+    if (normalizedContent === 'star' || normalizedContent === 'flower') {
+      const raf = requestAnimationFrame(() => setRevealedContent(normalizedContent))
+      return () => cancelAnimationFrame(raf)
+    }
+
+    if (normalizedContent === 'mushroom') {
+      const raf1 = requestAnimationFrame(() => setRevealedContent('mushroom'))
+      const raf2 = requestAnimationFrame(() => setMushroomMoving(true))
+      return () => {
+        cancelAnimationFrame(raf1)
+        cancelAnimationFrame(raf2)
+      }
+    }
+  }, [touches, normalizedContent])
+
   if (hidden && touches === 0) return null
+
+  const shouldShowPickup =
+    (revealedContent === 'mushroom' || revealedContent === 'flower' || revealedContent === 'star') &&
+    !itemCollected
 
   return (
     <BlockShell x={x} y={y} isBumping={isBumping}>
+      {(showCoin || shouldShowPickup) && (
+        <div className='absolute bottom-full left-1/2 -translate-x-1/2 mb-1 pointer-events-none z-30'>
+          <BlockContentPreview
+            content={showCoin ? 'coin' : revealedContent}
+            moving={shouldShowPickup && revealedContent === 'mushroom' && mushroomMoving}
+          />
+        </div>
+      )}
       <div className='w-14 h-1 ml-1 mr-1 bg-brick-dark'></div>
       <div className='flex flex-wrap h-15 w-full border-r-4 border-b-4 border-black'>
         <div className='w-1 h-full bg-brick-dark'></div>
@@ -31,7 +108,7 @@ const MysteryBlock = ({ x, y, touches, content, isBumping, hidden = false }) => 
           <div className='w-1 h-12 border-t-4 border-b-4 border-black m-1'></div>
         </div>
       </div>
-      {touches === 0 && content !== 'none' && (
+      {touches === 0 && (
         <>
           <div className='absolute w-5 h-1 mt-3 ml-5 mr-1 bg-brick-dark'></div>
           <div className='absolute w-7 h-3 mt-4 ml-4 border-l-8 border-r-8 border-brick-dark'>
@@ -97,6 +174,7 @@ const Block = ({
   border = true,
   content = 'coin',
   hidden = false,
+  itemCollected = false,
 }) => {
   const normalizedVariant = (variant || '').toLowerCase()
   const interactive = INTERACTIVE_VARIANTS.includes(normalizedVariant)
@@ -118,6 +196,7 @@ const Block = ({
         {...commonProps}
         {...stateProps}
         hidden={hidden}
+        itemCollected={itemCollected}
         isBumping={isBumping}
       />
     ),
