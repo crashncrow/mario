@@ -1,6 +1,28 @@
+import { useEffect, useState } from 'react'
 import DebugPanel from 'components/DebugPanel'
 import Stats from 'components/Stats'
 import TouchControls from 'components/TouchControls'
+
+const CONTROLS_HINT_MS = 5000
+
+const ControlsHint = ({ debug }) => {
+  const [visible, setVisible] = useState(true)
+
+  useEffect(() => {
+    const timeoutId = setTimeout(() => setVisible(false), CONTROLS_HINT_MS)
+    return () => clearTimeout(timeoutId)
+  }, [])
+
+  if (!visible) return null
+
+  return (
+    <div className={`${debug ? 'mt-2' : ''} hidden md:block p-4 bg-black/80 border-2 border-white text-[10px] leading-4 text-white text-center`}>
+      <div>Controls</div>
+      <div>← → move</div>
+      <div>Space jump</div>
+    </div>
+  )
+}
 
 const GameHud = ({
   debug,
@@ -13,9 +35,10 @@ const GameHud = ({
   time,
   gameStatus,
   loseReason,
-}) => (
-  <>
-    <Stats time={time} coins={coins} score={score} />
+}) => {
+  return (
+    <>
+      <Stats time={time} coins={coins} score={score} />
 
     <div
       className='fixed top-4 left-1/2 -translate-x-1/2 text-white flex flex-col items-center'
@@ -30,13 +53,8 @@ const GameHud = ({
           {gameLoopEnabled ? 'Juego ON' : 'Scroll libre'}
         </button>
       )}
-      {gameLoopEnabled && (
-        <div className={`${debug ? 'mt-2' : ''} p-2 bg-black/80 border-2 border-white text-[10px] leading-4 text-white text-center`}>
-          <div>Controles</div>
-          <div>← → mover</div>
-          <div>Space saltar</div>
-          <div>Click / doble click tambien</div>
-        </div>
+      {gameLoopEnabled && gameStatus === 'playing' && (
+        <ControlsHint key={`${gameLoopEnabled}-${gameStatus}`} debug={debug} />
       )}
       {gameStatus !== 'playing' && (
         <div className='mt-2 px-4 py-2 bg-black/85 border-2 border-white text-white text-sm'>
@@ -49,9 +67,10 @@ const GameHud = ({
       )}
     </div>
 
-    {debug && <DebugPanel {...debugPanelProps} />}
-    <TouchControls gameLoopEnabled={gameLoopEnabled} setLoopInput={setLoopInput} />
-  </>
-)
+      {debug && <DebugPanel {...debugPanelProps} />}
+      <TouchControls gameLoopEnabled={gameLoopEnabled} setLoopInput={setLoopInput} />
+    </>
+  )
+}
 
 export default GameHud
