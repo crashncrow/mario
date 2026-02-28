@@ -10,6 +10,7 @@ export default function useGameSession({
   pixels,
   objects,
   enemyHit = false,
+  lives = 3,
   initialTime = 400,
 }) {
   const [time, setTime] = useState(initialTime)
@@ -92,7 +93,7 @@ export default function useGameSession({
     return () => {
       window.cancelAnimationFrame(rafId)
     }
-  }, [time, left, bottom, pixels, floorEndPx, initialTime, gameStatus, gameLoopEnabled, enemyHit])
+  }, [time, left, bottom, pixels, floorEndPx, initialTime, gameStatus, gameLoopEnabled, enemyHit, lives])
 
   return {
     time,

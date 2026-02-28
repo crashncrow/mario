@@ -28,6 +28,7 @@ export default function Home() {
     objects,
     mushrooms,
     enemies,
+    lives,
     coins,
     score,
     time,
@@ -75,6 +76,7 @@ export default function Home() {
     pixels,
     left,
     bottom,
+    lives,
     renderLimit,
     visibleMinPx,
     visibleMaxPx,
@@ -102,6 +104,7 @@ export default function Home() {
         time={time}
         gameStatus={gameStatus}
         loseReason={loseReason}
+        lives={lives}
       />
       <div
         className={`fixed inset-0 h-dvh w-full z-50 ${gameLoopEnabled ? 'pointer-events-auto' : 'pointer-events-none'}`}

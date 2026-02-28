@@ -27,11 +27,15 @@ import { TILE_SIZE } from 'libs/worldConstants'
 
 const AppContext = createContext(null)
 const pixels = TILE_SIZE
+const START_LEFT = 100
+const START_BOTTOM = pixels
+const RESPAWN_DELAY_MS = 1200
 
 export const AppContextProvider = ({ children }) => {
   const { width } = useWindowDimensions();
   const debugEnabled = process.env.NEXT_PUBLIC_DEBUG === '1'
   const nextEnemyIdRef = useRef(0)
+  const lastGameStatusRef = useRef('playing')
   const createEnemyId = useCallback(
     () => `enemy_${nextEnemyIdRef.current++}`,
     []
@@ -45,8 +49,9 @@ export const AppContextProvider = ({ children }) => {
     createId: (_, index) => `enemy_init_${index}`,
   }))
 
-  const [ left, setLeft ] = useState(100)
-  const [ bottom, setBottom ] = useState(pixels)
+  const [ left, setLeft ] = useState(START_LEFT)
+  const [ bottom, setBottom ] = useState(START_BOTTOM)
+  const [ lives, setLives ] = useState(3)
   const [ coins, setCoins ] = useState(0)
   const [ score, setScore ] = useState(0)
   const [ enemyHit, setEnemyHit ] = useState(false)
@@ -214,6 +219,49 @@ export const AppContextProvider = ({ children }) => {
     setBottom(nextValue)
   }, [])
 
+  const createInitialEnemies = useCallback(() => (
+    createEnemiesState({
+      enemies: initialEnemies,
+      pixels,
+      createId: (_, index) => `enemy_init_${index}`,
+    })
+  ), [])
+
+  const resetMarioState = useCallback(() => {
+    const nextEnemies = createInitialEnemies()
+
+    setObjects(elements)
+    setMushrooms([])
+    setEnemies(nextEnemies)
+    setLeftSafe(START_LEFT)
+    setBottomSafe(START_BOTTOM)
+    setEnemyHit(false)
+
+    mushroomsRef.current = []
+    enemiesRef.current = nextEnemies
+
+    motionRef.current.x = START_LEFT
+    motionRef.current.y = START_BOTTOM
+    motionRef.current.vx = 0
+    motionRef.current.vy = 0
+    motionRef.current.grounded = true
+    motionRef.current.input = {
+      left: false,
+      right: false,
+      jump: false,
+    }
+    motionRef.current.jumpHeld = false
+    motionRef.current.coyoteTimer = 0
+    motionRef.current.jumpBufferTimer = 0
+    motionRef.current.headBlockedLastFrame = false
+
+    lastPositionRef.current = {
+      x: START_LEFT,
+      y: START_BOTTOM,
+    }
+    publishPendingRef.current = false
+  }, [createInitialEnemies, setBottomSafe, setLeftSafe])
+
   const {
     time,
     gameStatus,
@@ -225,6 +273,7 @@ export const AppContextProvider = ({ children }) => {
     pixels,
     objects,
     enemyHit,
+    lives,
   })
 
   const resolveEnemyCollision = useCallback(({
@@ -341,6 +390,26 @@ export const AppContextProvider = ({ children }) => {
   }, [gameStatus])
 
   useEffect(() => {
+    if (gameStatus === 'lost' && lastGameStatusRef.current !== 'lost') {
+      const rafId = window.requestAnimationFrame(() => {
+        if (lives > 1) {
+          setLives(prev => Math.max(0, prev - 1))
+          window.setTimeout(() => {
+            resetMarioState()
+          }, RESPAWN_DELAY_MS)
+          return
+        }
+
+        setLives(0)
+      })
+      lastGameStatusRef.current = gameStatus
+      return () => window.cancelAnimationFrame(rafId)
+    }
+
+    lastGameStatusRef.current = gameStatus
+  }, [gameStatus, lives, resetMarioState])
+
+  useEffect(() => {
     if (!gameLoopEnabled) return
 
     motionRef.current.x = stateRef.current.left
@@ -364,6 +433,7 @@ export const AppContextProvider = ({ children }) => {
         objects: objects,
         mushrooms: mushrooms,
         enemies: enemies,
+        lives: lives,
         coins: coins,
         score: score,
         time: time,
@@ -377,6 +447,7 @@ export const AppContextProvider = ({ children }) => {
         setLeft: setLeft,
         setBottom: setBottom,
         setObjects: setObjects,
+        setLives: setLives,
         setCoins: setCoins,
         setScore: setScore,
         spawnEnemy: spawnEnemy,

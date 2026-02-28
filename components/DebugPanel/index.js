@@ -4,6 +4,7 @@ const DebugPanel = ({
   renderLimit,
   left,
   bottom,
+  lives,
   marioMotion,
   visibleObjectsCount,
   visibleSpritesApprox,
@@ -32,6 +33,7 @@ const DebugPanel = ({
       <div>Sprites aprox: {visibleSpritesApprox}</div>
       <br/>
       <div>Mario position: x {Math.round(left)} / y {Math.round(bottom)}</div>
+      <div>Mario lives: {lives}</div>
       <div>Mario motion: {marioMotion}</div>
       <br/>
       <div>Bricks: {visibleBrickCount}</div>
