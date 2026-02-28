@@ -16,10 +16,12 @@ export default function useDebugMetrics({
   visibleMaxPx,
   decorMinPx,
   decorMaxPx,
+  motionRef,
 }) {
   const [ domCount, setDomCount ] = useState(0)
   const [ worldDomCount, setWorldDomCount ] = useState(0)
   const [ memoryStats, setMemoryStats ] = useState(null)
+  const [ marioMotion, setMarioMotion ] = useState('-')
 
   useEffect(() => {
     if (!debug) return
@@ -37,12 +39,22 @@ export default function useDebugMetrics({
       } else {
         setMemoryStats(null)
       }
+
+      const motion = motionRef?.current
+      const nextMarioMotion = []
+
+      if (motion?.input?.left && !motion?.input?.right) nextMarioMotion.push('←')
+      if (motion?.vy > 10) nextMarioMotion.push('↑')
+      if (motion?.input?.right && !motion?.input?.left) nextMarioMotion.push('→')
+      if (motion?.vy < -10) nextMarioMotion.push('↓')
+
+      setMarioMotion(nextMarioMotion.length > 0 ? nextMarioMotion.join(' ') : '-')
     }
 
     updateDomCounts()
     const interval = setInterval(updateDomCounts, 500)
     return () => clearInterval(interval)
-  }, [debug, worldRef])
+  }, [debug, motionRef, worldRef])
 
   const visibleObjects = objects.filter(el => {
     const elLeft = el.x * pixels
@@ -110,6 +122,7 @@ export default function useDebugMetrics({
       renderLimit,
       left,
       bottom,
+      marioMotion,
       visibleObjectsCount,
       visibleSpritesApprox,
       visibleBrickCount,

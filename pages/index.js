@@ -24,6 +24,7 @@ export default function Home() {
     width,
     left,
     bottom,
+    motionRef,
     objects,
     mushrooms,
     enemies,
@@ -79,6 +80,7 @@ export default function Home() {
     visibleMaxPx,
     decorMinPx,
     decorMaxPx,
+    motionRef,
   })
 
   useGameInput({
