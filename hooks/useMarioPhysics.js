@@ -13,6 +13,8 @@ export default function useMarioPhysics({
   bumpInteractiveBlockAt,
   collectRevealedMysteryItemAt,
   hasSideCollisionAt,
+  resolveEnemyCollision,
+  onEnemyHit,
   getMaxWalkX,
   setLeftSafe,
   setBottomSafe,
@@ -190,6 +192,25 @@ export default function useMarioPhysics({
     }
     motion.x = nextX
     motion.y = nextY
+
+    const enemyCollision = resolveEnemyCollision({
+      marioX: nextX,
+      marioY: nextY,
+      previousMarioY: prev.y,
+      marioVy: motion.vy,
+    })
+    if (enemyCollision.hitEnemy) {
+      onEnemyHit()
+    }
+    if (enemyCollision.stomped) {
+      if (Number.isFinite(enemyCollision.nextY)) {
+        nextY = enemyCollision.nextY
+        motion.y = nextY
+      }
+      motion.vy = enemyCollision.nextVy
+      motion.grounded = false
+      motion.coyoteTimer = 0
+    }
 
     collectRevealedMysteryItemAt(nextX, nextY)
 

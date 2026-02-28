@@ -60,7 +60,7 @@ const GameHud = ({
         <div className='mt-2 px-4 py-2 bg-black/85 border-2 border-white text-white text-sm'>
           {gameStatus === 'won'
             ? 'WIN'
-            : loseReason === 'fall'
+            : (loseReason === 'fall' || loseReason === 'enemy')
               ? 'GAME OVER'
               : 'TIME UP'}
         </div>
