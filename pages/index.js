@@ -26,6 +26,7 @@ export default function Home() {
     bottom,
     objects,
     mushrooms,
+    enemies,
     coins,
     score,
     time,
@@ -126,6 +127,7 @@ export default function Home() {
             debug={debug}
             objects={objects}
             mushrooms={mushrooms}
+            enemies={enemies}
             visibleMinPx={visibleMinPx}
             visibleMaxPx={visibleMaxPx}
             worldPreloadTiles={worldPreloadTiles}

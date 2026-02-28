@@ -9,6 +9,7 @@ export default function useGameSession({
   bottom,
   pixels,
   objects,
+  enemyHit = false,
   initialTime = 400,
 }) {
   const [time, setTime] = useState(initialTime)
@@ -55,7 +56,7 @@ export default function useGameSession({
     const fellOffLevel = gameLoopEnabled && bottom <= 0
 
     const terminalState =
-      time <= 0 || fellOffLevel
+      enemyHit || time <= 0 || fellOffLevel
         ? 'lost'
         : touchesFlag
           ? 'won'
@@ -82,7 +83,7 @@ export default function useGameSession({
       setGameStatus(terminalState)
       setLoseReason(
         terminalState === 'lost'
-          ? (time <= 0 ? 'time' : 'fall')
+          ? (enemyHit ? 'enemy' : (time <= 0 ? 'time' : 'fall'))
           : null
       )
       setTime(initialTime)
@@ -91,7 +92,7 @@ export default function useGameSession({
     return () => {
       window.cancelAnimationFrame(rafId)
     }
-  }, [time, left, bottom, pixels, floorEndPx, initialTime, gameStatus, gameLoopEnabled])
+  }, [time, left, bottom, pixels, floorEndPx, initialTime, gameStatus, gameLoopEnabled, enemyHit])
 
   return {
     time,

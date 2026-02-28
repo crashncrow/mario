@@ -95,6 +95,7 @@ const Mario = () => {
     debug,
     left,
     bottom,
+    marioCollision,
     gameLoopEnabled,
     motionRef,
   } = useAppContext()
@@ -152,7 +153,7 @@ const Mario = () => {
 
         {
           debug &&
-          <div className='absolute w-full h-full border-4 border-mario-red z-50 pointer-events-none'></div>
+          <div className={`absolute w-full h-full border-4 ${marioCollision ? 'border-black' : 'border-mario-red'} z-50 pointer-events-none`}></div>
         }
 
         {currentMatrix.map((x, i) => {

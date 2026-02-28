@@ -2,8 +2,10 @@ import { createContext, useCallback, useContext, useEffect, useRef, useState } f
 import { useWindowDimensions } from 'hooks/window'
 import useMarioPhysics from 'hooks/useMarioPhysics'
 import useMushroomPhysics, { MUSHROOM_HORIZONTAL_SPEED, MUSHROOM_SIZE } from 'hooks/useMushroomPhysics'
+import useEnemyPhysics from 'hooks/useEnemyPhysics'
 import useGameSession from 'hooks/useGameSession'
-import { elements } from 'libs/elements'
+import { elements, enemies as initialEnemies } from 'libs/elements'
+import { createEnemiesState, createEnemyState } from 'libs/createEnemyState'
 import {
   getLandingYAtPosition,
   getMaxWalkXForObjects,
@@ -16,6 +18,11 @@ import {
   bumpInteractiveBlockAtPosition,
   collectRevealedMysteryItemAtPosition,
 } from 'libs/interaction'
+import {
+  hasMarioEnemyContact,
+  resolveMarioEnemyCollision,
+} from 'libs/enemyInteractions'
+import { getEnemyTypeConfig } from 'libs/enemyTypes'
 import { TILE_SIZE } from 'libs/worldConstants'
 
 const AppContext = createContext(null)
@@ -24,14 +31,25 @@ const pixels = TILE_SIZE
 export const AppContextProvider = ({ children }) => {
   const { width } = useWindowDimensions();
   const debugEnabled = process.env.NEXT_PUBLIC_DEBUG === '1'
+  const nextEnemyIdRef = useRef(0)
+  const createEnemyId = useCallback(
+    () => `enemy_${nextEnemyIdRef.current++}`,
+    []
+  )
 
   const [ objects, setObjects ] = useState(elements)
   const [ mushrooms, setMushrooms ] = useState([])
+  const [ enemies, setEnemies ] = useState(() => createEnemiesState({
+    enemies: initialEnemies,
+    pixels,
+    createId: (_, index) => `enemy_init_${index}`,
+  }))
 
   const [ left, setLeft ] = useState(100)
   const [ bottom, setBottom ] = useState(pixels)
   const [ coins, setCoins ] = useState(0)
   const [ score, setScore ] = useState(0)
+  const [ enemyHit, setEnemyHit ] = useState(false)
   
   const [ gameLoopEnabled, setGameLoopEnabled ] = useState(true)
   const renderLimit = left + (width ?? 0) + 500
@@ -69,6 +87,7 @@ export const AppContextProvider = ({ children }) => {
   })
   const publishPendingRef = useRef(false)
   const mushroomsRef = useRef(mushrooms)
+  const enemiesRef = useRef(enemies)
 
   useEffect(() => {
     stateRef.current = {
@@ -86,6 +105,10 @@ export const AppContextProvider = ({ children }) => {
   useEffect(() => {
     mushroomsRef.current = mushrooms
   }, [mushrooms])
+
+  useEffect(() => {
+    enemiesRef.current = enemies
+  }, [enemies])
 
   useEffect(() => {
     if (gameLoopEnabled) return
@@ -116,6 +139,12 @@ export const AppContextProvider = ({ children }) => {
   const getMaxWalkX = useCallback(() => {
     return getMaxWalkXForObjects({ objects, pixels })
   }, [objects])
+
+  const marioCollision =
+    hasCollisionAtPosition({ objects, pixels, x: left, y: bottom }) ||
+    hasSideCollisionAtPosition({ objects, pixels, x: left, y: bottom }) ||
+    hasCeilingCollisionAtPosition({ objects, pixels, x: left, y: bottom }) ||
+    hasMarioEnemyContact({ marioX: left, marioY: bottom, pixels, enemies })
 
   const bumpInteractiveBlockAt = useCallback((x, y) => {
     const { nextObjects, bumped, reward, spawnedItem } = bumpInteractiveBlockAtPosition({ objects, pixels, x, y })
@@ -158,6 +187,19 @@ export const AppContextProvider = ({ children }) => {
     if (reward?.coinsDelta) setCoins(prev => prev + reward.coinsDelta)
   }, [objects])
 
+  const spawnEnemy = useCallback(enemy => {
+    const nextEnemy = createEnemyState({
+      enemy,
+      id: createEnemyId(),
+      index: enemiesRef.current.length,
+      pixels,
+    })
+    const nextEnemies = [ ...enemiesRef.current, nextEnemy ]
+    enemiesRef.current = nextEnemies
+    setEnemies(nextEnemies)
+    return nextEnemy
+  }, [createEnemyId])
+
   const setLeftSafe = useCallback(nextValue => {
     if (!Number.isFinite(nextValue)) return
     if (stateRef.current.left === nextValue) return
@@ -182,7 +224,46 @@ export const AppContextProvider = ({ children }) => {
     bottom,
     pixels,
     objects,
+    enemyHit,
   })
+
+  const resolveEnemyCollision = useCallback(({
+    marioX,
+    marioY,
+    previousMarioY,
+    marioVy,
+  }) => {
+    const result = resolveMarioEnemyCollision({
+      marioX,
+      marioY,
+      previousMarioY,
+      marioVy,
+      pixels,
+      enemies: enemiesRef.current,
+      getEnemyTypeConfig,
+    })
+
+    if (result.scoreDelta > 0) {
+      setScore(prev => prev + result.scoreDelta)
+    }
+
+    if (result.stomped || result.enemiesChanged) {
+      const nextEnemies = result.nextEnemies
+      enemiesRef.current = nextEnemies
+      setEnemies(nextEnemies)
+    }
+
+    return {
+      hitEnemy: result.hitEnemy,
+      stomped: result.stomped,
+      nextVy: result.nextVy,
+      nextY: result.nextY,
+    }
+  }, [])
+
+  const onEnemyHit = useCallback(() => {
+    setEnemyHit(true)
+  }, [])
 
   // Modern mode: requestAnimationFrame physics loop.
   useMarioPhysics({
@@ -198,6 +279,8 @@ export const AppContextProvider = ({ children }) => {
     bumpInteractiveBlockAt,
     collectRevealedMysteryItemAt,
     hasSideCollisionAt,
+    resolveEnemyCollision,
+    onEnemyHit,
     getMaxWalkX,
     setLeftSafe,
     setBottomSafe,
@@ -211,6 +294,15 @@ export const AppContextProvider = ({ children }) => {
     marioBottom: bottom,
     mushroomsRef,
     setMushrooms,
+    setScore,
+  })
+
+  useEnemyPhysics({
+    enabled: gameLoopEnabled && gameStatus === 'playing',
+    objects,
+    pixels,
+    enemiesRef,
+    setEnemies,
     setScore,
   })
 
@@ -268,8 +360,10 @@ export const AppContextProvider = ({ children }) => {
 
         left: left,
         bottom: bottom,
+        marioCollision: marioCollision,
         objects: objects,
         mushrooms: mushrooms,
+        enemies: enemies,
         coins: coins,
         score: score,
         time: time,
@@ -285,6 +379,7 @@ export const AppContextProvider = ({ children }) => {
         setObjects: setObjects,
         setCoins: setCoins,
         setScore: setScore,
+        spawnEnemy: spawnEnemy,
         setLoopInput: setLoopInput,
         setGameLoopEnabled: setGameLoopEnabled
       }}

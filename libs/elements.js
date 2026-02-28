@@ -1,5 +1,11 @@
 import { TILE_SIZE } from 'libs/worldConstants'
 
+export const enemies = [
+  { type: 'goomba', x: 8, y: 1 },
+  { type: 'koopa', x: 20, y: 1 },
+  { type: 'buzzy', x: 16, y: 1 },
+]
+
 export const elements = [
   { type: 'Solid', x: 135, y: 1, size: 1, width: TILE_SIZE, height: TILE_SIZE },
   { type: 'Solid', x: 136, y: 1, size: 1, width: TILE_SIZE, height: TILE_SIZE },
