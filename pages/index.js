@@ -10,8 +10,6 @@ import GameHud from 'components/ui/GameHud'
 import WorldScene from 'components/world/WorldScene'
 
 export default function Home() {
-
-  const buttonRef = useRef()
   const worldRef = useRef(null)
   const cameraXRef = useRef(0)
   const scrollContainerRef = useRef(null)
@@ -93,7 +91,6 @@ export default function Home() {
   })
 
   useGameInput({
-    buttonRef,
     gameLoopEnabled,
     isPaused,
     setLoopInput,
@@ -121,7 +118,6 @@ export default function Home() {
       />
       <div
         className={`fixed inset-0 h-dvh w-full z-50 ${gameLoopEnabled ? 'pointer-events-auto' : 'pointer-events-none'}`}
-        ref={buttonRef}
       ></div>
       <div
         ref={scrollContainerRef}

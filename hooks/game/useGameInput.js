@@ -1,9 +1,6 @@
-import { useCallback, useEffect } from 'react'
-
-import useDoubleClick from 'hooks/shared/clicks'
+import { useEffect } from 'react'
 
 export default function useGameInput({
-  buttonRef,
   gameLoopEnabled,
   isPaused,
   setLoopInput,
@@ -69,27 +66,4 @@ export default function useGameInput({
     }
   }, [gameLoopEnabled, isPaused])
 
-  const triggerLoopJump = useCallback(() => {
-    setLoopInput({ jump: true })
-    setTimeout(() => {
-      setLoopInput({ jump: false })
-    }, 60)
-  }, [setLoopInput])
-
-  const onSingleClick = useCallback(() => {
-    if (!gameLoopEnabled || isPaused) return
-    triggerLoopJump()
-  }, [gameLoopEnabled, isPaused, triggerLoopJump])
-
-  const onDoubleClick = useCallback(() => {
-    if (!gameLoopEnabled || isPaused) return
-    triggerLoopJump()
-  }, [gameLoopEnabled, isPaused, triggerLoopJump])
-
-  useDoubleClick({
-    onSingleClick,
-    onDoubleClick,
-    ref: buttonRef,
-    latency: 250,
-  })
 }
