@@ -7,21 +7,41 @@ import {
 export default function useBlockInteractions({
   objects,
   pixels,
+  playerForm,
   mushroomSize,
   mushroomSpeed,
+  setBrickBreaks,
   setObjects,
   setCoins,
   setScore,
   setMushrooms,
 }) {
   const bumpInteractiveBlockAt = useCallback((x, y) => {
-    const { nextObjects, bumped, reward, spawnedItem } = bumpInteractiveBlockAtPosition({ objects, pixels, x, y })
+    const { nextObjects, bumped, reward, spawnedItem, brokenBrick } = bumpInteractiveBlockAtPosition({
+      objects,
+      pixels,
+      x,
+      y,
+      playerForm,
+    })
 
     if (!bumped) return
 
     setObjects(nextObjects)
     if (reward?.scoreDelta) setScore(prev => prev + reward.scoreDelta)
     if (reward?.coinsDelta) setCoins(prev => prev + reward.coinsDelta)
+
+    if (brokenBrick) {
+      const now = Date.now()
+      setBrickBreaks(prev => ([
+        ...prev,
+        {
+          id: `brick_break_${brokenBrick.x}_${brokenBrick.y}_${now}`,
+          ...brokenBrick,
+          expiresAt: now + 450,
+        },
+      ]))
+    }
 
     if (spawnedItem?.type === 'mushroom') {
       setMushrooms(prev => ([
@@ -39,7 +59,7 @@ export default function useBlockInteractions({
         },
       ]))
     }
-  }, [mushroomSize, mushroomSpeed, objects, pixels, setCoins, setMushrooms, setObjects, setScore])
+  }, [mushroomSize, mushroomSpeed, objects, pixels, playerForm, setBrickBreaks, setCoins, setMushrooms, setObjects, setScore])
 
   const collectRevealedMysteryItemAt = useCallback((x, y) => {
     const { nextObjects, collected, reward } = collectRevealedMysteryItemAtPosition({
@@ -47,6 +67,7 @@ export default function useBlockInteractions({
       pixels,
       x,
       y,
+      playerForm,
     })
 
     if (!collected) return
@@ -54,7 +75,7 @@ export default function useBlockInteractions({
     setObjects(nextObjects)
     if (reward?.scoreDelta) setScore(prev => prev + reward.scoreDelta)
     if (reward?.coinsDelta) setCoins(prev => prev + reward.coinsDelta)
-  }, [objects, pixels, setCoins, setObjects, setScore])
+  }, [objects, pixels, playerForm, setCoins, setObjects, setScore])
 
   return {
     bumpInteractiveBlockAt,

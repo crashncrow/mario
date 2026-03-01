@@ -29,6 +29,7 @@ export const AppContextProvider = ({ children }) => {
   const { width } = useWindowDimensions();
   const debugEnabled = process.env.NEXT_PUBLIC_DEBUG === '1'
   const nextEnemyIdRef = useRef(0)
+  const playerDamageCooldownRef = useRef(0)
   const lastGameStatusRef = useRef('playing')
   const createEnemyId = useCallback(
     () => `enemy_${nextEnemyIdRef.current++}`,
@@ -42,6 +43,7 @@ export const AppContextProvider = ({ children }) => {
 
   const [ objects, setObjects ] = useState(currentLevel.elements)
   const [ mushrooms, setMushrooms ] = useState([])
+  const [ brickBreaks, setBrickBreaks ] = useState([])
   const [ enemies, setEnemies ] = useState(() => createEnemiesState({
     enemies: currentLevel.enemies,
     pixels,
@@ -50,6 +52,7 @@ export const AppContextProvider = ({ children }) => {
 
   const [ left, setLeft ] = useState(currentLevel.startLeft)
   const [ bottom, setBottom ] = useState(currentLevel.startBottom)
+  const [ playerForm, setPlayerForm ] = useState('small')
   const [ lives, setLives ] = useState(3)
   const [ coins, setCoins ] = useState(0)
   const [ score, setScore ] = useState(0)
@@ -111,6 +114,19 @@ export const AppContextProvider = ({ children }) => {
   }, [mushrooms])
 
   useEffect(() => {
+    if (brickBreaks.length === 0) return
+
+    const timeoutId = window.setTimeout(() => {
+      const now = Date.now()
+      setBrickBreaks(prev => prev.filter(effect => effect.expiresAt > now))
+    }, 450)
+
+    return () => {
+      window.clearTimeout(timeoutId)
+    }
+  }, [brickBreaks])
+
+  useEffect(() => {
     enemiesRef.current = enemies
   }, [enemies])
 
@@ -121,42 +137,44 @@ export const AppContextProvider = ({ children }) => {
   }, [left, bottom, gameLoopEnabled])
 
   const hasCollisionAt = useCallback((x, y) => {
-    return hasCollisionAtPosition({ objects, pixels, x, y })
-  }, [objects])
+    return hasCollisionAtPosition({ objects, pixels, x, y, playerForm })
+  }, [objects, playerForm])
 
   const isGroundedAt = useCallback((x, y) => {
-    return isGroundedAtPosition({ objects, pixels, x, y })
-  }, [objects])
+    return isGroundedAtPosition({ objects, pixels, x, y, playerForm })
+  }, [objects, playerForm])
 
   const getLandingYAt = useCallback((x, fromY, toY) => {
-    return getLandingYAtPosition({ objects, pixels, x, fromY, toY })
-  }, [objects])
+    return getLandingYAtPosition({ objects, pixels, x, fromY, toY, playerForm })
+  }, [objects, playerForm])
 
   const hasSideCollisionAt = useCallback((x, y) => {
-    return hasSideCollisionAtPosition({ objects, pixels, x, y })
-  }, [objects])
+    return hasSideCollisionAtPosition({ objects, pixels, x, y, playerForm })
+  }, [objects, playerForm])
 
   const hasCeilingCollisionAt = useCallback((x, y) => {
-    return hasCeilingCollisionAtPosition({ objects, pixels, x, y })
-  }, [objects])
+    return hasCeilingCollisionAtPosition({ objects, pixels, x, y, playerForm })
+  }, [objects, playerForm])
 
   const getMaxWalkX = useCallback(() => {
-    return getMaxWalkXForObjects({ objects, pixels })
-  }, [objects])
+    return getMaxWalkXForObjects({ objects, pixels, playerForm })
+  }, [objects, playerForm])
 
   const marioCollision =
-    hasCollisionAtPosition({ objects, pixels, x: left, y: bottom }) ||
-    hasSideCollisionAtPosition({ objects, pixels, x: left, y: bottom }) ||
-    hasCeilingCollisionAtPosition({ objects, pixels, x: left, y: bottom }) ||
-    hasMarioEnemyContact({ marioX: left, marioY: bottom, pixels, enemies })
+    hasCollisionAtPosition({ objects, pixels, x: left, y: bottom, playerForm }) ||
+    hasSideCollisionAtPosition({ objects, pixels, x: left, y: bottom, playerForm }) ||
+    hasCeilingCollisionAtPosition({ objects, pixels, x: left, y: bottom, playerForm }) ||
+    hasMarioEnemyContact({ marioX: left, marioY: bottom, pixels, playerForm, enemies })
   const {
     bumpInteractiveBlockAt,
     collectRevealedMysteryItemAt,
   } = useBlockInteractions({
     objects,
     pixels,
+    playerForm,
     mushroomSize: MUSHROOM_SIZE,
     mushroomSpeed: MUSHROOM_HORIZONTAL_SPEED,
+    setBrickBreaks,
     setObjects,
     setCoins,
     setScore,
@@ -186,6 +204,7 @@ export const AppContextProvider = ({ children }) => {
     left,
     bottom,
     pixels,
+    playerForm,
     objects,
     enemyHit,
     lives,
@@ -202,8 +221,10 @@ export const AppContextProvider = ({ children }) => {
     setLives,
     setObjects,
     setMushrooms,
+    setBrickBreaks,
     setEnemies,
     setEnemyHit,
+    setPlayerForm,
     setLeftSafe,
     setBottomSafe,
     motionRef,
@@ -211,6 +232,7 @@ export const AppContextProvider = ({ children }) => {
     publishPendingRef,
     mushroomsRef,
     enemiesRef,
+    playerDamageCooldownRef,
     lastGameStatusRef,
   })
 
@@ -221,8 +243,11 @@ export const AppContextProvider = ({ children }) => {
   } = useEnemyState({
     enemiesRef,
     pixels,
+    playerForm,
+    playerDamageCooldownRef,
     setEnemies,
     setEnemyHit,
+    setPlayerForm,
     setScore,
     createEnemyId,
   })
@@ -252,11 +277,13 @@ export const AppContextProvider = ({ children }) => {
     enabled: gameLoopEnabled && gameStatus === 'playing',
     objects,
     pixels,
+    playerForm,
     marioLeft: left,
     marioBottom: bottom,
     mushroomsRef,
     setMushrooms,
     setScore,
+    onCollectMushroom: () => setPlayerForm('big'),
   })
 
   useEnemyPhysics({
@@ -337,7 +364,9 @@ export const AppContextProvider = ({ children }) => {
         currentCastle: currentLevel.castle,
         objects: objects,
         mushrooms: mushrooms,
+        brickBreaks: brickBreaks,
         enemies: enemies,
+        playerForm: playerForm,
         lives: lives,
         coins: coins,
         score: score,
@@ -352,6 +381,7 @@ export const AppContextProvider = ({ children }) => {
         setLeft: setLeft,
         setBottom: setBottom,
         setObjects: setObjects,
+        setPlayerForm: setPlayerForm,
         setLives: setLives,
         setCoins: setCoins,
         setScore: setScore,

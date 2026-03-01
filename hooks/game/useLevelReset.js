@@ -11,8 +11,10 @@ export default function useLevelReset({
   setLives,
   setObjects,
   setMushrooms,
+  setBrickBreaks,
   setEnemies,
   setEnemyHit,
+  setPlayerForm,
   setLeftSafe,
   setBottomSafe,
   motionRef,
@@ -20,6 +22,7 @@ export default function useLevelReset({
   publishPendingRef,
   mushroomsRef,
   enemiesRef,
+  playerDamageCooldownRef,
   lastGameStatusRef,
 }) {
   const createInitialEnemies = useCallback(level => (
@@ -30,15 +33,21 @@ export default function useLevelReset({
     })
   ), [pixels])
 
-  const resetLevelState = useCallback(level => {
+  const resetLevelState = useCallback((level, options = {}) => {
+    const { resetPlayerForm = false } = options
     const nextEnemies = createInitialEnemies(level)
 
     setObjects(level.elements)
     setMushrooms([])
+    setBrickBreaks([])
     setEnemies(nextEnemies)
     setLeftSafe(level.startLeft)
     setBottomSafe(level.startBottom)
     setEnemyHit(false)
+    if (resetPlayerForm) {
+      setPlayerForm('small')
+    }
+    playerDamageCooldownRef.current = 0
 
     mushroomsRef.current = []
     enemiesRef.current = nextEnemies
@@ -70,12 +79,15 @@ export default function useLevelReset({
     motionRef,
     mushroomsRef,
     publishPendingRef,
+    playerDamageCooldownRef,
     setBottomSafe,
+    setBrickBreaks,
     setEnemies,
     setEnemyHit,
     setLeftSafe,
     setMushrooms,
     setObjects,
+    setPlayerForm,
   ])
 
   useEffect(() => {
@@ -84,7 +96,7 @@ export default function useLevelReset({
         if (lives > 1) {
           setLives(prev => Math.max(0, prev - 1))
           window.setTimeout(() => {
-            resetLevelState(currentLevel)
+            resetLevelState(currentLevel, { resetPlayerForm: true })
           }, RESPAWN_DELAY_MS)
           return
         }

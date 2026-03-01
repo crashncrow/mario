@@ -1,4 +1,5 @@
 import { getObjectHeight, getObjectWidth } from 'libs/world/objectDimensions'
+import { getPlayerBounds } from 'libs/playerDimensions'
 
 const getBlockVariant = obj => (obj.variant || obj.type || '').toLowerCase()
 
@@ -14,13 +15,17 @@ const getBlockContent = obj => {
   return variant === 'mystery' ? 'coin' : 'none'
 }
 
-const getRewardForHit = ({ obj, previousTouches }) => {
+const getRewardForHit = ({ obj, previousTouches, playerForm }) => {
   const variant = getBlockVariant(obj)
   const content = getBlockContent(obj)
   const isFirstHit = previousTouches === 0
 
   if (variant === 'brick') {
-    return { scoreDelta: 0, coinsDelta: 0, item: null }
+    return {
+      scoreDelta: playerForm === 'big' ? 50 : 0,
+      coinsDelta: 0,
+      item: null,
+    }
   }
 
   if (variant === 'mystery') {
@@ -51,10 +56,11 @@ const getRewardForPickup = content => {
   return { scoreDelta: 0, coinsDelta: 0, item: null }
 }
 
-export const bumpInteractiveBlockAtPosition = ({ objects, pixels, x, y }) => {
+export const bumpInteractiveBlockAtPosition = ({ objects, pixels, x, y, playerForm }) => {
   let bumped = false
   let reward = { scoreDelta: 0, coinsDelta: 0, item: null }
   let spawnedItem = null
+  let brokenBrick = null
 
   const nextObjects = objects.map(obj => {
     if (bumped || obj.type === 'Floor' || !isInteractiveBlock(obj)) {
@@ -66,14 +72,13 @@ export const bumpInteractiveBlockAtPosition = ({ objects, pixels, x, y }) => {
     const objBottom = obj.y * pixels
     const objTop = objBottom + getObjectHeight(obj)
 
-    const marioLeft = x + 12
-    const marioRight = x + pixels - 22
-    const headBottom = y + pixels - 4
-    const headTop = y + pixels
+    const playerBounds = getPlayerBounds({ x, y, pixels, playerForm })
+    const headBottom = playerBounds.top - 4
+    const headTop = playerBounds.top
 
     const hit =
-      marioLeft < objRight &&
-      marioRight > objLeft &&
+      playerBounds.left < objRight &&
+      playerBounds.right > objLeft &&
       headBottom < objTop &&
       headTop > objBottom
 
@@ -81,11 +86,22 @@ export const bumpInteractiveBlockAtPosition = ({ objects, pixels, x, y }) => {
 
     bumped = true
     const previousTouches = obj.touches || 0
-    reward = getRewardForHit({ obj, previousTouches })
+    reward = getRewardForHit({ obj, previousTouches, playerForm })
 
     const isFirstHit = previousTouches === 0
     const variant = getBlockVariant(obj)
     const content = getBlockContent(obj).toLowerCase()
+
+    if (variant === 'brick' && playerForm === 'big') {
+      brokenBrick = {
+        x: obj.x * pixels,
+        y: obj.y * pixels,
+        width: pixels,
+        height: pixels,
+      }
+      return null
+    }
+
     if (isFirstHit && variant === 'mystery' && content === 'mushroom') {
       spawnedItem = {
         type: 'mushroom',
@@ -98,18 +114,15 @@ export const bumpInteractiveBlockAtPosition = ({ objects, pixels, x, y }) => {
       ...obj,
       touches: previousTouches + 1,
     }
-  })
+  }).filter(Boolean)
 
-  return { nextObjects, bumped, reward, spawnedItem }
+  return { nextObjects, bumped, reward, spawnedItem, brokenBrick }
 }
-export const collectRevealedMysteryItemAtPosition = ({ objects, pixels, x, y }) => {
+export const collectRevealedMysteryItemAtPosition = ({ objects, pixels, x, y, playerForm }) => {
   let collected = false
   let reward = { scoreDelta: 0, coinsDelta: 0, item: null }
 
-  const marioLeft = x + 12
-  const marioRight = x + pixels - 22
-  const marioBottom = y
-  const marioTop = y + pixels
+  const playerBounds = getPlayerBounds({ x, y, pixels, playerForm })
 
   const nextObjects = objects.map(obj => {
     if (collected || getBlockVariant(obj) !== 'mystery') return obj
@@ -128,10 +141,10 @@ export const collectRevealedMysteryItemAtPosition = ({ objects, pixels, x, y }) 
     const itemTop = itemBottom + pixels
 
     const overlaps =
-      marioLeft < itemRight &&
-      marioRight > itemLeft &&
-      marioBottom < itemTop &&
-      marioTop > itemBottom
+      playerBounds.left < itemRight &&
+      playerBounds.right > itemLeft &&
+      playerBounds.bottom < itemTop &&
+      playerBounds.top > itemBottom
 
     if (!overlaps) return obj
 

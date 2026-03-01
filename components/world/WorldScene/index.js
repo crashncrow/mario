@@ -1,4 +1,5 @@
 import Castle from 'components/world/Castle'
+import BrickBreakEffect from 'components/world/BrickBreakEffect'
 import Mountains from 'components/decorations/Mountains'
 import Plants from 'components/decorations/Plants'
 import Sky from 'components/decorations/Sky'
@@ -38,6 +39,7 @@ const WorldScene = ({
   debug,
   objects,
   mushrooms,
+  brickBreaks,
   enemies,
   visibleMinPx,
   visibleMaxPx,
@@ -59,6 +61,13 @@ const WorldScene = ({
           visibleMinPx={visibleMinPx}
           visibleMaxPx={visibleMaxPx}
           renderItem={renderMushroom}
+        />
+
+        <VisibleEntitiesLayer
+          items={brickBreaks}
+          visibleMinPx={visibleMinPx}
+          visibleMaxPx={visibleMaxPx}
+          renderItem={() => <BrickBreakEffect />}
         />
 
         <VisibleEntitiesLayer

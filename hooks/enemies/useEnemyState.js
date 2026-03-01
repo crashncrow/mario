@@ -6,8 +6,11 @@ import { getEnemyTypeConfig } from 'libs/enemies/enemyTypes'
 export default function useEnemyState({
   enemiesRef,
   pixels,
+  playerForm,
+  playerDamageCooldownRef,
   setEnemies,
   setEnemyHit,
+  setPlayerForm,
   setScore,
   createEnemyId,
 }) {
@@ -36,6 +39,7 @@ export default function useEnemyState({
       previousMarioY,
       marioVy,
       pixels,
+      playerForm,
       enemies: enemiesRef.current,
       getEnemyTypeConfig,
     })
@@ -56,11 +60,20 @@ export default function useEnemyState({
       nextVy: result.nextVy,
       nextY: result.nextY,
     }
-  }, [enemiesRef, pixels, setEnemies, setScore])
+  }, [enemiesRef, pixels, playerForm, setEnemies, setScore])
 
   const onEnemyHit = useCallback(() => {
+    const now = Date.now()
+    if (now < playerDamageCooldownRef.current) return
+
+    if (playerForm === 'big') {
+      playerDamageCooldownRef.current = now + 1200
+      setPlayerForm('small')
+      return
+    }
+
     setEnemyHit(true)
-  }, [setEnemyHit])
+  }, [playerDamageCooldownRef, playerForm, setEnemyHit, setPlayerForm])
 
   return {
     spawnEnemy,

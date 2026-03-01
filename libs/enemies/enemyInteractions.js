@@ -1,11 +1,10 @@
+import { getPlayerBounds } from 'libs/playerDimensions'
+
 const STOMP_BAND_PX = 10
 
-export const getMarioBounds = ({ x, y, pixels }) => ({
-  left: x + 12,
-  right: x + pixels - 22,
-  bottom: y,
-  top: y + pixels,
-})
+export const getMarioBounds = ({ x, y, pixels, playerForm }) => (
+  getPlayerBounds({ x, y, pixels, playerForm })
+)
 
 export const getEnemyBounds = enemy => ({
   left: enemy.x + 6,
@@ -29,8 +28,8 @@ export const touchesEnemyTop = ({ marioBounds, previousMarioBottom, marioVy, ene
   marioBounds.bottom <= (enemyBounds.top + STOMP_BAND_PX)
 )
 
-export const hasMarioEnemyContact = ({ marioX, marioY, pixels, enemies }) => {
-  const marioBounds = getMarioBounds({ x: marioX, y: marioY, pixels })
+export const hasMarioEnemyContact = ({ marioX, marioY, pixels, playerForm, enemies }) => {
+  const marioBounds = getMarioBounds({ x: marioX, y: marioY, pixels, playerForm })
 
   return enemies.some(enemy => {
     const enemyBounds = getEnemyBounds(enemy)
@@ -52,11 +51,12 @@ export const resolveMarioEnemyCollision = ({
   previousMarioY,
   marioVy,
   pixels,
+  playerForm,
   enemies,
   getEnemyTypeConfig,
   now = Date.now(),
 }) => {
-  const marioBounds = getMarioBounds({ x: marioX, y: marioY, pixels })
+  const marioBounds = getMarioBounds({ x: marioX, y: marioY, pixels, playerForm })
   const previousMarioBottom = previousMarioY
   const marioCenterX = (marioBounds.left + marioBounds.right) / 2
 

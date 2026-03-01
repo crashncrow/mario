@@ -1,5 +1,6 @@
 import useGameLoop from 'hooks/game/useGameLoop'
 import { getObjectHeight, getObjectWidth } from 'libs/world/objectDimensions'
+import { getPlayerBounds } from 'libs/playerDimensions'
 
 const MUSHROOM_SIZE = 64
 const MUSHROOM_HORIZONTAL_SPEED = 300
@@ -52,13 +53,11 @@ const hasSideCollision = ({ objects, pixels, x, y }) => {
   })
 }
 
-const collectByMario = ({ mushrooms, marioX, marioY, addScore }) => {
-  const marioLeft = marioX + 12
-  const marioRight = marioX + MUSHROOM_SIZE - 22
-  const marioBottom = marioY
-  const marioTop = marioY + MUSHROOM_SIZE
+const collectByMario = ({ mushrooms, marioX, marioY, pixels, playerForm, addScore }) => {
+  const marioBounds = getPlayerBounds({ x: marioX, y: marioY, pixels, playerForm })
 
   let changed = false
+  let collectedMushroom = false
 
   const next = mushrooms.filter(mushroom => {
     if (mushroom.phase === 'emerging') return true
@@ -69,30 +68,33 @@ const collectByMario = ({ mushrooms, marioX, marioY, addScore }) => {
     const itemTop = mushroom.y + MUSHROOM_SIZE - 2
 
     const overlaps =
-      marioLeft < itemRight &&
-      marioRight > itemLeft &&
-      marioBottom < itemTop &&
-      marioTop > itemBottom
+      marioBounds.left < itemRight &&
+      marioBounds.right > itemLeft &&
+      marioBounds.bottom < itemTop &&
+      marioBounds.top > itemBottom
 
     if (!overlaps) return true
 
     changed = true
+    collectedMushroom = true
     addScore(prev => prev + 1000)
     return false
   })
 
-  return { next, changed }
+  return { next, changed, collectedMushroom }
 }
 
 export default function useMushroomPhysics({
   enabled,
   objects,
   pixels,
+  playerForm,
   marioLeft,
   marioBottom,
   mushroomsRef,
   setMushrooms,
   setScore,
+  onCollectMushroom,
 }) {
   useGameLoop(dt => {
     if (!enabled || !Number.isFinite(dt) || dt <= 0) return
@@ -173,12 +175,22 @@ export default function useMushroomPhysics({
       }
     })
 
-    const { next: collected, changed: collectedAny } = collectByMario({
+    const {
+      next: collected,
+      changed: collectedAny,
+      collectedMushroom,
+    } = collectByMario({
       mushrooms: updated,
       marioX: marioLeft,
       marioY: marioBottom,
+      pixels,
+      playerForm,
       addScore: setScore,
     })
+
+    if (collectedMushroom) {
+      onCollectMushroom?.()
+    }
 
     if (!mutated && !collectedAny) return
 

@@ -95,6 +95,7 @@ const Mario = () => {
     debug,
     left,
     bottom,
+    playerForm,
     marioCollision,
     gameLoopEnabled,
     motionRef,
@@ -108,6 +109,9 @@ const Mario = () => {
       : index % 4 === 2 ? matrix3
         : index % 4 === 3 ? matrix2
           : matrix1
+  const spriteScale = playerForm === 'big'
+    ? 'scale(1.25, 1.5)'
+    : 'scale(1, 1)'
 
   useEffect(() => {
     if (!gameLoopEnabled) return
@@ -149,7 +153,12 @@ const Mario = () => {
 
       <div
         className='flex flex-wrap w-16 absolute bottom-0 z-40'
-        style={{ left: `${left}px`, bottom: `${bottom}px` }}>
+        style={{
+          left: `${left}px`,
+          bottom: `${bottom}px`,
+          transform: spriteScale,
+          transformOrigin: 'bottom left',
+        }}>
 
         {
           debug &&

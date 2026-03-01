@@ -1,11 +1,13 @@
 import { useEffect, useRef, useState } from 'react'
 import { getObjectWidth } from 'libs/world/objectDimensions'
+import { getPlayerBounds } from 'libs/playerDimensions'
 
 export default function useGameSession({
   gameLoopEnabled,
   left,
   bottom,
   pixels,
+  playerForm,
   objects,
   enemyHit = false,
   lives = 3,
@@ -37,10 +39,7 @@ export default function useGameSession({
   }, [gameLoopEnabled, time, gameStatus])
 
   useEffect(() => {
-    const marioLeft = left + 10
-    const marioRight = left + pixels - 20
-    const marioBottom = bottom
-    const marioTop = bottom + pixels
+    const marioBounds = getPlayerBounds({ x: left, y: bottom, pixels, playerForm })
 
     // Approximate Flag area (pole + fabric + top) in world coordinates.
     const flagLeft = (flag.x * pixels) - 24
@@ -49,10 +48,10 @@ export default function useGameSession({
     const flagTop = flagBottom + (8 * pixels)
 
     const touchesFlag = (
-      marioLeft < flagRight &&
-      marioRight > flagLeft &&
-      marioBottom < flagTop &&
-      marioTop > flagBottom
+      marioBounds.left < flagRight &&
+      marioBounds.right > flagLeft &&
+      marioBounds.bottom < flagTop &&
+      marioBounds.top > flagBottom
     )
     const fellOffLevel = gameLoopEnabled && bottom <= 0
 
@@ -93,7 +92,7 @@ export default function useGameSession({
     return () => {
       window.cancelAnimationFrame(rafId)
     }
-  }, [time, left, bottom, pixels, flag, floorEndPx, initialTime, gameStatus, gameLoopEnabled, enemyHit, lives])
+  }, [time, left, bottom, pixels, playerForm, flag, floorEndPx, initialTime, gameStatus, gameLoopEnabled, enemyHit, lives])
 
   useEffect(() => {
     terminalStateRef.current = null

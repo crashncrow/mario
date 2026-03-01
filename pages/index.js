@@ -27,6 +27,7 @@ export default function Home() {
     motionRef,
     objects,
     mushrooms,
+    brickBreaks,
     enemies,
     lives,
     coins,
@@ -138,6 +139,7 @@ export default function Home() {
             debug={debug}
             objects={objects}
             mushrooms={mushrooms}
+            brickBreaks={brickBreaks}
             enemies={enemies}
             visibleMinPx={visibleMinPx}
             visibleMaxPx={visibleMaxPx}
