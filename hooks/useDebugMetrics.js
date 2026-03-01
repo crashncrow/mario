@@ -3,6 +3,7 @@ import { useEffect, useState } from 'react'
 import { SKY_CLOUDS } from 'components/Sky'
 import { PLANTS_BUSHES } from 'components/Plants'
 import { MOUNTAINS_LIST } from 'components/Mountains'
+import { getObjectWidth } from 'libs/objectDimensions'
 
 export default function useDebugMetrics({
   debug,
@@ -59,7 +60,7 @@ export default function useDebugMetrics({
 
   const visibleObjects = objects.filter(el => {
     const elLeft = el.x * pixels
-    const elRight = elLeft + (el.width ?? pixels)
+    const elRight = elLeft + getObjectWidth(el)
     return elRight > visibleMinPx && elLeft < visibleMaxPx
   })
 

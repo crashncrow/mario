@@ -1,83 +1,50 @@
-import { useAppContext } from 'contexts/AppContext'
+import FloorTile from 'components/FloorTile'
 
-const Floor = ({ segments, minPx = 0, maxPx }) => {
-  const { renderLimit, pixels } = useAppContext()
-  const visibleMaxPx = typeof maxPx === 'number' ? maxPx : renderLimit
+const getVisibleTileRange = ({ segment, pixels, minPx, maxPx }) => {
+  const segmentLeftPx = segment.x * pixels
+  const totalTiles = segment.size
+  const startTile = Math.max(0, Math.floor((minPx - segmentLeftPx) / pixels))
+  const endTile = Math.min(totalTiles, Math.ceil((maxPx - segmentLeftPx) / pixels))
+  const tileCount = Math.max(0, endTile - startTile)
 
-  return segments.map((el, i) => (
-    (() => {
-      const segmentLeftPx = el.x * pixels
-      const totalTiles = el.size
-      const startTile = Math.max(0, Math.floor((minPx - segmentLeftPx) / pixels))
-      const endTile = Math.min(totalTiles, Math.ceil((visibleMaxPx - segmentLeftPx) / pixels))
-      const tileCount = Math.max(0, endTile - startTile)
-
-      if (tileCount === 0) return null
-
-      return (
-        <div
-          className='absolute bottom-0'
-          style={{ left: `${segmentLeftPx + (startTile * pixels)}px` }}
-          key={i}
-        >
-          <div className='inline-flex'>
-            {Array(tileCount)
-              .fill(1)
-              .map((ele, j) => (
-            <div
-              className={`flex flex-wrap w-16 bg-brick-dark mb-0`}
-              key={`floor_${el.x}_${startTile + j}`}
-            >
-              <div className='flex flex-wrap w-16 h-16'>
-                <div className='w-10 h-15 b'>
-                  <div className='w-full h-10 border-r-4 border-black'>
-                    <div className='h-1 border-l-4 border-brick-dark bg-brick-light'></div>
-                    <div className='h-9 border-l-4 border-brick-light'></div>
-                  </div>
-                  <div className='w-full h-2 border-r-4 border-brick-light'>
-                    <div className='flex flex-wrap w-full h-2 border-r-4 border-black'>
-                      <div className='w-2 h-2 border-t-4 border-black bg-brick-light'></div>
-                      <div className='w-2 h-2 border-b-4 border-black '></div>
-                    </div>
-                  </div>
-
-                  <div className='w-full h-3'>
-                    <div className='w-9 h-3 border-l-4 border-r-4 border-brick-light pl-1'>
-                      <div className='h-1 bg-brick-light pl-2'>
-                        <div className='h-3 bg-black pt-1 pr-1'>
-                          <div className='h-2 bg-brick-light border-b-4 border-brick-dark'></div>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-
-                <div className='w-6'>
-                  <div className='h-1 w-full border-l-4 border-r-4 border-brick-dark bg-brick-light'></div>
-                  <div className='h-4 w-5 border-l-4 border-brick-light'>
-                    <div className='h-4 w-5 border-r-4 border-black'>
-                      <div className='pt-3 h-1 w-1 border-b-4 border-black'></div>
-                    </div>
-                  </div>
-                  <div className='h-1 w-full border-l-4 border-r-4 border-brick-dark bg-black'></div>
-                  <div className='h-9 w-full border-r-4 border-black'>
-                    <div className='h-4 w-full border-l-4 border-t-4 border-brick-light'></div>
-                    <div className='h-1 w-1 ml-4 mt-4 bg-black'></div>
-                  </div>
-                </div>
-
-                <div className='flex flex-wrap w-full h-1 border-l-4 border-r-4 border-brick-dark bg-black'>
-                  <div className='ml-6 h-1 w-1 bg-brick-dark'></div>
-                  <div className='h-1 w-1 bg-brick-light'></div>
-                </div>
-              </div>
-            </div>
-            ))}
-          </div>
-        </div>
-      )
-    })()
-  ))
+  return {
+    segmentLeftPx,
+    startTile,
+    tileCount,
+  }
 }
+
+const Floor = ({ segments, pixels, minPx = 0, maxPx }) => (
+  segments.map(segment => {
+    const {
+      segmentLeftPx,
+      startTile,
+      tileCount,
+    } = getVisibleTileRange({
+      segment,
+      pixels,
+      minPx,
+      maxPx,
+    })
+
+    if (tileCount === 0) return null
+
+    return (
+      <div
+        className='absolute bottom-0'
+        style={{ left: `${segmentLeftPx + (startTile * pixels)}px` }}
+        key={`floor_segment_${segment.x}_${segment.size}`}
+      >
+        <div className='inline-flex'>
+          {Array(tileCount)
+            .fill(1)
+            .map((_, index) => (
+              <FloorTile key={`floor_${segment.x}_${startTile + index}`} />
+            ))}
+        </div>
+      </div>
+    )
+  })
+)
 
 export default Floor

@@ -1,6 +1,7 @@
 import useGameLoop from 'hooks/useGameLoop'
 import { getEnemyTypeConfig } from 'libs/enemyTypes'
 import { getEnemyBounds, hasBoundsOverlap } from 'libs/enemyInteractions'
+import { getObjectHeight, getObjectWidth } from 'libs/objectDimensions'
 
 const ENEMY_GRAVITY = 2600
 const ENEMY_SIDE_INSET_X = 6
@@ -17,8 +18,8 @@ const getLandingY = ({ objects, pixels, entity, fromY, toY }) => {
 
   objects.forEach(obj => {
     const objLeft = obj.x * pixels
-    const objRight = objLeft + obj.width
-    const objTop = (obj.y * pixels) + obj.height
+    const objRight = objLeft + getObjectWidth(obj)
+    const objTop = (obj.y * pixels) + getObjectHeight(obj)
 
     if (!overlapsX(entity, objLeft, objRight)) return
     if (objTop <= fromY && objTop >= toY) {
@@ -39,9 +40,9 @@ const hasSideCollision = ({ objects, pixels, entity, x, y }) => {
     if (obj.type === 'Floor') return false
 
     const objLeft = obj.x * pixels
-    const objRight = objLeft + obj.width
+    const objRight = objLeft + getObjectWidth(obj)
     const objBottom = obj.y * pixels
-    const objTop = objBottom + obj.height
+    const objTop = objBottom + getObjectHeight(obj)
 
     return (
       entityLeft < objRight &&

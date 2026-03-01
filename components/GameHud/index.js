@@ -33,6 +33,8 @@ const GameHud = ({
   coins,
   score,
   time,
+  world,
+  stage,
   gameStatus,
   loseReason,
   lives,
@@ -44,7 +46,7 @@ const GameHud = ({
 
   return (
     <>
-      <Stats time={time} coins={coins} score={score} />
+      <Stats time={time} coins={coins} score={score} world={world} stage={stage} />
 
     <div
       className='fixed top-4 left-1/2 -translate-x-1/2 text-white flex flex-col items-center'

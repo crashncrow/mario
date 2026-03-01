@@ -1,5 +1,6 @@
 import Pipe from 'components/Pipe'
 import Block from 'components/Block'
+import { getObjectHeight, getObjectWidth } from 'libs/objectDimensions'
 
 const getElementKey = el => `${el.type}_${el.x}_${el.y}_${el.size ?? 1}`
 
@@ -12,8 +13,8 @@ const WorldObjectsLayer = ({ visibleObjects, pixels, debug }) => (
         style={{
           bottom: `${o.y * pixels}px`,
           left: `${o.x * pixels}px`,
-          height: `${o.height}px`,
-          width: `${o.width}px`
+          height: `${getObjectHeight(o)}px`,
+          width: `${getObjectWidth(o)}px`
         }}
       >
         <div className='absolute w-full h-full border-4 border-mario-red z-50 pointer-events-none'></div>

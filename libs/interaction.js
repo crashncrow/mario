@@ -1,3 +1,5 @@
+import { getObjectHeight, getObjectWidth } from 'libs/objectDimensions'
+
 const getBlockVariant = obj => (obj.variant || obj.type || '').toLowerCase()
 
 const isInteractiveBlock = obj => {
@@ -60,9 +62,9 @@ export const bumpInteractiveBlockAtPosition = ({ objects, pixels, x, y }) => {
     }
 
     const objLeft = obj.x * pixels
-    const objRight = objLeft + obj.width
+    const objRight = objLeft + getObjectWidth(obj)
     const objBottom = obj.y * pixels
-    const objTop = objBottom + obj.height
+    const objTop = objBottom + getObjectHeight(obj)
 
     const marioLeft = x + 12
     const marioRight = x + pixels - 22

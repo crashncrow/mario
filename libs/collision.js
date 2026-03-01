@@ -1,9 +1,11 @@
+import { getObjectHeight, getObjectWidth } from 'libs/objectDimensions'
+
 export const hasCollisionAtPosition = ({ objects, pixels, x, y }) => (
   objects.some(obj => (
-    x + 10 < obj.x * pixels + obj.width &&
+    x + 10 < obj.x * pixels + getObjectWidth(obj) &&
     x + pixels - 20 > obj.x * pixels &&
     y >= obj.y * pixels &&
-    y <= obj.y * pixels + obj.height
+    y <= obj.y * pixels + getObjectHeight(obj)
   ))
 )
 
@@ -16,8 +18,8 @@ export const getLandingYAtPosition = ({ objects, pixels, x, fromY, toY }) => {
 
   objects.forEach(obj => {
     const objLeft = obj.x * pixels
-    const objRight = objLeft + obj.width
-    const objTop = (obj.y * pixels) + obj.height
+    const objRight = objLeft + getObjectWidth(obj)
+    const objTop = (obj.y * pixels) + getObjectHeight(obj)
 
     const overlapsX =
       x + 10 < objRight &&
@@ -41,9 +43,9 @@ export const hasSideCollisionAtPosition = ({ objects, pixels, x, y }) => {
 
   return objects.some(obj => {
     const objLeft = obj.x * pixels
-    const objRight = objLeft + obj.width
+    const objRight = objLeft + getObjectWidth(obj)
     const objBottom = obj.y * pixels
-    const objTop = objBottom + obj.height
+    const objTop = objBottom + getObjectHeight(obj)
 
     return (
       marioLeft < objRight &&
@@ -64,9 +66,9 @@ export const hasCeilingCollisionAtPosition = ({ objects, pixels, x, y }) => {
     if (obj.type === 'Floor') return false
 
     const objLeft = obj.x * pixels
-    const objRight = objLeft + obj.width
+    const objRight = objLeft + getObjectWidth(obj)
     const objBottom = obj.y * pixels
-    const objTop = objBottom + obj.height
+    const objTop = objBottom + getObjectHeight(obj)
 
     return (
       marioLeft < objRight &&
@@ -82,7 +84,7 @@ export const getMaxWalkXForObjects = ({ objects, pixels }) => {
   if (floorSegments.length === 0) return Infinity
 
   const floorEndPx = floorSegments.reduce((max, obj) => {
-    const end = (obj.x * pixels) + obj.width
+    const end = (obj.x * pixels) + getObjectWidth(obj)
     return Math.max(max, end)
   }, 0)
 

@@ -1,6 +1,6 @@
 import Coin from 'components/Coin'
 
-const Stats = ({ time = 400, coins = 0, score = 0 }) => {
+const Stats = ({ time = 400, coins = 0, score = 0, world = 1, stage = 1 }) => {
   const coinsText = String(coins).padStart(2, '0')
   const scoreText = String(score).padStart(6, '0')
 
@@ -22,7 +22,7 @@ const Stats = ({ time = 400, coins = 0, score = 0 }) => {
 
         <div className='text-center'>
           <div>WORLD</div>
-          <div>1 - 1</div>
+          <div>{world} - {stage}</div>
         </div>
 
         <div className='text-center'>

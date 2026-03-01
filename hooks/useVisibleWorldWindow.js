@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react'
+import { getObjectWidth } from 'libs/objectDimensions'
 import { TILE_SIZE } from 'libs/worldConstants'
 
 export default function useVisibleWorldWindow({
@@ -34,7 +35,7 @@ export default function useVisibleWorldWindow({
 
   const floorEndPx = objects
     .filter(el => el.type === 'Floor')
-    .reduce((max, el) => Math.max(max, (el.x * pixels) + el.width), 0)
+    .reduce((max, el) => Math.max(max, (el.x * pixels) + getObjectWidth(el)), 0)
 
   const maxCameraX = Math.max(0, floorEndPx - (width || 0))
 

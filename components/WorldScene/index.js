@@ -7,9 +7,10 @@ import Plants from 'components/Plants'
 import Sky from 'components/Sky'
 import WorldObjectsLayer from 'components/WorldObjectsLayer'
 import { renderEnemy, renderMushroom } from 'libs/entityRenderers'
+import { getObjectWidth } from 'libs/objectDimensions'
 
 const isWithinVisibleRange = (entity, visibleMinPx, visibleMaxPx) => {
-  const right = entity.x + entity.width
+  const right = entity.x + getObjectWidth(entity)
   return right > visibleMinPx && entity.x < visibleMaxPx
 }
 
@@ -41,6 +42,8 @@ const WorldScene = ({
   visibleMinPx,
   visibleMaxPx,
   worldPreloadTiles,
+  flag,
+  castle,
 }) => (
   <main className='relative h-full w-full overflow-hidden'>
     <div ref={worldRef} className='absolute inset-x-0 bottom-0 h-full w-full'>
@@ -73,12 +76,13 @@ const WorldScene = ({
 
         <Floor
           segments={objects.filter(el => el.type == 'Floor')}
+          pixels={pixels}
           minPx={visibleMinPx}
           maxPx={visibleMaxPx}
         />
 
-        {visibleMaxPx > (205 - worldPreloadTiles) * pixels && <Flag x={201} y={2} debug={debug} />}
-        {visibleMaxPx > (205 - worldPreloadTiles) * pixels && <Castle x={205} />}
+        {visibleMaxPx > (castle.x - worldPreloadTiles) * pixels && <Flag x={flag.x} y={flag.y} debug={debug} />}
+        {visibleMaxPx > (castle.x - worldPreloadTiles) * pixels && <Castle x={castle.x} />}
       </div>
     </div>
   </main>

@@ -1,7 +1,5 @@
 import { useEffect, useRef, useState } from 'react'
-
-const FLAG_X_TILES = 201
-const FLAG_Y_TILES = 2
+import { getObjectWidth } from 'libs/objectDimensions'
 
 export default function useGameSession({
   gameLoopEnabled,
@@ -12,6 +10,8 @@ export default function useGameSession({
   enemyHit = false,
   lives = 3,
   initialTime = 400,
+  flag,
+  levelKey,
 }) {
   const [time, setTime] = useState(initialTime)
   const [gameStatus, setGameStatus] = useState('playing')
@@ -20,7 +20,7 @@ export default function useGameSession({
 
   const floorEndPx = objects
     .filter(obj => obj.type === 'Floor')
-    .reduce((max, obj) => Math.max(max, (obj.x * pixels) + obj.width), 0)
+    .reduce((max, obj) => Math.max(max, (obj.x * pixels) + getObjectWidth(obj)), 0)
 
   useEffect(() => {
     if (!gameLoopEnabled) return
@@ -43,9 +43,9 @@ export default function useGameSession({
     const marioTop = bottom + pixels
 
     // Approximate Flag area (pole + fabric + top) in world coordinates.
-    const flagLeft = (FLAG_X_TILES * pixels) - 24
-    const flagRight = (FLAG_X_TILES * pixels) + (2 * pixels)
-    const flagBottom = FLAG_Y_TILES * pixels
+    const flagLeft = (flag.x * pixels) - 24
+    const flagRight = (flag.x * pixels) + (2 * pixels)
+    const flagBottom = flag.y * pixels
     const flagTop = flagBottom + (8 * pixels)
 
     const touchesFlag = (
@@ -93,7 +93,18 @@ export default function useGameSession({
     return () => {
       window.cancelAnimationFrame(rafId)
     }
-  }, [time, left, bottom, pixels, floorEndPx, initialTime, gameStatus, gameLoopEnabled, enemyHit, lives])
+  }, [time, left, bottom, pixels, flag, floorEndPx, initialTime, gameStatus, gameLoopEnabled, enemyHit, lives])
+
+  useEffect(() => {
+    terminalStateRef.current = null
+    const rafId = window.requestAnimationFrame(() => {
+      setTime(initialTime)
+      setGameStatus('playing')
+      setLoseReason(null)
+    })
+
+    return () => window.cancelAnimationFrame(rafId)
+  }, [initialTime, levelKey])
 
   return {
     time,

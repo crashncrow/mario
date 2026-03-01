@@ -32,6 +32,10 @@ export default function Home() {
     coins,
     score,
     time,
+    currentWorld,
+    currentStage,
+    currentFlag,
+    currentCastle,
     gameStatus,
     loseReason,
     setLoopInput,
@@ -102,6 +106,8 @@ export default function Home() {
         coins={coins}
         score={score}
         time={time}
+        world={currentWorld}
+        stage={currentStage}
         gameStatus={gameStatus}
         loseReason={loseReason}
         lives={lives}
@@ -136,6 +142,8 @@ export default function Home() {
             visibleMinPx={visibleMinPx}
             visibleMaxPx={visibleMaxPx}
             worldPreloadTiles={worldPreloadTiles}
+            flag={currentFlag}
+            castle={currentCastle}
           />
         </div>
       </div>
