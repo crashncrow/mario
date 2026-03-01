@@ -6,26 +6,26 @@ const Stats = ({ time = 400, coins = 0, score = 0, world = 1, stage = 1 }) => {
 
   return (
     <div className='fixed top-0 inset-x-0 p-4 z-50 pointer-events-none'>
-      <div className='grid grid-cols-4 text-white'>
-        <div className='text-center'>
+      <div className='mx-auto grid w-full max-w-3xl grid-cols-4 text-center text-white'>
+        <div className='text-left'>
           <div>MARIO</div>
           <div>{scoreText}</div>
         </div>
 
-        <div className='text-center'>
-          <div>COINS</div>
-          <div className='inline-flex items-center gap-1'>
+        <div>
+          <div></div>
+          <div className='inline-flex gap-2'>
             <Coin />
             x {coinsText}
           </div>
         </div>
 
-        <div className='text-center'>
+        <div>
           <div>WORLD</div>
           <div>{world} - {stage}</div>
         </div>
 
-        <div className='text-center'>
+        <div className='text-right'>
           <div>TIME</div>
           <div>{time}</div>
         </div>
