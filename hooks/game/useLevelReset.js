@@ -15,6 +15,7 @@ export default function useLevelReset({
   setEnemies,
   setEnemyHit,
   setPlayerForm,
+  startLevelIntro,
   setLeftSafe,
   setBottomSafe,
   motionRef,
@@ -48,6 +49,7 @@ export default function useLevelReset({
       setPlayerForm('small')
     }
     playerDamageCooldownRef.current = 0
+    startLevelIntro()
 
     mushroomsRef.current = []
     enemiesRef.current = nextEnemies
@@ -88,6 +90,7 @@ export default function useLevelReset({
     setMushrooms,
     setObjects,
     setPlayerForm,
+    startLevelIntro,
   ])
 
   useEffect(() => {

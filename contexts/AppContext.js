@@ -24,6 +24,7 @@ import { TILE_SIZE } from 'libs/world/constants'
 
 const AppContext = createContext(null)
 const pixels = TILE_SIZE
+const LEVEL_INTRO_MS = 1800
 
 export const AppContextProvider = ({ children }) => {
   const { width } = useWindowDimensions();
@@ -60,6 +61,7 @@ export const AppContextProvider = ({ children }) => {
   
   const [ gameLoopEnabled, setGameLoopEnabled ] = useState(true)
   const [ isPaused, setIsPaused ] = useState(false)
+  const [ isLevelIntroVisible, setIsLevelIntroVisible ] = useState(true)
   const renderLimit = left + (width ?? 0) + 500
 
   const stateRef = useRef({
@@ -96,6 +98,7 @@ export const AppContextProvider = ({ children }) => {
   const publishPendingRef = useRef(false)
   const mushroomsRef = useRef(mushrooms)
   const enemiesRef = useRef(enemies)
+  const levelIntroTimeoutRef = useRef(null)
 
   useEffect(() => {
     stateRef.current = {
@@ -130,6 +133,45 @@ export const AppContextProvider = ({ children }) => {
   useEffect(() => {
     enemiesRef.current = enemies
   }, [enemies])
+
+  const clearLoopInput = useCallback(() => {
+    motionRef.current.input = {
+      left: false,
+      right: false,
+      jump: false,
+    }
+    motionRef.current.jumpHeld = false
+    motionRef.current.vx = 0
+    motionRef.current.vy = 0
+  }, [])
+
+  const startLevelIntro = useCallback(() => {
+    if (levelIntroTimeoutRef.current) {
+      window.clearTimeout(levelIntroTimeoutRef.current)
+      levelIntroTimeoutRef.current = null
+    }
+
+    setIsLevelIntroVisible(true)
+    clearLoopInput()
+    levelIntroTimeoutRef.current = window.setTimeout(() => {
+      setIsLevelIntroVisible(false)
+      levelIntroTimeoutRef.current = null
+    }, LEVEL_INTRO_MS)
+  }, [clearLoopInput])
+
+  useEffect(() => {
+    levelIntroTimeoutRef.current = window.setTimeout(() => {
+      setIsLevelIntroVisible(false)
+      levelIntroTimeoutRef.current = null
+    }, LEVEL_INTRO_MS)
+
+    return () => {
+      if (levelIntroTimeoutRef.current) {
+        window.clearTimeout(levelIntroTimeoutRef.current)
+        levelIntroTimeoutRef.current = null
+      }
+    }
+  }, [])
 
   useEffect(() => {
     if (gameLoopEnabled) return
@@ -203,6 +245,7 @@ export const AppContextProvider = ({ children }) => {
   } = useGameSession({
     gameLoopEnabled,
     isPaused,
+    isLevelIntroVisible,
     left,
     bottom,
     pixels,
@@ -227,6 +270,7 @@ export const AppContextProvider = ({ children }) => {
     setEnemies,
     setEnemyHit,
     setPlayerForm,
+    startLevelIntro,
     setLeftSafe,
     setBottomSafe,
     motionRef,
@@ -254,17 +298,6 @@ export const AppContextProvider = ({ children }) => {
     createEnemyId,
   })
 
-  const clearLoopInput = useCallback(() => {
-    motionRef.current.input = {
-      left: false,
-      right: false,
-      jump: false,
-    }
-    motionRef.current.jumpHeld = false
-    motionRef.current.vx = 0
-    motionRef.current.vy = 0
-  }, [])
-
   const togglePause = useCallback(() => {
     if (gameStatus !== 'playing') return
 
@@ -279,7 +312,7 @@ export const AppContextProvider = ({ children }) => {
 
   // Modern mode: requestAnimationFrame physics loop.
   useMarioPhysics({
-    enabled: gameLoopEnabled && gameStatus === 'playing' && !isPaused,
+    enabled: gameLoopEnabled && gameStatus === 'playing' && !isPaused && !isLevelIntroVisible,
     motionRef,
     lastPositionRef,
     stateRef,
@@ -299,7 +332,7 @@ export const AppContextProvider = ({ children }) => {
   })
 
   useMushroomPhysics({
-    enabled: gameLoopEnabled && gameStatus === 'playing' && !isPaused,
+    enabled: gameLoopEnabled && gameStatus === 'playing' && !isPaused && !isLevelIntroVisible,
     objects,
     pixels,
     playerForm,
@@ -319,7 +352,7 @@ export const AppContextProvider = ({ children }) => {
   })
 
   useEnemyPhysics({
-    enabled: gameLoopEnabled && gameStatus === 'playing' && !isPaused,
+    enabled: gameLoopEnabled && gameStatus === 'playing' && !isPaused && !isLevelIntroVisible,
     objects,
     pixels,
     enemiesRef,
@@ -328,17 +361,17 @@ export const AppContextProvider = ({ children }) => {
   })
 
   const setLoopInput = useCallback(nextInput => {
-    if (gameStatus !== 'playing' || isPaused) return
+    if (gameStatus !== 'playing' || isPaused || isLevelIntroVisible) return
     motionRef.current.input = {
       ...motionRef.current.input,
       ...nextInput,
     }
-  }, [gameStatus, isPaused])
+  }, [gameStatus, isPaused, isLevelIntroVisible])
 
   useEffect(() => {
-    if (gameLoopEnabled && !isPaused) return
+    if (gameLoopEnabled && !isPaused && !isLevelIntroVisible) return
     clearLoopInput()
-  }, [clearLoopInput, gameLoopEnabled, isPaused])
+  }, [clearLoopInput, gameLoopEnabled, isPaused, isLevelIntroVisible])
 
   useEffect(() => {
     if (gameStatus === 'playing') return
@@ -401,6 +434,7 @@ export const AppContextProvider = ({ children }) => {
         gameStatus: gameStatus,
         loseReason: loseReason,
         isPaused: isPaused,
+        isLevelIntroVisible: isLevelIntroVisible,
 
         renderLimit: renderLimit, 
         motionRef: motionRef,

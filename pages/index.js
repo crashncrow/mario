@@ -7,6 +7,7 @@ import useVisibleWorldWindow from 'hooks/world/useVisibleWorldWindow'
 
 import Head from 'next/head'
 import GameHud from 'components/ui/GameHud'
+import LevelIntroScreen from 'components/ui/LevelIntroScreen'
 import WorldScene from 'components/world/WorldScene'
 
 export default function Home() {
@@ -34,6 +35,7 @@ export default function Home() {
     time,
     currentWorld,
     currentStage,
+    isLevelIntroVisible,
     currentFlag,
     currentCastle,
     gameStatus,
@@ -115,6 +117,15 @@ export default function Home() {
         gameStatus={gameStatus}
         loseReason={loseReason}
         lives={lives}
+      />
+      <LevelIntroScreen
+        visible={isLevelIntroVisible}
+        world={currentWorld}
+        stage={currentStage}
+        lives={lives}
+        time={time}
+        coins={coins}
+        score={score}
       />
       <div
         className={`fixed inset-0 h-dvh w-full z-50 ${gameLoopEnabled ? 'pointer-events-auto' : 'pointer-events-none'}`}
