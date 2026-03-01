@@ -1,20 +1,7 @@
 import { useAppContext } from 'contexts/AppContext'
 import Mountain from 'components/decorations/Mountain'
 
-export const MOUNTAINS_LIST = [
-  {x: 0, size: 2},
-  {x: 17, size: 1},
-  {x: 49, size: 2},
-  {x: 65, size: 1},
-  {x: 96, size: 2},
-  {x: 113, size: 1},
-  {x: 145, size: 2},
-  {x: 161, size: 2},
-  {x: 195, size: 2},
-  {x: 211, size: 1},
-]
-
-const Mountains = ({ cameraX = null }) => {
+const Mountains = ({ cameraX = null, mountains = [] }) => {
   const { left, width, pixels } = useAppContext()
   const preloadPx = pixels * 8
   const cameraLeft = cameraX ?? left
@@ -24,7 +11,7 @@ const Mountains = ({ cameraX = null }) => {
   return (
     <>
       {
-        MOUNTAINS_LIST.filter(mountain => {
+        mountains.filter(mountain => {
           const mountainLeft = mountain.x * pixels
           const mountainWidth = mountain.size === 2 ? 320 : 168
           const mountainRight = mountainLeft + mountainWidth

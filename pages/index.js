@@ -91,6 +91,7 @@ export default function Home() {
     visibleMaxPx,
     decorMinPx,
     decorMaxPx,
+    decorations: currentDecorations,
     motionRef,
   })
 

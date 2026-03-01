@@ -11,7 +11,11 @@ const createLevelDefinition = (world, stage, baseLevel = level1_1) => ({
   stage,
   label: `${world} - ${stage}`,
   background: baseLevel.background ?? 'sky',
-  decorations: baseLevel.decorations ?? 'overworld',
+  decorations: {
+    clouds: baseLevel.decorations?.clouds ?? [],
+    mountains: baseLevel.decorations?.mountains ?? [],
+    plants: baseLevel.decorations?.plants ?? [],
+  },
 })
 
 export const LEVELS = Array.from({ length: WORLD_COUNT }, (_, worldIndex) => (

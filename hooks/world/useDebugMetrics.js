@@ -1,8 +1,5 @@
 import { useEffect, useState } from 'react'
 
-import { SKY_CLOUDS } from 'components/decorations/Sky'
-import { PLANTS_BUSHES } from 'components/decorations/Plants'
-import { MOUNTAINS_LIST } from 'components/decorations/Mountains'
 import { getObjectWidth } from 'libs/world/objectDimensions'
 
 export default function useDebugMetrics({
@@ -18,8 +15,13 @@ export default function useDebugMetrics({
   visibleMaxPx,
   decorMinPx,
   decorMaxPx,
+  decorations = {},
   motionRef,
 }) {
+  const clouds = decorations.clouds ?? []
+  const mountains = decorations.mountains ?? []
+  const plants = decorations.plants ?? []
+
   const [ domCount, setDomCount ] = useState(0)
   const [ worldDomCount, setWorldDomCount ] = useState(0)
   const [ memoryStats, setMemoryStats ] = useState(null)
@@ -80,21 +82,21 @@ export default function useDebugMetrics({
       return total + Math.max(0, endTile - startTile)
     }, 0)
 
-  const visibleBushCount = PLANTS_BUSHES.filter(p => {
+  const visibleBushCount = plants.filter(p => {
     const plantLeft = (p.x * pixels) + (pixels / 2)
     const plantWidth = (1 + p.size) * pixels
     const plantRight = plantLeft + plantWidth
     return plantRight > decorMinPx && plantLeft < decorMaxPx
   }).length
 
-  const visibleCloudCount = SKY_CLOUDS.filter(cloud => {
+  const visibleCloudCount = clouds.filter(cloud => {
     const cloudLeft = cloud.x * pixels
     const cloudWidth = (1 + cloud.size) * pixels
     const cloudRight = cloudLeft + cloudWidth
     return cloudRight > decorMinPx && cloudLeft < decorMaxPx
   }).length
 
-  const visibleMountainCount = MOUNTAINS_LIST.filter(mountain => {
+  const visibleMountainCount = mountains.filter(mountain => {
     const mountainLeft = mountain.x * pixels
     const mountainWidth = mountain.size === 2 ? 320 : 168
     const mountainRight = mountainLeft + mountainWidth

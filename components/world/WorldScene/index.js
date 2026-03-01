@@ -1,8 +1,6 @@
 import Castle from 'components/world/Castle'
 import BrickBreakEffect from 'components/world/BrickBreakEffect'
-import Mountains from 'components/decorations/Mountains'
-import Plants from 'components/decorations/Plants'
-import Sky from 'components/decorations/Sky'
+import Decorations from 'components/decorations/Decorations'
 import Flag from 'components/world/Flag'
 import Floor from 'components/world/Floor'
 import Mario from 'components/characters/Mario'
@@ -44,7 +42,7 @@ const WorldScene = ({
   debug,
   objects,
   background = 'sky',
-  decorations = 'overworld',
+  decorations = {},
   mushrooms,
   brickBreaks,
   enemies,
@@ -53,59 +51,55 @@ const WorldScene = ({
   worldPreloadTiles,
   flag,
   castle,
-}) => (
-  <main className={`relative h-full w-full overflow-hidden ${BACKGROUND_CLASS[background] ?? BACKGROUND_CLASS.sky}`}>
-    <div ref={worldRef} className='absolute inset-x-0 bottom-0 h-full w-full'>
-      <Mario />
+}) => {
+  return (
+    <main className={`relative h-full w-full overflow-hidden ${BACKGROUND_CLASS[background] ?? BACKGROUND_CLASS.sky}`}>
+      <div ref={worldRef} className='absolute inset-x-0 bottom-0 h-full w-full'>
+        <Mario />
 
-      {decorations === 'overworld' && (
-        <>
-          <Sky cameraX={cameraXForMetrics} />
-          <Mountains cameraX={cameraXForMetrics} />
-          <Plants cameraX={cameraXForMetrics} />
-        </>
-      )}
+        <Decorations decorations={decorations} cameraX={cameraXForMetrics} />
 
-      <div className='inline-block'>
-        <VisibleEntitiesLayer
-          items={mushrooms}
-          visibleMinPx={visibleMinPx}
-          visibleMaxPx={visibleMaxPx}
-          renderItem={renderMushroom}
-        />
+        <div className='inline-block'>
+          <VisibleEntitiesLayer
+            items={mushrooms}
+            visibleMinPx={visibleMinPx}
+            visibleMaxPx={visibleMaxPx}
+            renderItem={renderMushroom}
+          />
 
-        <VisibleEntitiesLayer
-          items={brickBreaks}
-          visibleMinPx={visibleMinPx}
-          visibleMaxPx={visibleMaxPx}
-          renderItem={() => <BrickBreakEffect />}
-        />
+          <VisibleEntitiesLayer
+            items={brickBreaks}
+            visibleMinPx={visibleMinPx}
+            visibleMaxPx={visibleMaxPx}
+            renderItem={() => <BrickBreakEffect />}
+          />
 
-        <VisibleEntitiesLayer
-          items={enemies}
-          visibleMinPx={visibleMinPx}
-          visibleMaxPx={visibleMaxPx}
-          renderItem={enemy => renderEnemy(enemy, debug)}
-        />
+          <VisibleEntitiesLayer
+            items={enemies}
+            visibleMinPx={visibleMinPx}
+            visibleMaxPx={visibleMaxPx}
+            renderItem={enemy => renderEnemy(enemy, debug)}
+          />
 
-        <WorldObjectsLayer
-          visibleObjects={visibleObjects}
-          pixels={pixels}
-          debug={debug}
-        />
+          <WorldObjectsLayer
+            visibleObjects={visibleObjects}
+            pixels={pixels}
+            debug={debug}
+          />
 
-        <Floor
-          segments={objects.filter(el => el.type == 'Floor')}
-          pixels={pixels}
-          minPx={visibleMinPx}
-          maxPx={visibleMaxPx}
-        />
+          <Floor
+            segments={objects.filter(el => el.type === 'Floor')}
+            pixels={pixels}
+            minPx={visibleMinPx}
+            maxPx={visibleMaxPx}
+          />
 
-        {visibleMaxPx > (castle.x - worldPreloadTiles) * pixels && <Flag x={flag.x} y={flag.y} debug={debug} />}
-        {visibleMaxPx > (castle.x - worldPreloadTiles) * pixels && <Castle x={castle.x} />}
+          {visibleMaxPx > (castle.x - worldPreloadTiles) * pixels && <Flag x={flag.x} y={flag.y} debug={debug} />}
+          {visibleMaxPx > (castle.x - worldPreloadTiles) * pixels && <Castle x={castle.x} />}
+        </div>
       </div>
-    </div>
-  </main>
-)
+    </main>
+  )
+}
 
 export default WorldScene
