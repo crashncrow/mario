@@ -7,11 +7,11 @@ export const ENEMY_TYPES = {
   goomba: {
     width: TILE_SIZE,
     height: TILE_SIZE,
-    speed: 300,
+    speed: 200,
     gravity: 2600,
     score: 100,
     stompable: true,
-    render: (debug, enemy) => <Goomba debug={debug} state={enemy?.state ?? 'walk'} />,
+    render: (debug, enemy) => <Goomba debug={debug} state={enemy?.state ?? 'walk'} enemy={enemy} />,
   },
   koopa: {
     width: TILE_SIZE,
@@ -27,7 +27,7 @@ export const ENEMY_TYPES = {
   buzzy: {
     width: TILE_SIZE,
     height: TILE_SIZE,
-    speed: 220,
+    speed: 200,
     gravity: 2600,
     score: 300,
     stompable: true,
