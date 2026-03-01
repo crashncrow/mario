@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react'
 
-const TouchControls = ({ gameLoopEnabled, setLoopInput }) => {
+const TouchControls = ({ gameLoopEnabled, isPaused, setLoopInput }) => {
   const [isMobileLike, setIsMobileLike] = useState(false)
   const [pressed, setPressed] = useState({
     left: false,
@@ -26,7 +26,7 @@ const TouchControls = ({ gameLoopEnabled, setLoopInput }) => {
     }
   }, [])
 
-  if (!gameLoopEnabled || !isMobileLike) return null
+  if (!gameLoopEnabled || isPaused || !isMobileLike) return null
 
   const press = (key, nextInput) => e => {
     const value = Boolean(nextInput[key])

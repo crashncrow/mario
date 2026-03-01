@@ -59,6 +59,7 @@ export const AppContextProvider = ({ children }) => {
   const [ enemyHit, setEnemyHit ] = useState(false)
   
   const [ gameLoopEnabled, setGameLoopEnabled ] = useState(true)
+  const [ isPaused, setIsPaused ] = useState(false)
   const renderLimit = left + (width ?? 0) + 500
 
   const stateRef = useRef({
@@ -201,6 +202,7 @@ export const AppContextProvider = ({ children }) => {
     loseReason,
   } = useGameSession({
     gameLoopEnabled,
+    isPaused,
     left,
     bottom,
     pixels,
@@ -252,9 +254,32 @@ export const AppContextProvider = ({ children }) => {
     createEnemyId,
   })
 
+  const clearLoopInput = useCallback(() => {
+    motionRef.current.input = {
+      left: false,
+      right: false,
+      jump: false,
+    }
+    motionRef.current.jumpHeld = false
+    motionRef.current.vx = 0
+    motionRef.current.vy = 0
+  }, [])
+
+  const togglePause = useCallback(() => {
+    if (gameStatus !== 'playing') return
+
+    setIsPaused(prev => {
+      const nextPaused = !prev
+      if (nextPaused) {
+        clearLoopInput()
+      }
+      return nextPaused
+    })
+  }, [clearLoopInput, gameStatus])
+
   // Modern mode: requestAnimationFrame physics loop.
   useMarioPhysics({
-    enabled: gameLoopEnabled && gameStatus === 'playing',
+    enabled: gameLoopEnabled && gameStatus === 'playing' && !isPaused,
     motionRef,
     lastPositionRef,
     stateRef,
@@ -274,7 +299,7 @@ export const AppContextProvider = ({ children }) => {
   })
 
   useMushroomPhysics({
-    enabled: gameLoopEnabled && gameStatus === 'playing',
+    enabled: gameLoopEnabled && gameStatus === 'playing' && !isPaused,
     objects,
     pixels,
     playerForm,
@@ -287,7 +312,7 @@ export const AppContextProvider = ({ children }) => {
   })
 
   useEnemyPhysics({
-    enabled: gameLoopEnabled && gameStatus === 'playing',
+    enabled: gameLoopEnabled && gameStatus === 'playing' && !isPaused,
     objects,
     pixels,
     enemiesRef,
@@ -296,38 +321,22 @@ export const AppContextProvider = ({ children }) => {
   })
 
   const setLoopInput = useCallback(nextInput => {
-    if (gameStatus !== 'playing') return
+    if (gameStatus !== 'playing' || isPaused) return
     motionRef.current.input = {
       ...motionRef.current.input,
       ...nextInput,
     }
-  }, [gameStatus])
+  }, [gameStatus, isPaused])
 
   useEffect(() => {
-    if (gameLoopEnabled) return
-
-    motionRef.current.input = {
-      left: false,
-      right: false,
-      jump: false,
-    }
-    motionRef.current.jumpHeld = false
-    motionRef.current.vx = 0
-    motionRef.current.vy = 0
-  }, [gameLoopEnabled])
+    if (gameLoopEnabled && !isPaused) return
+    clearLoopInput()
+  }, [clearLoopInput, gameLoopEnabled, isPaused])
 
   useEffect(() => {
     if (gameStatus === 'playing') return
-
-    motionRef.current.input = {
-      left: false,
-      right: false,
-      jump: false,
-    }
-    motionRef.current.jumpHeld = false
-    motionRef.current.vx = 0
-    motionRef.current.vy = 0
-  }, [gameStatus])
+    clearLoopInput()
+  }, [clearLoopInput, gameStatus])
 
   useEffect(() => {
     if (!gameLoopEnabled) return
@@ -339,6 +348,17 @@ export const AppContextProvider = ({ children }) => {
       y: stateRef.current.bottom,
     }
   }, [gameLoopEnabled])
+
+  useEffect(() => {
+    if (gameLoopEnabled && gameStatus === 'playing') return
+    const rafId = window.requestAnimationFrame(() => {
+      setIsPaused(false)
+    })
+
+    return () => {
+      window.cancelAnimationFrame(rafId)
+    }
+  }, [gameLoopEnabled, gameStatus])
 
   useLevelAdvance({
     currentLevelIndex,
@@ -373,6 +393,7 @@ export const AppContextProvider = ({ children }) => {
         time: time,
         gameStatus: gameStatus,
         loseReason: loseReason,
+        isPaused: isPaused,
 
         renderLimit: renderLimit, 
         motionRef: motionRef,
@@ -387,7 +408,8 @@ export const AppContextProvider = ({ children }) => {
         setScore: setScore,
         spawnEnemy: spawnEnemy,
         setLoopInput: setLoopInput,
-        setGameLoopEnabled: setGameLoopEnabled
+        setGameLoopEnabled: setGameLoopEnabled,
+        togglePause: togglePause,
       }}
     >
       {children}

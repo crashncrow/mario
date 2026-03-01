@@ -4,6 +4,7 @@ import { getPlayerBounds } from 'libs/playerDimensions'
 
 export default function useGameSession({
   gameLoopEnabled,
+  isPaused,
   left,
   bottom,
   pixels,
@@ -27,6 +28,7 @@ export default function useGameSession({
   useEffect(() => {
     if (!gameLoopEnabled) return
     if (time <= 0) return
+    if (isPaused) return
     if (gameStatus !== 'playing') return
 
     const timerId = window.setTimeout(() => {
@@ -36,7 +38,7 @@ export default function useGameSession({
     return () => {
       window.clearTimeout(timerId)
     }
-  }, [gameLoopEnabled, time, gameStatus])
+  }, [gameLoopEnabled, isPaused, time, gameStatus])
 
   useEffect(() => {
     const marioBounds = getPlayerBounds({ x: left, y: bottom, pixels, playerForm })

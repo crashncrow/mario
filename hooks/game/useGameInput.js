@@ -5,12 +5,22 @@ import useDoubleClick from 'hooks/shared/clicks'
 export default function useGameInput({
   buttonRef,
   gameLoopEnabled,
+  isPaused,
   setLoopInput,
+  togglePause,
 }) {
   useEffect(() => {
     if (!gameLoopEnabled) return
 
     const onKeyDown = e => {
+      if (e.code === 'KeyP' || e.code === 'Escape') {
+        e.preventDefault()
+        togglePause()
+        return
+      }
+
+      if (isPaused) return
+
       if (e.code === 'ArrowLeft') {
         e.preventDefault()
         setLoopInput({ left: true })
@@ -24,6 +34,8 @@ export default function useGameInput({
     }
 
     const onKeyUp = e => {
+      if (isPaused) return
+
       if (e.code === 'ArrowLeft') {
         setLoopInput({ left: false })
       } else if (e.code === 'ArrowRight') {
@@ -40,10 +52,10 @@ export default function useGameInput({
       window.removeEventListener('keydown', onKeyDown)
       window.removeEventListener('keyup', onKeyUp)
     }
-  }, [gameLoopEnabled, setLoopInput])
+  }, [gameLoopEnabled, isPaused, setLoopInput, togglePause])
 
   useEffect(() => {
-    if (!gameLoopEnabled) return
+    if (!gameLoopEnabled || isPaused) return
 
     const onWheel = e => {
       // The camera follows Mario in the game loop; manual wheel scroll fights it and causes shaking.
@@ -55,7 +67,7 @@ export default function useGameInput({
     return () => {
       window.removeEventListener('wheel', onWheel)
     }
-  }, [gameLoopEnabled])
+  }, [gameLoopEnabled, isPaused])
 
   const triggerLoopJump = useCallback(() => {
     setLoopInput({ jump: true })
@@ -65,14 +77,14 @@ export default function useGameInput({
   }, [setLoopInput])
 
   const onSingleClick = useCallback(() => {
-    if (!gameLoopEnabled) return
+    if (!gameLoopEnabled || isPaused) return
     triggerLoopJump()
-  }, [gameLoopEnabled, triggerLoopJump])
+  }, [gameLoopEnabled, isPaused, triggerLoopJump])
 
   const onDoubleClick = useCallback(() => {
-    if (!gameLoopEnabled) return
+    if (!gameLoopEnabled || isPaused) return
     triggerLoopJump()
-  }, [gameLoopEnabled, triggerLoopJump])
+  }, [gameLoopEnabled, isPaused, triggerLoopJump])
 
   useDoubleClick({
     onSingleClick,

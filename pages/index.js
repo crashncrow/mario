@@ -19,6 +19,7 @@ export default function Home() {
   const {
     debug,
     gameLoopEnabled,
+    isPaused,
     renderLimit,
     pixels,
     width,
@@ -41,6 +42,7 @@ export default function Home() {
     loseReason,
     setLoopInput,
     setGameLoopEnabled,
+    togglePause,
   } = useAppContext()
 
   const {
@@ -93,7 +95,9 @@ export default function Home() {
   useGameInput({
     buttonRef,
     gameLoopEnabled,
+    isPaused,
     setLoopInput,
+    togglePause,
   })
 
   return (
@@ -104,6 +108,8 @@ export default function Home() {
         gameLoopEnabled={gameLoopEnabled}
         setGameLoopEnabled={setGameLoopEnabled}
         setLoopInput={setLoopInput}
+        isPaused={isPaused}
+        togglePause={togglePause}
         coins={coins}
         score={score}
         time={time}
