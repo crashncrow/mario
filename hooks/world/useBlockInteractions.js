@@ -43,16 +43,17 @@ export default function useBlockInteractions({
       ]))
     }
 
-    if (spawnedItem?.type === 'mushroom') {
+    if (spawnedItem?.type === 'mushroom' || spawnedItem?.type === 'flower') {
       setMushrooms(prev => ([
         ...prev,
         {
-          id: `mushroom_${spawnedItem.x}_${spawnedItem.y}_${Date.now()}`,
+          id: `${spawnedItem.type}_${spawnedItem.x}_${spawnedItem.y}_${Date.now()}`,
+          type: spawnedItem.type,
           x: spawnedItem.x * pixels,
           y: spawnedItem.y * pixels,
           emergeToY: (spawnedItem.y + 1) * pixels,
           phase: 'emerging',
-          vx: mushroomSpeed,
+          vx: spawnedItem.type === 'mushroom' ? mushroomSpeed : 0,
           vy: 0,
           width: mushroomSize,
           height: mushroomSize,

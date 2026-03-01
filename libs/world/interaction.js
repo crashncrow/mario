@@ -56,6 +56,14 @@ const getRewardForPickup = content => {
   return { scoreDelta: 0, coinsDelta: 0, item: null }
 }
 
+const getSpawnedMysteryItemType = ({ content, playerForm }) => {
+  if (content === 'flower') {
+    return playerForm === 'small' ? 'mushroom' : 'flower'
+  }
+
+  return content
+}
+
 export const bumpInteractiveBlockAtPosition = ({ objects, pixels, x, y, playerForm }) => {
   let bumped = false
   let reward = { scoreDelta: 0, coinsDelta: 0, item: null }
@@ -102,9 +110,9 @@ export const bumpInteractiveBlockAtPosition = ({ objects, pixels, x, y, playerFo
       return null
     }
 
-    if (isFirstHit && variant === 'mystery' && content === 'mushroom') {
+    if (isFirstHit && variant === 'mystery' && (content === 'mushroom' || content === 'flower')) {
       spawnedItem = {
-        type: 'mushroom',
+        type: getSpawnedMysteryItemType({ content, playerForm }),
         x: obj.x,
         y: obj.y,
       }
@@ -129,7 +137,7 @@ export const collectRevealedMysteryItemAtPosition = ({ objects, pixels, x, y, pl
 
     const content = getBlockContent(obj)
     const normalizedContent = (content || '').toLowerCase()
-    const hasPickup = normalizedContent === 'flower' || normalizedContent === 'star'
+    const hasPickup = normalizedContent === 'star'
     const touched = (obj.touches || 0) > 0
     const alreadyCollected = Boolean(obj.itemCollected)
 

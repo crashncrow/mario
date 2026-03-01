@@ -1,6 +1,7 @@
 import { useState, useRef, useEffect } from 'react'
 import { useAppContext } from 'contexts/AppContext'
 import { processFullArray } from 'libs/pixless'
+import { getPlayerDimensions } from 'libs/playerDimensions'
 
 const c = {
   0: '', // bg-transparent
@@ -109,9 +110,13 @@ const Mario = () => {
       : index % 4 === 2 ? matrix3
         : index % 4 === 3 ? matrix2
           : matrix1
-  const spriteScale = playerForm === 'big'
-    ? 'scale(1.25, 1.5)'
-    : 'scale(1, 1)'
+  const playerSize = getPlayerDimensions({ pixels, playerForm })
+  const spriteStyle = playerForm === 'big' || playerForm === 'fire'
+    ? {
+        transform: 'scaleY(1.5)',
+        transformOrigin: 'bottom left',
+      }
+    : undefined
 
   useEffect(() => {
     if (!gameLoopEnabled) return
@@ -152,12 +157,12 @@ const Mario = () => {
       }
 
       <div
-        className='flex flex-wrap w-16 absolute bottom-0 z-40'
+        className='absolute z-40'
         style={{
           left: `${left}px`,
           bottom: `${bottom}px`,
-          transform: spriteScale,
-          transformOrigin: 'bottom left',
+          width: `${playerSize.width}px`,
+          height: `${playerSize.height}px`,
         }}>
 
         {
@@ -165,18 +170,22 @@ const Mario = () => {
           <div className={`absolute w-full h-full border-4 ${marioCollision ? 'border-black' : 'border-mario-red'} z-50 pointer-events-none`}></div>
         }
 
-        {currentMatrix.map((x, i) => {
-          if (reverse) {
-            // reverse without mutate
-            return x.slice().reverse().map((y, j) => (
-              <div
-                className={`h-1 w-${y.count} flex-none ${c[y.color]}`}
-                key={`mario_${i}${j}`}
-              >
-              </div>
-            ))
-          }
-          else {
+        <div
+          className='absolute bottom-0 left-0 flex w-16 flex-wrap'
+          style={spriteStyle}
+        >
+          {currentMatrix.map((x, i) => {
+            if (reverse) {
+              // reverse without mutate
+              return x.slice().reverse().map((y, j) => (
+                <div
+                  className={`h-1 w-${y.count} flex-none ${c[y.color]}`}
+                  key={`mario_${i}${j}`}
+                >
+                </div>
+              ))
+            }
+
             return x.map((y, j) => (
               <div
                 className={`h-1 w-${y.count} flex-none ${c[y.color]}`}
@@ -184,9 +193,8 @@ const Mario = () => {
               >
               </div>
             ))
-          }
-        }
-        )}
+          })}
+        </div>
       </div>
     </>
   )

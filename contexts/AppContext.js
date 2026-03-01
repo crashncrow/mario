@@ -308,7 +308,14 @@ export const AppContextProvider = ({ children }) => {
     mushroomsRef,
     setMushrooms,
     setScore,
-    onCollectMushroom: () => setPlayerForm('big'),
+    onCollectMushroom: itemType => {
+      if (itemType === 'flower') {
+        setPlayerForm('fire')
+        return
+      }
+
+      setPlayerForm('big')
+    },
   })
 
   useEnemyPhysics({

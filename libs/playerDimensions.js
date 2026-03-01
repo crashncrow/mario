@@ -1,6 +1,6 @@
 export const getPlayerDimensions = ({ pixels, playerForm = 'small' }) => ({
   width: pixels,
-  height: playerForm === 'big' ? pixels * 1.5 : pixels,
+  height: playerForm === 'big' || playerForm === 'fire' ? pixels * 1.5 : pixels,
 })
 
 export const getPlayerBounds = ({ x, y, pixels, playerForm = 'small' }) => {

@@ -2,7 +2,6 @@ import { memo, useEffect, useRef, useState } from 'react'
 import useBlockBump from 'hooks/world/useBlockBump'
 import { TILE_SIZE } from 'libs/world/constants'
 import Coin from 'components/items/Coin'
-import FireFlower from 'components/items/FireFlower'
 import Mushroom from 'components/items/Mushroom'
 import Star from 'components/items/Star'
 
@@ -33,10 +32,6 @@ const BlockContentPreview = ({ content, moving = false }) => {
     return <Star />
   }
 
-  if (content === 'flower') {
-    return <FireFlower />
-  }
-
   if (content === 'mushroom') {
     return <Mushroom moving={moving} />
   }
@@ -62,7 +57,7 @@ const MysteryBlock = ({ x, y, touches, content, isBumping, hidden = false, itemC
       return () => clearTimeout(timer)
     }
 
-    if (normalizedContent === 'star' || normalizedContent === 'flower') {
+    if (normalizedContent === 'star') {
       const raf = requestAnimationFrame(() => setRevealedContent(normalizedContent))
       return () => cancelAnimationFrame(raf)
     }
@@ -78,7 +73,7 @@ const MysteryBlock = ({ x, y, touches, content, isBumping, hidden = false, itemC
   if (hidden && touches === 0) return null
 
   const shouldShowPickup =
-    (revealedContent === 'flower' || revealedContent === 'star') &&
+    revealedContent === 'star' &&
     !itemCollected
 
   return (

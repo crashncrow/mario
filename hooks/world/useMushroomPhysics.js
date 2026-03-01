@@ -57,7 +57,7 @@ const collectByMario = ({ mushrooms, marioX, marioY, pixels, playerForm, addScor
   const marioBounds = getPlayerBounds({ x: marioX, y: marioY, pixels, playerForm })
 
   let changed = false
-  let collectedMushroom = false
+  let collectedItem = null
 
   const next = mushrooms.filter(mushroom => {
     if (mushroom.phase === 'emerging') return true
@@ -76,12 +76,12 @@ const collectByMario = ({ mushrooms, marioX, marioY, pixels, playerForm, addScor
     if (!overlaps) return true
 
     changed = true
-    collectedMushroom = true
     addScore(prev => prev + 1000)
+    collectedItem = mushroom.type ?? 'mushroom'
     return false
   })
 
-  return { next, changed, collectedMushroom }
+  return { next, changed, collectedItem }
 }
 
 export default function useMushroomPhysics({
@@ -122,6 +122,10 @@ export default function useMushroomPhysics({
           phase: emerged ? 'active' : 'emerging',
           vy: 0,
         }
+      }
+
+      if ((mushroom.type ?? 'mushroom') === 'flower') {
+        return mushroom
       }
 
       let nextX = mushroom.x
@@ -178,7 +182,7 @@ export default function useMushroomPhysics({
     const {
       next: collected,
       changed: collectedAny,
-      collectedMushroom,
+      collectedItem,
     } = collectByMario({
       mushrooms: updated,
       marioX: marioLeft,
@@ -188,8 +192,8 @@ export default function useMushroomPhysics({
       addScore: setScore,
     })
 
-    if (collectedMushroom) {
-      onCollectMushroom?.()
+    if (collectedItem) {
+      onCollectMushroom?.(collectedItem)
     }
 
     if (!mutated && !collectedAny) return

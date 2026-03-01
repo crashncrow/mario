@@ -66,6 +66,12 @@ export default function useEnemyState({
     const now = Date.now()
     if (now < playerDamageCooldownRef.current) return
 
+    if (playerForm === 'fire') {
+      playerDamageCooldownRef.current = now + 1200
+      setPlayerForm('big')
+      return
+    }
+
     if (playerForm === 'big') {
       playerDamageCooldownRef.current = now + 1200
       setPlayerForm('small')
