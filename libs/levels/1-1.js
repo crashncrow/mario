@@ -4,13 +4,17 @@ import { TILE_SIZE } from 'libs/world/constants'
 
 const enemiesByType = {
   goomba: [
-    { x: 8, y: 1 },
+    { x: 24, y: 1, direction: 'left' },
+    { x: 45, y: 1 },
+
+    { x: 55, y: 1 },
+    { x: 52, y: 1 },
   ],
   koopa: [
-    { x: 20, y: 1 },
+    // { x: 20, y: 1 },
   ],
   buzzy: [
-    { x: 16, y: 1 },
+    // { x: 16, y: 1 },
   ],
 }
 
@@ -110,11 +114,12 @@ const elementsByType = {
   mystery: [
     { x: 17,  y: 4, content: 'coin' },
     { x: 22,  y: 4, content: 'mushroom' },
-    { x: 23,  y: 7, content: 'flower' },
-    { x: 24,  y: 4, content: 'star' },
-    { x: 65,  y: 5, content: 'star', hidden: 1 },
-    { x: 81,  y: 7, content: 'coin' },
+    { x: 23,  y: 7, content: 'coin' },
+    { x: 24,  y: 4, content: 'coin' },
+    { x: 64,  y: 4, content: 'mushroom', hidden: 1 }, // todo: 1up
+    { x: 79,  y: 4, content: 'flower' },
     { x: 95,  y: 7, content: 'coin' },
+    { x: 101, y: 4, content: 'star' }, // todo: render como ladrillo
     { x: 107, y: 4, content: 'coin' },
     { x: 110, y: 4, content: 'coin' },
     { x: 110, y: 7, content: 'coin' },
@@ -129,7 +134,6 @@ const elementsByType = {
     { x: 23,  y: 4 },
     { x: 25,  y: 4 },
     { x: 78,  y: 4 },
-    { x: 79,  y: 4 },
     { x: 80,  y: 4 },
     { x: 82,  y: 7 },
     { x: 83,  y: 7 },
@@ -143,7 +147,7 @@ const elementsByType = {
     { x: 94,  y: 7 },
     { x: 95,  y: 4 },
     { x: 100, y: 4 },
-    { x: 101, y: 4 },
+    // { x: 101, y: 4 },
     { x: 119, y: 4 },
     { x: 122, y: 7 },
     { x: 123, y: 7 },

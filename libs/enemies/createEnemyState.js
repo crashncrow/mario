@@ -1,8 +1,15 @@
 import { getEnemyTypeConfig } from 'libs/enemies/enemyTypes'
 import { TILE_SIZE } from 'libs/world/constants'
 
+const getDirectionMultiplier = direction => {
+  if (direction === 'left' || direction === -1) return -1
+  if (direction === 'right' || direction === 1) return 1
+  return 1
+}
+
 export const createEnemyState = ({ enemy, index, id, pixels = TILE_SIZE }) => {
   const config = getEnemyTypeConfig(enemy.type)
+  const directionMultiplier = getDirectionMultiplier(enemy.direction)
 
   return {
     ...enemy,
@@ -12,7 +19,7 @@ export const createEnemyState = ({ enemy, index, id, pixels = TILE_SIZE }) => {
     state: enemy.state ?? 'walk',
     width: enemy.width ?? config?.width ?? TILE_SIZE,
     height: enemy.height ?? config?.height ?? TILE_SIZE,
-    vx: config?.speed ?? 0,
+    vx: (config?.speed ?? 0) * directionMultiplier,
     vy: 0,
     gravity: config?.gravity ?? 2600,
   }
