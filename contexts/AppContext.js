@@ -1,10 +1,14 @@
 import { createContext, useCallback, useContext, useEffect, useRef, useState } from 'react'
-import { useWindowDimensions } from 'hooks/window'
-import useMarioPhysics from 'hooks/useMarioPhysics'
-import useMushroomPhysics, { MUSHROOM_HORIZONTAL_SPEED, MUSHROOM_SIZE } from 'hooks/useMushroomPhysics'
-import useEnemyPhysics from 'hooks/useEnemyPhysics'
-import useGameSession from 'hooks/useGameSession'
-import { createEnemiesState, createEnemyState } from 'libs/createEnemyState'
+import { useWindowDimensions } from 'hooks/shared/window'
+import useMarioPhysics from 'hooks/world/useMarioPhysics'
+import useBlockInteractions from 'hooks/world/useBlockInteractions'
+import useMushroomPhysics, { MUSHROOM_HORIZONTAL_SPEED, MUSHROOM_SIZE } from 'hooks/world/useMushroomPhysics'
+import useEnemyPhysics from 'hooks/enemies/useEnemyPhysics'
+import useEnemyState from 'hooks/enemies/useEnemyState'
+import useGameSession from 'hooks/game/useGameSession'
+import useLevelReset from 'hooks/game/useLevelReset'
+import { useCurrentLevel, useLevelAdvance } from 'hooks/game/useLevelProgression'
+import { createEnemiesState } from 'libs/enemies/createEnemyState'
 import {
   getLandingYAtPosition,
   getMaxWalkXForObjects,
@@ -12,36 +16,29 @@ import {
   hasCollisionAtPosition,
   hasSideCollisionAtPosition,
   isGroundedAtPosition,
-} from 'libs/collision'
-import {
-  bumpInteractiveBlockAtPosition,
-  collectRevealedMysteryItemAtPosition,
-} from 'libs/interaction'
+} from 'libs/world/collision'
 import {
   hasMarioEnemyContact,
-  resolveMarioEnemyCollision,
-} from 'libs/enemyInteractions'
-import { getEnemyTypeConfig } from 'libs/enemyTypes'
-import { getLevelByIndex, getNextLevelIndex } from 'libs/levels'
-import { TILE_SIZE } from 'libs/worldConstants'
+} from 'libs/enemies/enemyInteractions'
+import { TILE_SIZE } from 'libs/world/constants'
 
 const AppContext = createContext(null)
 const pixels = TILE_SIZE
-const RESPAWN_DELAY_MS = 1200
-const LEVEL_ADVANCE_DELAY_MS = 1500
 
 export const AppContextProvider = ({ children }) => {
   const { width } = useWindowDimensions();
   const debugEnabled = process.env.NEXT_PUBLIC_DEBUG === '1'
   const nextEnemyIdRef = useRef(0)
   const lastGameStatusRef = useRef('playing')
-  const levelAdvanceTimeoutRef = useRef(null)
   const createEnemyId = useCallback(
     () => `enemy_${nextEnemyIdRef.current++}`,
     []
   )
-  const [ currentLevelIndex, setCurrentLevelIndex ] = useState(0)
-  const currentLevel = getLevelByIndex(currentLevelIndex)
+  const {
+    currentLevelIndex,
+    currentLevel,
+    setCurrentLevelIndex,
+  } = useCurrentLevel()
 
   const [ objects, setObjects ] = useState(currentLevel.elements)
   const [ mushrooms, setMushrooms ] = useState([])
@@ -152,60 +149,19 @@ export const AppContextProvider = ({ children }) => {
     hasSideCollisionAtPosition({ objects, pixels, x: left, y: bottom }) ||
     hasCeilingCollisionAtPosition({ objects, pixels, x: left, y: bottom }) ||
     hasMarioEnemyContact({ marioX: left, marioY: bottom, pixels, enemies })
-
-  const bumpInteractiveBlockAt = useCallback((x, y) => {
-    const { nextObjects, bumped, reward, spawnedItem } = bumpInteractiveBlockAtPosition({ objects, pixels, x, y })
-
-    if (bumped) {
-      setObjects(nextObjects)
-      if (reward?.scoreDelta) setScore(prev => prev + reward.scoreDelta)
-      if (reward?.coinsDelta) setCoins(prev => prev + reward.coinsDelta)
-      if (spawnedItem?.type === 'mushroom') {
-        setMushrooms(prev => ([
-          ...prev,
-          {
-            id: `mushroom_${spawnedItem.x}_${spawnedItem.y}_${Date.now()}`,
-            x: spawnedItem.x * pixels,
-            y: spawnedItem.y * pixels,
-            emergeToY: (spawnedItem.y + 1) * pixels,
-            phase: 'emerging',
-            vx: MUSHROOM_HORIZONTAL_SPEED,
-            vy: 0,
-            width: MUSHROOM_SIZE,
-            height: MUSHROOM_SIZE,
-          },
-        ]))
-      }
-    }
-  }, [objects])
-
-  const collectRevealedMysteryItemAt = useCallback((x, y) => {
-    const { nextObjects, collected, reward } = collectRevealedMysteryItemAtPosition({
-      objects,
-      pixels,
-      x,
-      y,
-    })
-
-    if (!collected) return
-
-    setObjects(nextObjects)
-    if (reward?.scoreDelta) setScore(prev => prev + reward.scoreDelta)
-    if (reward?.coinsDelta) setCoins(prev => prev + reward.coinsDelta)
-  }, [objects])
-
-  const spawnEnemy = useCallback(enemy => {
-    const nextEnemy = createEnemyState({
-      enemy,
-      id: createEnemyId(),
-      index: enemiesRef.current.length,
-      pixels,
-    })
-    const nextEnemies = [ ...enemiesRef.current, nextEnemy ]
-    enemiesRef.current = nextEnemies
-    setEnemies(nextEnemies)
-    return nextEnemy
-  }, [createEnemyId])
+  const {
+    bumpInteractiveBlockAt,
+    collectRevealedMysteryItemAt,
+  } = useBlockInteractions({
+    objects,
+    pixels,
+    mushroomSize: MUSHROOM_SIZE,
+    mushroomSpeed: MUSHROOM_HORIZONTAL_SPEED,
+    setObjects,
+    setCoins,
+    setScore,
+    setMushrooms,
+  })
 
   const setLeftSafe = useCallback(nextValue => {
     if (!Number.isFinite(nextValue)) return
@@ -220,49 +176,6 @@ export const AppContextProvider = ({ children }) => {
     stateRef.current.bottom = nextValue
     setBottom(nextValue)
   }, [])
-
-  const createInitialEnemies = useCallback(level => (
-    createEnemiesState({
-      enemies: level.enemies,
-      pixels,
-      createId: (_, index) => `enemy_init_${index}`,
-    })
-  ), [])
-
-  const resetLevelState = useCallback(level => {
-    const nextEnemies = createInitialEnemies(level)
-
-    setObjects(level.elements)
-    setMushrooms([])
-    setEnemies(nextEnemies)
-    setLeftSafe(level.startLeft)
-    setBottomSafe(level.startBottom)
-    setEnemyHit(false)
-
-    mushroomsRef.current = []
-    enemiesRef.current = nextEnemies
-
-    motionRef.current.x = level.startLeft
-    motionRef.current.y = level.startBottom
-    motionRef.current.vx = 0
-    motionRef.current.vy = 0
-    motionRef.current.grounded = true
-    motionRef.current.input = {
-      left: false,
-      right: false,
-      jump: false,
-    }
-    motionRef.current.jumpHeld = false
-    motionRef.current.coyoteTimer = 0
-    motionRef.current.jumpBufferTimer = 0
-    motionRef.current.headBlockedLastFrame = false
-
-    lastPositionRef.current = {
-      x: level.startLeft,
-      y: level.startBottom,
-    }
-    publishPendingRef.current = false
-  }, [createInitialEnemies, setBottomSafe, setLeftSafe])
 
   const {
     time,
@@ -281,43 +194,38 @@ export const AppContextProvider = ({ children }) => {
     levelKey: currentLevel.id,
   })
 
-  const resolveEnemyCollision = useCallback(({
-    marioX,
-    marioY,
-    previousMarioY,
-    marioVy,
-  }) => {
-    const result = resolveMarioEnemyCollision({
-      marioX,
-      marioY,
-      previousMarioY,
-      marioVy,
-      pixels,
-      enemies: enemiesRef.current,
-      getEnemyTypeConfig,
-    })
+  const { resetLevelState } = useLevelReset({
+    currentLevel,
+    gameStatus,
+    lives,
+    pixels,
+    setLives,
+    setObjects,
+    setMushrooms,
+    setEnemies,
+    setEnemyHit,
+    setLeftSafe,
+    setBottomSafe,
+    motionRef,
+    lastPositionRef,
+    publishPendingRef,
+    mushroomsRef,
+    enemiesRef,
+    lastGameStatusRef,
+  })
 
-    if (result.scoreDelta > 0) {
-      setScore(prev => prev + result.scoreDelta)
-    }
-
-    if (result.stomped || result.enemiesChanged) {
-      const nextEnemies = result.nextEnemies
-      enemiesRef.current = nextEnemies
-      setEnemies(nextEnemies)
-    }
-
-    return {
-      hitEnemy: result.hitEnemy,
-      stomped: result.stomped,
-      nextVy: result.nextVy,
-      nextY: result.nextY,
-    }
-  }, [])
-
-  const onEnemyHit = useCallback(() => {
-    setEnemyHit(true)
-  }, [])
+  const {
+    spawnEnemy,
+    resolveEnemyCollision,
+    onEnemyHit,
+  } = useEnemyState({
+    enemiesRef,
+    pixels,
+    setEnemies,
+    setEnemyHit,
+    setScore,
+    createEnemyId,
+  })
 
   // Modern mode: requestAnimationFrame physics loop.
   useMarioPhysics({
@@ -395,51 +303,6 @@ export const AppContextProvider = ({ children }) => {
   }, [gameStatus])
 
   useEffect(() => {
-    if (gameStatus === 'lost' && lastGameStatusRef.current !== 'lost') {
-      const rafId = window.requestAnimationFrame(() => {
-        if (lives > 1) {
-          setLives(prev => Math.max(0, prev - 1))
-          window.setTimeout(() => {
-            resetLevelState(currentLevel)
-          }, RESPAWN_DELAY_MS)
-          return
-        }
-
-        setLives(0)
-      })
-      lastGameStatusRef.current = gameStatus
-      return () => window.cancelAnimationFrame(rafId)
-    }
-
-    lastGameStatusRef.current = gameStatus
-  }, [currentLevel, gameStatus, lives, resetLevelState])
-
-  useEffect(() => {
-    if (levelAdvanceTimeoutRef.current) {
-      window.clearTimeout(levelAdvanceTimeoutRef.current)
-      levelAdvanceTimeoutRef.current = null
-    }
-
-    if (gameStatus !== 'won') return
-
-    const nextLevelIndex = getNextLevelIndex(currentLevelIndex)
-    if (nextLevelIndex === null) return
-
-    levelAdvanceTimeoutRef.current = window.setTimeout(() => {
-      const nextLevel = getLevelByIndex(nextLevelIndex)
-      setCurrentLevelIndex(nextLevelIndex)
-      resetLevelState(nextLevel)
-    }, LEVEL_ADVANCE_DELAY_MS)
-
-    return () => {
-      if (levelAdvanceTimeoutRef.current) {
-        window.clearTimeout(levelAdvanceTimeoutRef.current)
-        levelAdvanceTimeoutRef.current = null
-      }
-    }
-  }, [currentLevelIndex, gameStatus, resetLevelState])
-
-  useEffect(() => {
     if (!gameLoopEnabled) return
 
     motionRef.current.x = stateRef.current.left
@@ -449,6 +312,13 @@ export const AppContextProvider = ({ children }) => {
       y: stateRef.current.bottom,
     }
   }, [gameLoopEnabled])
+
+  useLevelAdvance({
+    currentLevelIndex,
+    gameStatus,
+    onAdvanceLevel: resetLevelState,
+    setCurrentLevelIndex,
+  })
 
   return (
     <AppContext.Provider

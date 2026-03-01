@@ -1,13 +1,13 @@
 import { useRef } from 'react'
 import { useAppContext } from 'contexts/AppContext'
-import useDebugMetrics from 'hooks/useDebugMetrics'
-import useVisibleWorldWindow from 'hooks/useVisibleWorldWindow'
-import useGameInput from 'hooks/useGameInput'
-import useCameraFollow from 'hooks/useCameraFollow'
+import useGameInput from 'hooks/game/useGameInput'
+import useCameraFollow from 'hooks/world/useCameraFollow'
+import useDebugMetrics from 'hooks/world/useDebugMetrics'
+import useVisibleWorldWindow from 'hooks/world/useVisibleWorldWindow'
 
 import Head from 'next/head'
-import GameHud from 'components/GameHud'
-import WorldScene from 'components/WorldScene'
+import GameHud from 'components/ui/GameHud'
+import WorldScene from 'components/world/WorldScene'
 
 export default function Home() {
 

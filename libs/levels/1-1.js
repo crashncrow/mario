@@ -1,6 +1,6 @@
-import { normalizeLevelElements } from 'libs/normalizeLevelElements'
-import { normalizeLevelEnemies } from 'libs/normalizeLevelEnemies'
-import { TILE_SIZE } from 'libs/worldConstants'
+import { normalizeLevelElements } from 'libs/levels/normalizeLevelElements'
+import { normalizeLevelEnemies } from 'libs/levels/normalizeLevelEnemies'
+import { TILE_SIZE } from 'libs/world/constants'
 
 const enemiesByType = {
   goomba: [
