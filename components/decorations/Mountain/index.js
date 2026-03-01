@@ -7,18 +7,18 @@ const Mountain = ({x, size, pixels}) => {
         {
           Array((size === 2? 35 : 16)).fill(1).map((x, i, elements) => {
             if(i > 2){
-              return <div key={`mountain_${i}`} className={`h-1 w-${12 + (i * 2)} ml-${elements.length - i - 1} bg-green-dark border-l-4 border-r-4 border-black`}></div>
+              return <div key={`mountain_${i}`} className={`h-1 w-${12 + (i * 2)} ml-${elements.length - i - 1} bg-smb-green border-l-4 border-r-4 border-black`}></div>
             }
             else if( i === 0){
               return <div key={`mountain_${i}`} className={`h-1 w-6 ml-${size === 2? '37' : '18'} bg-black`}></div>
             }
             else if( i === 1){
               return  <div key={`mountain_${i}`} className={`h-1 w-12 ml-${size === 2? '34' : '15'} bg-black`}>
-                        <div className="w-6 h-1 ml-3 mr-3 bg-green-dark"></div>
+                        <div className="w-6 h-1 ml-3 mr-3 bg-smb-green"></div>
                       </div>
             }
             else if( i === 2){
-              return <div key={`mountain_${i}`} className={`h-1 w-16 ml-${size === 2? '32' : '13'} bg-green-dark border-l-8 border-r-8 border-black`}></div>
+              return <div key={`mountain_${i}`} className={`h-1 w-16 ml-${size === 2? '32' : '13'} bg-smb-green border-l-8 border-r-8 border-black`}></div>
             }
           })
         }

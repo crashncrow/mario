@@ -1,6 +1,6 @@
 const BuzzyBeetle = ({ debug = false, state = 'walk' }) => (
   <div className='relative w-16 h-16'>
-    {debug && <div className='absolute inset-0 border-4 border-mario-red z-50'></div>}
+    {debug && <div className='absolute inset-0 border-4 border-smb-red z-50'></div>}
 
     {state === 'dead' ? (
       <div className='absolute left-3 top-11 w-10 h-4 bg-black rounded-full opacity-70'></div>

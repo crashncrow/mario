@@ -19,10 +19,11 @@ const getRewardForHit = ({ obj, previousTouches, playerForm }) => {
   const variant = getBlockVariant(obj)
   const content = getBlockContent(obj)
   const isFirstHit = previousTouches === 0
+  const canBreakBrick = playerForm === 'big' || playerForm === 'fire'
 
   if (variant === 'brick') {
     return {
-      scoreDelta: playerForm === 'big' ? 50 : 0,
+      scoreDelta: canBreakBrick ? 50 : 0,
       coinsDelta: 0,
       item: null,
     }
@@ -69,6 +70,7 @@ export const bumpInteractiveBlockAtPosition = ({ objects, pixels, x, y, playerFo
   let reward = { scoreDelta: 0, coinsDelta: 0, item: null }
   let spawnedItem = null
   let brokenBrick = null
+  const canBreakBrick = playerForm === 'big' || playerForm === 'fire'
 
   const nextObjects = objects.map(obj => {
     if (bumped || obj.type === 'Floor' || !isInteractiveBlock(obj)) {
@@ -100,7 +102,7 @@ export const bumpInteractiveBlockAtPosition = ({ objects, pixels, x, y, playerFo
     const variant = getBlockVariant(obj)
     const content = getBlockContent(obj).toLowerCase()
 
-    if (variant === 'brick' && playerForm === 'big') {
+    if (variant === 'brick' && canBreakBrick) {
       brokenBrick = {
         x: obj.x * pixels,
         y: obj.y * pixels,

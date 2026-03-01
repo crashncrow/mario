@@ -4,8 +4,8 @@ import { processFullArray } from 'libs/pixless'
 const c = {
   0: '',//bg-transparent
   1: 'bg-black',
-  2: 'bg-green-light',
-  3: 'bg-green-dark',
+  2: 'bg-smb-green-light',
+  3: 'bg-smb-green',
 }
 
 const m1 = [
@@ -72,7 +72,7 @@ const Bush = ({x, size, pixels}) => {
             </div>
           ))
         ))}
-        <div className="h-8 w-full bg-green-light"></div>
+        <div className="h-8 w-full bg-smb-green-light"></div>
       </div>
       ))
       }

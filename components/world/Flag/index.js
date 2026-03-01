@@ -9,32 +9,32 @@ const Flag = ({ x, y, debug = false }) => {
         className={`flex flex-wrap absolute bg-transparent w-16`} 
         style={{left: `${x * pixels}px`, bottom: `${(y * pixels)}px`}}>
 
-        {debug && <div className='absolute w-full h-full border-4 border-mario-red z-50 pointer-events-none'></div>}
+        {debug && <div className='absolute w-full h-full border-4 border-smb-red z-50 pointer-events-none'></div>}
 
         <div className='relative w-full h-full flex flex-col items-center'>
           <div className='w-4 h-1 bg-black'></div>
           <div className='w-6 h-1 bg-black relative'>
-            <div className='w-4 h-full bg-green-dark mx-auto'></div>
-            <div className='absolute left-1 top-0 w-1 h-1 bg-green-light'></div>
+            <div className='w-4 h-full bg-smb-green mx-auto'></div>
+            <div className='absolute left-1 top-0 w-1 h-1 bg-smb-green-light'></div>
           </div>
           <div className='w-8 h-1 bg-black relative'>
-            <div className='w-6 h-full bg-green-dark mx-auto'></div>
-            <div className='absolute left-1 top-0 w-1 h-2 bg-green-light'></div>
+            <div className='w-6 h-full bg-smb-green mx-auto'></div>
+            <div className='absolute left-1 top-0 w-1 h-2 bg-smb-green-light'></div>
           </div>
           <div className='w-8 h-1 bg-black'>
-            <div className='w-6 h-full bg-green-dark mx-auto'></div>
+            <div className='w-6 h-full bg-smb-green mx-auto'></div>
           </div>
           <div className='w-8 h-1 bg-black'>
-            <div className='w-6 h-full bg-green-dark mx-auto'></div>
+            <div className='w-6 h-full bg-smb-green mx-auto'></div>
           </div>
           <div className='w-6 h-1 bg-black'>
-            <div className='w-4 h-full bg-green-dark mx-auto'></div>
+            <div className='w-4 h-full bg-smb-green mx-auto'></div>
           </div>
           <div className='w-4 h-1 bg-black'></div>
         </div>
 
         <div className="relative w-full h-38 flex flex-col items-center" >
-          <div className='w-2 h-full bg-green-light'></div>
+          <div className='w-2 h-full bg-smb-green-light'></div>
 
           <div className='absolute left-4 top-1 w-28 h-20 pointer-events-none'>
             <div className='absolute right-26'>
@@ -57,20 +57,20 @@ const Flag = ({ x, y, debug = false }) => {
             </div>
 
             <div className='absolute right-27 top-1 w-7 h-6'>
-              <div className='absolute inset-0 bg-green-dark'></div>
-              <div className='absolute left-0 top-0 w-7 h-1 bg-green-dark border-r-white border-l-white border-l-4 border-r-4'></div>
+              <div className='absolute inset-0 bg-smb-green'></div>
+              <div className='absolute left-0 top-0 w-7 h-1 bg-smb-green border-r-white border-l-white border-l-4 border-r-4'></div>
               <div className='absolute left-2 top-1 w-1 h-2 bg-white'></div>
               <div className='absolute left-4 top-1 w-1 h-2 bg-white'></div>
               <div className='absolute left-1 top-2 w-1 h-2 bg-white'></div>
               <div className='absolute left-5 top-2 w-1 h-2 bg-white'></div>
               <div className='absolute left-3 top-4 w-1 h-1 bg-white'></div>
-              <div className='absolute left-2 top-5 w-3 h-2 bg-green-dark'></div>
+              <div className='absolute left-2 top-5 w-3 h-2 bg-smb-green'></div>
             </div>
           </div>
         </div>
 
         <div className="relative w-full h-96 flex flex-col items-center" >
-          <div className='w-2 h-full bg-green-light'></div>
+          <div className='w-2 h-full bg-smb-green-light'></div>
         </div>
       </div>
     </>

@@ -17,7 +17,7 @@ const WorldObjectsLayer = ({ visibleObjects, pixels, debug }) => (
           width: `${getObjectWidth(o)}px`
         }}
       >
-        <div className='absolute w-full h-full border-4 border-mario-red z-50 pointer-events-none'></div>
+        <div className='absolute w-full h-full border-4 border-smb-red z-50 pointer-events-none'></div>
       </div>
     ))}
 

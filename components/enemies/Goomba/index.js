@@ -4,7 +4,7 @@ const Goomba = ({ debug = false, state = 'walk', enemy }) => {
 
   return (
     <div className='relative w-16 h-16'>
-      {debug && <div className='absolute inset-0 border-4 border-mario-red z-50'></div>}
+      {debug && <div className='absolute inset-0 border-4 border-smb-red z-50'></div>}
 
       {state === 'dead' ? (
         <>

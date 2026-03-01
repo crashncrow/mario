@@ -1,16 +1,16 @@
 @import "tailwindcss";
 
 @theme {
-  --color-green-light: #6cdb01;
-  --color-green-dark: #049204;
-  --color-blue-sky: #5b95fc;
-  --color-brick-light: #f9c87d;
-  --color-brick-dark: #db6c03;
-  --color-mario-red: #d82801;
-  --color-mario-skin: #fd9838;
-  --color-mario-brown: #886f03;
-  --color-mystery-yellow: #feb600;
-  --color-box-orange: #db6c03;
+  --color-smb-brown: #ac7c00;
+  --color-smb-green-light: #6cdb01;
+  --color-smb-green: #049204;
+  --color-smb-orange-dark: #db6c03; 
+  --color-smb-orange-light: #fcb45c;
+  --color-smb-orange-mid: #c84c0c;
+  --color-smb-red: #f83800;
+  --color-smb-skin: #fca044;
+  --color-smb-sky: #5c94fc;
+  --color-smb-yellow: #f8b800;
 
   --spacing-7: 1.75rem;
   --spacing-9: 2.25rem;

@@ -9,7 +9,7 @@ const PIECES = [
 
 const FragmentPiece = ({ piece, active }) => (
   <div
-    className='absolute h-4 w-4 bg-brick-dark border-r-2 border-b-2 border-black'
+    className='absolute h-4 w-4 bg-smb-orange-dark border-r-2 border-b-2 border-black'
     style={{
       left: `${piece.startLeft}px`,
       bottom: `${piece.startBottom}px`,
@@ -20,7 +20,7 @@ const FragmentPiece = ({ piece, active }) => (
       opacity: active ? 0 : 1,
     }}
   >
-    <div className='h-1 w-full bg-brick-light' />
+    <div className='h-1 w-full bg-smb-orange-light' />
     <div className='h-3 w-full border-l-2 border-black' />
   </div>
 )

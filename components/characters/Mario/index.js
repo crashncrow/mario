@@ -5,9 +5,9 @@ import { getPlayerDimensions } from 'libs/playerDimensions'
 
 const c = {
   0: '', // bg-transparent
-  1: 'bg-mario-red',
-  2: 'bg-mario-brown',
-  3: 'bg-mario-skin'
+  1: 'bg-smb-red',
+  2: 'bg-smb-brown',
+  3: 'bg-smb-skin'
 }
 
 const m0 = [
@@ -147,7 +147,7 @@ const Mario = () => {
       {
         debug && (
           <div
-            className='absolute border-4 border-mario-brown z-50 w-1 h-1'
+            className='absolute border-4 border-smb-brown z-50 w-1 h-1'
             style={{
               bottom: `${bottom}px`,
               left: `${left}px`
@@ -167,7 +167,7 @@ const Mario = () => {
 
         {
           debug &&
-          <div className={`absolute w-full h-full border-4 ${marioCollision ? 'border-black' : 'border-mario-red'} z-50 pointer-events-none`}></div>
+          <div className={`absolute w-full h-full border-4 ${marioCollision ? 'border-black' : 'border-smb-red'} z-50 pointer-events-none`}></div>
         }
 
         <div
