@@ -186,6 +186,8 @@ const level1_1 = {
   world: 1,
   stage: 1,
   label: '1 - 1',
+  background: 'sky',
+  decorations: 'overworld',
   elements,
   enemies,
   startLeft: 100,

@@ -420,6 +420,8 @@ export const AppContextProvider = ({ children }) => {
         currentWorld: currentLevel.world,
         currentStage: currentLevel.stage,
         currentLevelLabel: currentLevel.label,
+        currentBackground: currentLevel.background,
+        currentDecorations: currentLevel.decorations,
         currentFlag: currentLevel.flag,
         currentCastle: currentLevel.castle,
         objects: objects,

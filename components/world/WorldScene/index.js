@@ -15,6 +15,11 @@ const isWithinVisibleRange = (entity, visibleMinPx, visibleMaxPx) => {
   return right > visibleMinPx && entity.x < visibleMaxPx
 }
 
+const BACKGROUND_CLASS = {
+  sky: 'bg-smb-sky',
+  black: 'bg-black',
+}
+
 const VisibleEntitiesLayer = ({ items, visibleMinPx, visibleMaxPx, renderItem }) => (
   <>
     {items
@@ -38,6 +43,8 @@ const WorldScene = ({
   pixels,
   debug,
   objects,
+  background = 'sky',
+  decorations = 'overworld',
   mushrooms,
   brickBreaks,
   enemies,
@@ -47,13 +54,17 @@ const WorldScene = ({
   flag,
   castle,
 }) => (
-  <main className='relative h-full w-full overflow-hidden'>
+  <main className={`relative h-full w-full overflow-hidden ${BACKGROUND_CLASS[background] ?? BACKGROUND_CLASS.sky}`}>
     <div ref={worldRef} className='absolute inset-x-0 bottom-0 h-full w-full'>
       <Mario />
 
-      <Sky cameraX={cameraXForMetrics} />
-      <Mountains cameraX={cameraXForMetrics} />
-      <Plants cameraX={cameraXForMetrics} />
+      {decorations === 'overworld' && (
+        <>
+          <Sky cameraX={cameraXForMetrics} />
+          <Mountains cameraX={cameraXForMetrics} />
+          <Plants cameraX={cameraXForMetrics} />
+        </>
+      )}
 
       <div className='inline-block'>
         <VisibleEntitiesLayer

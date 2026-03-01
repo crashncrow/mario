@@ -6,6 +6,8 @@ const level1_2 = {
   world: 1,
   stage: 2,
   label: '1 - 2',
+  background: 'black',
+  decorations: 'overworld',
 }
 
 export default level1_2

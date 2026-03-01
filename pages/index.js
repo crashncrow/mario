@@ -35,6 +35,8 @@ export default function Home() {
     time,
     currentWorld,
     currentStage,
+    currentBackground,
+    currentDecorations,
     isLevelIntroVisible,
     currentFlag,
     currentCastle,
@@ -151,6 +153,8 @@ export default function Home() {
             pixels={pixels}
             debug={debug}
             objects={objects}
+            background={currentBackground}
+            decorations={currentDecorations}
             mushrooms={mushrooms}
             brickBreaks={brickBreaks}
             enemies={enemies}
