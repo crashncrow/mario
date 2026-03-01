@@ -7,7 +7,22 @@ const Goomba = ({ debug = false, state = 'walk', enemy }) => {
       {debug && <div className='absolute inset-0 border-4 border-mario-red z-50'></div>}
 
       {state === 'dead' ? (
-        <div className='absolute left-2 top-11 w-12 h-4 bg-amber-900 rounded-full opacity-70'></div>
+        <>
+          <div className='absolute w-4 h-1 bottom-5 left-8 bg-orange-700'></div>
+          <div className='absolute w-10 h-1 bottom-4 left-5 bg-orange-700'></div>
+          <div className='absolute w-14 h-1 bottom-3 left-3 bg-orange-700'></div>
+          
+          <div className='absolute w-16 h-2 bottom-1 left-2 bg-orange-700'></div>
+
+          <div className='absolute w-3 h-1 bottom-3 left-5 bg-black'></div>
+          <div className='absolute w-3 h-1 bottom-3 left-12 bg-black'></div>
+
+          <div className='absolute w-4 h-1 bottom-2 left-4 bg-red-200'></div>
+          <div className='absolute w-4 h-1 bottom-2 left-8 bg-black'></div>
+          <div className='absolute w-4 h-1 bottom-2 left-12 bg-red-200'></div>
+
+          <div className='absolute w-12 h-1 bottom-0 left-4 bg-red-200'></div>
+        </>
       ) : (
         <>
           <div className='w-full h-1 px-6'>
