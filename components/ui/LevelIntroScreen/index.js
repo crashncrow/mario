@@ -39,7 +39,7 @@ const LevelIntroScreen = ({ visible, world, stage, lives, time, coins, score }) 
   if (!visible) return null
 
   return (
-    <div className='fixed inset-0 z-[90] flex items-center justify-center bg-black text-white pointer-events-none'>
+    <div className='fixed inset-0 z-90 flex items-center justify-center bg-black text-white pointer-events-none'>
       <Stats time={time} coins={coins} score={score} world={world} stage={stage} />
       <div className='flex flex-col items-center gap-10 text-center'>
         <div className='text-3xl'>WORLD&nbsp;&nbsp;{world}-{stage}</div>
