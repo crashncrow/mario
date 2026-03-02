@@ -74,7 +74,7 @@ const Flag = ({
 }) => {
   return (
     <div
-      className='absolute flex flex-wrap bg-transparent w-6'
+      className='absolute flex flex-wrap bg-transparent'
       style={{ left: `${(x * pixels) + FLAG_OFFSET_X_PX}px`, bottom: `${y * pixels}px` }}
     >
       {debug && (
