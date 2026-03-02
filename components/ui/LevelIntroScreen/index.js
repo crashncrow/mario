@@ -48,8 +48,8 @@ const LevelIntroScreen = ({ visible, world, stage, lives, time, coins, score }) 
     <div className='fixed inset-0 z-90 flex items-center justify-center bg-black text-white pointer-events-none'>
       <Stats time={time} coins={coins} score={score} world={world} stage={stage} />
       <div className='flex flex-col items-center gap-10 text-center'>
-        <div className='text-3xl'>WORLD&nbsp;&nbsp;{world}-{stage}</div>
-        <div className='flex items-center gap-6 text-3xl'>
+        <div className='text-xl md:text-3xl'>WORLD&nbsp;&nbsp;{world}-{stage}</div>
+        <div className='flex items-center gap-6 text-xl md:text-3xl'>
           <MarioLifeIcon />
           <span>x</span>
           <span>{lives}</span>
