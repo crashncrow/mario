@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from 'react'
 import { getObjectWidth } from 'libs/world/objectDimensions'
+import { getFlagBounds } from 'libs/world/flag'
 import { getPlayerBounds } from 'libs/playerDimensions'
 
 export default function useGameSession({
@@ -43,18 +44,13 @@ export default function useGameSession({
 
   useEffect(() => {
     const marioBounds = getPlayerBounds({ x: left, y: bottom, pixels, playerForm })
-
-    // Approximate Flag area (pole + fabric + top) in world coordinates.
-    const flagLeft = (flag.x * pixels) - 24
-    const flagRight = (flag.x * pixels) + (2 * pixels)
-    const flagBottom = flag.y * pixels
-    const flagTop = flagBottom + (8 * pixels)
+    const flagBounds = getFlagBounds({ x: flag.x, y: flag.y, pixels })
 
     const touchesFlag = (
-      marioBounds.left < flagRight &&
-      marioBounds.right > flagLeft &&
-      marioBounds.bottom < flagTop &&
-      marioBounds.top > flagBottom
+      marioBounds.left < flagBounds.right &&
+      marioBounds.right > flagBounds.left &&
+      marioBounds.bottom < flagBounds.top &&
+      marioBounds.top > flagBounds.bottom
     )
     const fellOffLevel = gameLoopEnabled && bottom <= 0
 

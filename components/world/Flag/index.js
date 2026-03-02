@@ -1,79 +1,95 @@
-import { useAppContext } from 'contexts/AppContext'
+import { FLAG_HEIGHT_PX, FLAG_OFFSET_X_PX, FLAG_WIDTH_PX } from 'libs/world/flag'
 
-const Flag = ({ x, y, debug = false }) => {
-  const { pixels } = useAppContext()
+const FlagTop = ({ topColor, topHighlightColor }) => (
+  <div className='relative w-full h-full flex flex-col items-center'>
+    <div className='relative w-4 h-1 bg-black'></div>
+    <div className={`relative w-6 h-1 border-x-4 border-black ${topColor}`}></div>
+    <div className={`relative w-8 h-3 border-x-4 border-black ${topColor}`}></div>
+    <div className={`relative w-6 h-1 border-x-4 border-black ${topColor}`}></div>
+    <div className={`absolute left-2 top-1 w-1 h-1 ${topHighlightColor}`}></div>
+    <div className={`absolute left-1 top-2 w-1 h-2 ${topHighlightColor}`}></div>
+    <div className='relative w-4 h-1 bg-black'></div>
+  </div>
+)
 
+const FlagBanner = ({ flagColor, skullColor }) => (
+  <div className='absolute left-0 top-1 w-28 pointer-events-none'>
+    <div className='absolute right-25'>
+      <div className={`h-1 w-16 ml-0 ${flagColor}`}></div>
+      <div className={`h-1 w-15 ml-1 ${flagColor}`}></div>
+      <div className={`h-1 w-14 ml-2 ${flagColor}`}></div>
+      <div className={`h-1 w-13 ml-3 ${flagColor}`}></div>
+      <div className={`h-1 w-12 ml-4 ${flagColor}`}></div>
+      <div className={`h-1 w-11 ml-5 ${flagColor}`}></div>
+      <div className={`h-1 w-10 ml-6 ${flagColor}`}></div>
+      <div className={`h-1 w-9  ml-7 ${flagColor}`}></div>
+      <div className={`h-1 w-8  ml-8 ${flagColor}`}></div>
+      <div className={`h-1 w-7  ml-9 ${flagColor}`}></div>
+      <div className={`h-1 w-6 ml-10 ${flagColor}`}></div>
+      <div className={`h-1 w-5 ml-11 ${flagColor}`}></div>
+      <div className={`h-1 w-4 ml-12 ${flagColor}`}></div>
+      <div className={`h-1 w-3 ml-13 ${flagColor}`}></div>
+      <div className={`h-1 w-2 ml-14 ${flagColor}`}></div>
+      <div className={`h-1 w-1 ml-15 ${flagColor}`}></div>
+    </div>
+
+    <FlagSkull skullColor={skullColor} />
+  </div>
+)
+
+const FlagSkull = ({ skullColor }) => (
+  <>
+    <div className='absolute right-26 top-0 w-7 h-6'>
+      <div className={`absolute right-1 top-1 w-5 h-1 ${skullColor}`}></div>
+      <div className={`absolute right-0 top-2 w-2 h-1 ${skullColor}`}></div>
+      <div className={`absolute right-3 top-2 w-1 h-2 ${skullColor}`}></div>
+      <div className={`absolute right-5 top-2 w-2 h-1 ${skullColor}`}></div>
+      <div className={`absolute right-0 top-3 w-1 h-2 ${skullColor}`}></div>
+      <div className={`absolute right-6 top-3 w-1 h-2 ${skullColor}`}></div>
+      <div className={`absolute right-2 top-4 w-3 h-1 ${skullColor}`}></div>
+      <div className={`absolute right-0 top-5 w-3 h-2 ${skullColor}`}></div>
+      <div className={`absolute right-4 top-5 w-3 h-2 ${skullColor}`}></div>
+      <div className={`absolute right-2 top-6 w-3 h-2 ${skullColor}`}></div>
+    </div>
+  </>
+)
+
+const FlagPole = ({ poleColor, children = null }) => (
+  <div className={`relative w-full h-134 flex flex-col items-center`}>
+    <div className={`w-2 h-full ${poleColor}`}></div>
+    {children}
+  </div>
+)
+
+const Flag = ({
+  x,
+  y,
+  pixels,
+  debug = false,
+  poleColor = 'bg-smb-green-light',
+  flagColor = 'bg-white',
+  skullColor = 'bg-smb-green',
+  topColor = 'bg-smb-green',
+  topHighlightColor = 'bg-smb-green-light',
+}) => {
   return (
-    <>
-      <div 
-        className={`flex flex-wrap absolute bg-transparent w-16`} 
-        style={{left: `${x * pixels}px`, bottom: `${(y * pixels)}px`}}>
+    <div
+      className='absolute flex flex-wrap bg-transparent w-6'
+      style={{ left: `${(x * pixels) + FLAG_OFFSET_X_PX}px`, bottom: `${y * pixels}px` }}
+    >
+      {debug && (
+        <div
+          className='absolute border-4 border-smb-red z-50 pointer-events-none'
+          style={{ left: 0, bottom: 0, width: `${FLAG_WIDTH_PX}px`, height: `${FLAG_HEIGHT_PX}px` }}
+        ></div>
+      )}
 
-        {debug && <div className='absolute w-full h-full border-4 border-smb-red z-50 pointer-events-none'></div>}
+      <FlagTop topColor={topColor} topHighlightColor={topHighlightColor} />
 
-        <div className='relative w-full h-full flex flex-col items-center'>
-          <div className='w-4 h-1 bg-black'></div>
-          <div className='w-6 h-1 bg-black relative'>
-            <div className='w-4 h-full bg-smb-green mx-auto'></div>
-            <div className='absolute left-1 top-0 w-1 h-1 bg-smb-green-light'></div>
-          </div>
-          <div className='w-8 h-1 bg-black relative'>
-            <div className='w-6 h-full bg-smb-green mx-auto'></div>
-            <div className='absolute left-1 top-0 w-1 h-2 bg-smb-green-light'></div>
-          </div>
-          <div className='w-8 h-1 bg-black'>
-            <div className='w-6 h-full bg-smb-green mx-auto'></div>
-          </div>
-          <div className='w-8 h-1 bg-black'>
-            <div className='w-6 h-full bg-smb-green mx-auto'></div>
-          </div>
-          <div className='w-6 h-1 bg-black'>
-            <div className='w-4 h-full bg-smb-green mx-auto'></div>
-          </div>
-          <div className='w-4 h-1 bg-black'></div>
-        </div>
-
-        <div className="relative w-full h-38 flex flex-col items-center" >
-          <div className='w-2 h-full bg-smb-green-light'></div>
-
-          <div className='absolute left-4 top-1 w-28 h-20 pointer-events-none'>
-            <div className='absolute right-26'>
-              <div className='h-1 w-16 bg-white'></div>
-              <div className='h-1 w-15 bg-white ml-1'></div>
-              <div className='h-1 w-14 bg-white ml-2'></div>
-              <div className='h-1 w-13 bg-white ml-3'></div>
-              <div className='h-1 w-12 bg-white ml-4'></div>
-              <div className='h-1 w-11 bg-white ml-5'></div>
-              <div className='h-1 w-10 bg-white ml-6'></div>
-              <div className='h-1 w-9 bg-white ml-7'></div>
-              <div className='h-1 w-8 bg-white ml-8'></div>
-              <div className='h-1 w-7 bg-white ml-9'></div>
-              <div className='h-1 w-6 bg-white ml-10'></div>
-              <div className='h-1 w-5 bg-white ml-11'></div>
-              <div className='h-1 w-4 bg-white ml-12'></div>
-              <div className='h-1 w-3 bg-white ml-13'></div>
-              <div className='h-1 w-2 bg-white ml-14'></div>
-              <div className='h-1 w-1 bg-white ml-15'></div>
-            </div>
-
-            <div className='absolute right-27 top-1 w-7 h-6'>
-              <div className='absolute inset-0 bg-smb-green'></div>
-              <div className='absolute left-0 top-0 w-7 h-1 bg-smb-green border-r-white border-l-white border-l-4 border-r-4'></div>
-              <div className='absolute left-2 top-1 w-1 h-2 bg-white'></div>
-              <div className='absolute left-4 top-1 w-1 h-2 bg-white'></div>
-              <div className='absolute left-1 top-2 w-1 h-2 bg-white'></div>
-              <div className='absolute left-5 top-2 w-1 h-2 bg-white'></div>
-              <div className='absolute left-3 top-4 w-1 h-1 bg-white'></div>
-              <div className='absolute left-2 top-5 w-3 h-2 bg-smb-green'></div>
-            </div>
-          </div>
-        </div>
-
-        <div className="relative w-full h-96 flex flex-col items-center" >
-          <div className='w-2 h-full bg-smb-green-light'></div>
-        </div>
-      </div>
-    </>
+      <FlagPole poleColor={poleColor}>
+        <FlagBanner flagColor={flagColor} skullColor={skullColor} />
+      </FlagPole>
+    </div>
   )
 }
 

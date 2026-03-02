@@ -94,7 +94,7 @@ const WorldScene = ({
             maxPx={visibleMaxPx}
           />
 
-          {visibleMaxPx > (castle.x - worldPreloadTiles) * pixels && <Flag x={flag.x} y={flag.y} debug={debug} />}
+          {visibleMaxPx > (castle.x - worldPreloadTiles) * pixels && <Flag x={flag.x} y={flag.y} pixels={pixels} debug={debug} />}
           {visibleMaxPx > (castle.x - worldPreloadTiles) * pixels && <Castle x={castle.x} />}
         </div>
       </div>
