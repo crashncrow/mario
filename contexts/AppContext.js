@@ -9,6 +9,7 @@ import useGameSession from 'hooks/game/useGameSession'
 import useLevelReset from 'hooks/game/useLevelReset'
 import { useCurrentLevel, useLevelAdvance } from 'hooks/game/useLevelProgression'
 import { createEnemiesState } from 'libs/enemies/createEnemyState'
+import { createLevelObjectsState } from 'libs/levels/createLevelState'
 import {
   getLandingYAtPosition,
   getMaxWalkXForObjects,
@@ -42,7 +43,7 @@ export const AppContextProvider = ({ children }) => {
     setCurrentLevelIndex,
   } = useCurrentLevel()
 
-  const [ objects, setObjects ] = useState(currentLevel.elements)
+  const [ objects, setObjects ] = useState(() => createLevelObjectsState(currentLevel))
   const [ mushrooms, setMushrooms ] = useState([])
   const [ brickBreaks, setBrickBreaks ] = useState([])
   const [ enemies, setEnemies ] = useState(() => createEnemiesState({

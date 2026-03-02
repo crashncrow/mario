@@ -46,6 +46,18 @@ const MysteryBlock = ({ x, y, touches, content, isBumping, hidden = false, itemC
   const prevTouchesRef = useRef(touches)
 
   useEffect(() => {
+    if (touches !== 0) return
+
+    prevTouchesRef.current = 0
+    const raf = requestAnimationFrame(() => {
+      setShowCoin(false)
+      setRevealedContent(null)
+    })
+
+    return () => cancelAnimationFrame(raf)
+  }, [touches])
+
+  useEffect(() => {
     if (touches <= prevTouchesRef.current) return
 
     const isFirstHit = prevTouchesRef.current === 0

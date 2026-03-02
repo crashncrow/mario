@@ -1,5 +1,6 @@
 import { useCallback, useEffect } from 'react'
 import { createEnemiesState } from 'libs/enemies/createEnemyState'
+import { createLevelObjectsState } from 'libs/levels/createLevelState'
 
 const RESPAWN_DELAY_MS = 1200
 
@@ -37,8 +38,9 @@ export default function useLevelReset({
   const resetLevelState = useCallback((level, options = {}) => {
     const { resetPlayerForm = false } = options
     const nextEnemies = createInitialEnemies(level)
+    const nextObjects = createLevelObjectsState(level)
 
-    setObjects(level.elements)
+    setObjects(nextObjects)
     setMushrooms([])
     setBrickBreaks([])
     setEnemies(nextEnemies)
