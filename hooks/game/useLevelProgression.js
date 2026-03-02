@@ -1,16 +1,18 @@
 import { useEffect, useRef, useState } from 'react'
-import { getLevelByIndex, getNextLevelIndex } from 'libs/levels'
+import { getLevelById, getLevelIndexById, getLevelByIndex, getNextLevelIndex } from 'libs/levels'
 
 const LEVEL_ADVANCE_DELAY_MS = 1500
 
 export const useCurrentLevel = () => {
-  const [currentLevelIndex, setCurrentLevelIndex] = useState(0)
-  const currentLevel = getLevelByIndex(currentLevelIndex)
+  const [currentLevelId, setCurrentLevelId] = useState('1-1')
+  const currentLevel = getLevelById(currentLevelId)
+  const currentLevelIndex = getLevelIndexById(currentLevelId)
 
   return {
+    currentLevelId,
     currentLevelIndex,
     currentLevel,
-    setCurrentLevelIndex,
+    setCurrentLevelId,
   }
 }
 
@@ -18,7 +20,7 @@ export const useLevelAdvance = ({
   currentLevelIndex,
   gameStatus,
   onAdvanceLevel,
-  setCurrentLevelIndex,
+  setCurrentLevelId,
 }) => {
   const levelAdvanceTimeoutRef = useRef(null)
 
@@ -35,7 +37,7 @@ export const useLevelAdvance = ({
 
     levelAdvanceTimeoutRef.current = window.setTimeout(() => {
       const nextLevel = getLevelByIndex(nextLevelIndex)
-      setCurrentLevelIndex(nextLevelIndex)
+      setCurrentLevelId(nextLevel.id)
       onAdvanceLevel(nextLevel)
     }, LEVEL_ADVANCE_DELAY_MS)
 
@@ -45,5 +47,5 @@ export const useLevelAdvance = ({
         levelAdvanceTimeoutRef.current = null
       }
     }
-  }, [currentLevelIndex, gameStatus, onAdvanceLevel, setCurrentLevelIndex])
+  }, [currentLevelIndex, gameStatus, onAdvanceLevel, setCurrentLevelId])
 }

@@ -6,7 +6,9 @@ const level1_2 = {
   world: 1,
   stage: 2,
   label: '1 - 2',
+  type: 'main',
   background: 'black',
+  theme: 'underground',
   decorations: {
     ...level1_1.decorations,
     clouds: [
@@ -21,6 +23,10 @@ const level1_2 = {
       { x: 201, y: 1, size: 2 },
     ],
   },
+  spawns: {
+    start: { x: 3, y: 1 },
+  },
+  transitions: [],
 }
 
 export default level1_2

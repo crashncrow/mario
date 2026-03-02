@@ -4,7 +4,7 @@ import { getObjectHeight, getObjectWidth } from 'libs/world/objectDimensions'
 
 const getElementKey = el => `${el.type}_${el.x}_${el.y}_${el.size ?? 1}`
 
-const WorldObjectsLayer = ({ visibleObjects, pixels, debug }) => (
+const WorldObjectsLayer = ({ visibleObjects, pixels, debug, theme = 'overworld' }) => (
   <>
     {debug && visibleObjects.map((o, i) => (
       <div
@@ -36,10 +36,11 @@ const WorldObjectsLayer = ({ visibleObjects, pixels, debug }) => (
               content={el.content ?? 'coin'}
               hidden={Boolean(el.hidden)}
               itemCollected={Boolean(el.itemCollected)}
+              theme={theme}
             />
           )
         case 'Brick':
-          return <Block key={key} variant='brick' x={el.x} y={el.y} touches={el.touches} />
+          return <Block key={key} variant='brick' x={el.x} y={el.y} touches={el.touches} theme={theme} />
         case 'Solid':
           return <Block key={key} variant='solid' x={el.x} y={el.y} />
         case 'Pipe':

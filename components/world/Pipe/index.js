@@ -1,87 +1,82 @@
 import { memo } from 'react'
+import { TILE_SIZE } from 'libs/world/constants'
 
-const c = {
-  0: '', // bg-transparent
-  1: 'bg-black',
-  2: 'bg-smb-green',
-  3: 'bg-smb-green-light'
-}
+const PIPE_WIDTH = TILE_SIZE * 2
+const PIPE_TOP_HEIGHT = TILE_SIZE - 4
+const PIPE_BODY_INSET = 8
+const PIPE_BODY_WIDTH = PIPE_WIDTH - (PIPE_BODY_INSET * 2)
 
-const t1 = [
-  0, 2, 0, 2,
-  2, 0, 2, 0,
-  0, 2, 0, 2,
-  2, 0, 2, 0,
-  0, 2, 0, 2,
-  2, 0, 2, 0,
-  0, 2, 0, 2,
-  2, 0, 2, 0,
-  0, 2, 0, 2,
-  2, 0, 2, 0,
-  0, 2, 0, 2
-]
+const createAlternatingRows = ({ count, evenRow, oddRow }) => (
+  Array.from({ length: count }, (_, index) => (
+    index % 2 === 0 ? evenRow : oddRow
+  ))
+)
 
-const t2 = [
-  0, 2, 0,
-  2, 0, 2,
-  0, 2, 0,
-  2, 0, 2,
-  0, 2, 0,
-  2, 0, 2,
-  0, 2, 0,
-  2, 0, 2,
-  0, 2, 0,
-  2, 0, 2,
-  0, 2, 0,
-  2, 0, 2,
-  0, 2, 0,
-  2, 0, 2,
-  0, 2, 0,
-  2, 0, 2
-]
+const TOP_PATTERN_ROWS = createAlternatingRows({
+  count: 10,
+  evenRow: '010101',
+  oddRow: '101010',
+})
 
-const Pipe = ({x, size, pixels}) => {
+const BODY_PATTERN_ROWS = createAlternatingRows({
+  count: 16,
+  evenRow: '010',
+  oddRow: '101',
+})
+
+const PipePattern = ({ rows }) => (
+  <div className='flex flex-wrap w-full h-full content-start'>
+    {rows.flatMap((row, rowIndex) => (
+      row.split('').map((cell, cellIndex) => (
+        <div
+          key={`${rowIndex}_${cellIndex}`}
+          className={`h-1 w-1 ${cell === '1' ? 'bg-smb-green' : ''}`}
+        ></div>
+      ))
+    ))}
+  </div>
+)
+
+const Pipe = ({ x, size, pixels }) => {
+  const bodyHeight = size * TILE_SIZE
 
   return (
-    <div className="flex flex-wrap absolute w-32 bottom-0" style={{left: `${x * pixels}px`, bottom: `${pixels}px`}}>
-      <div className="flex flex-wrap bg-smb-green-light w-32 h-15 border-4 border-black pb-1">
-        <div className="mt-1 w-5 mb-4 h-full border-t-4 border-r-8 border-smb-green"></div>
-        <div className="flex flex-wrap mt-1 w-19 mb-4 ml-6 h-full border-t-4 border-l-4 border-smb-green">
-          <div className="w-10 ml-2 h-full bg-smb-green"></div>
-          <div className="flex flex-wrap w-4 h-full">
-          {  
-            t1.map((x, i) => 
-              (
-              <div 
-                className={`h-1 w-1 border border-none ${c[x]}`}
-                key={`pipe_top_${i}`}
-                >
-                </div>
-              )
-            )
-          }
+    <div
+      className='absolute bottom-0'
+      style={{
+        left: `${x * pixels}px`,
+        bottom: `${pixels}px`,
+        width: `${PIPE_WIDTH}px`,
+        height: `${PIPE_TOP_HEIGHT + bodyHeight}px`,
+      }}
+    >
+      <div
+        className='absolute top-0 left-0 border-4 border-black bg-smb-green-light overflow-hidden'
+        style={{ width: `${PIPE_WIDTH}px`, height: `${PIPE_TOP_HEIGHT}px` }}
+      >
+        <div className='absolute top-4 left-0 h-12 w-5 border-t-4 border-r-8 border-smb-green'></div>
+
+        <div className='absolute top-4 left-11 h-12 w-19 border-t-4 border-l-4 border-smb-green'>
+          <div className='absolute top-0 left-2 h-full w-10 bg-smb-green'></div>
+          <div className='absolute top-0 right-2 h-10 w-6'>
+            <PipePattern rows={TOP_PATTERN_ROWS} />
           </div>
         </div>
       </div>
 
-      <div className={`bg-smb-green-light w-32 h-${16*size} mx-2 border-l-4 border-r-4 border-t-4 border-black flex flex-wrap`}>
-        <div className="ml-3 w-2 h-full bg-smb-green"></div>
-        <div className="ml-5 w-1 h-full bg-smb-green"></div>
-        <div className="ml-2 w-8 h-full bg-smb-green"></div>
-        <div className="flex flex-wrap w-3 h-full">
-        {  
-          Array(size).fill(1).map((x, i) => (
-            t2.map((x, j) => 
-              (
-              <div 
-                className={`h-1 w-1 border border-none ${c[x]}`}
-                key={`pipe_${i}${j}`}
-                >
-                </div>
-              )
-            )
-          ))
-        }
+      <div
+        className='absolute left-2 border-l-4 border-r-4 border-t-4 border-black bg-smb-green-light overflow-hidden'
+        style={{
+          bottom: 0,
+          width: `${PIPE_BODY_WIDTH}px`,
+          height: `${bodyHeight}px`,
+        }}
+      >
+        <div className='absolute top-0 left-3 h-full w-2 bg-smb-green'></div>
+        <div className='absolute top-0 left-10 h-full w-1 bg-smb-green'></div>
+        <div className='absolute top-0 left-13 h-full w-8 bg-smb-green'></div>
+        <div className='absolute top-0 right-2 h-full w-3'>
+          <PipePattern rows={Array.from({ length: size }, () => BODY_PATTERN_ROWS).flat()} />
         </div>
       </div>
     </div>

@@ -99,6 +99,7 @@ const Mario = () => {
     playerForm,
     marioCollision,
     gameLoopEnabled,
+    pipeTransition,
     motionRef,
   } = useAppContext()
 
@@ -119,7 +120,7 @@ const Mario = () => {
     : undefined
 
   useEffect(() => {
-    if (!gameLoopEnabled) return
+    if (!gameLoopEnabled || pipeTransition?.active) return
 
     const rafId = window.requestAnimationFrame(() => {
       const vx = motionRef.current?.vx || 0
@@ -140,7 +141,7 @@ const Mario = () => {
     return () => {
       window.cancelAnimationFrame(rafId)
     }
-  }, [left, gameLoopEnabled, motionRef])
+  }, [left, gameLoopEnabled, motionRef, pipeTransition?.active])
 
   return (
     <>
@@ -163,6 +164,7 @@ const Mario = () => {
           bottom: `${bottom}px`,
           width: `${playerSize.width}px`,
           height: `${playerSize.height}px`,
+          transform: pipeTransition?.active ? `translateY(${pipeTransition.translateY}px)` : undefined,
         }}>
 
         {
