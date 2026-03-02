@@ -32,6 +32,8 @@ export const hasMarioEnemyContact = ({ marioX, marioY, pixels, playerForm, enemi
   const marioBounds = getMarioBounds({ x: marioX, y: marioY, pixels, playerForm })
 
   return enemies.some(enemy => {
+    if (enemy.state === 'dead') return false
+
     const enemyBounds = getEnemyBounds(enemy)
 
     return (
@@ -69,6 +71,8 @@ export const resolveMarioEnemyCollision = ({
 
   for (let i = 0; i < enemies.length; i += 1) {
     const enemy = enemies[i]
+    if (enemy.state === 'dead') continue
+
     const enemyConfig = getEnemyTypeConfig(enemy.type)
     const enemyBounds = getEnemyBounds(enemy)
     const overlaps = hasBoundsOverlap(marioBounds, enemyBounds)
