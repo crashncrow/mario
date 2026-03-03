@@ -2,6 +2,7 @@ import { createContext, useCallback, useContext, useEffect, useRef, useState } f
 import { useWindowDimensions } from 'hooks/shared/window'
 import useMarioPhysics from 'hooks/world/useMarioPhysics'
 import useBlockInteractions from 'hooks/world/useBlockInteractions'
+import useLevelTransitions from 'hooks/world/useLevelTransitions'
 import useMushroomPhysics, { MUSHROOM_HORIZONTAL_SPEED, MUSHROOM_SIZE } from 'hooks/world/useMushroomPhysics'
 import useEnemyPhysics from 'hooks/enemies/useEnemyPhysics'
 import useEnemyState from 'hooks/enemies/useEnemyState'
@@ -10,6 +11,7 @@ import useLevelReset from 'hooks/game/useLevelReset'
 import { useCurrentLevel, useLevelAdvance } from 'hooks/game/useLevelProgression'
 import { createEnemiesState } from 'libs/enemies/createEnemyState'
 import { createLevelObjectsState } from 'libs/levels/createLevelState'
+import { getLevelById } from 'libs/levels'
 import {
   getLandingYAtPosition,
   getMaxWalkXForObjects,
@@ -22,6 +24,10 @@ import {
   hasMarioEnemyContact,
 } from 'libs/enemies/enemyInteractions'
 import { TILE_SIZE } from 'libs/world/constants'
+import {
+  PIPE_TRANSITION_DURATION_MS,
+  getPipeExitStartOffset,
+} from 'libs/world/pipeTransition'
 
 const AppContext = createContext(null)
 const pixels = TILE_SIZE
@@ -38,9 +44,10 @@ export const AppContextProvider = ({ children }) => {
     []
   )
   const {
+    currentLevelId,
     currentLevelIndex,
     currentLevel,
-    setCurrentLevelIndex,
+    setCurrentLevelId,
   } = useCurrentLevel()
 
   const [ objects, setObjects ] = useState(() => createLevelObjectsState(currentLevel))
@@ -63,6 +70,12 @@ export const AppContextProvider = ({ children }) => {
   const [ gameLoopEnabled, setGameLoopEnabled ] = useState(true)
   const [ isPaused, setIsPaused ] = useState(false)
   const [ isLevelIntroVisible, setIsLevelIntroVisible ] = useState(true)
+  const [ pipeTransition, setPipeTransition ] = useState({
+    active: false,
+    direction: null,
+    translateX: 0,
+    translateY: 0,
+  })
   const renderLimit = left + (width ?? 0) + 500
 
   const stateRef = useRef({
@@ -85,6 +98,8 @@ export const AppContextProvider = ({ children }) => {
     input: {
       left: false,
       right: false,
+      up: false,
+      down: false,
       jump: false,
     },
     jumpHeld: false,
@@ -100,6 +115,8 @@ export const AppContextProvider = ({ children }) => {
   const mushroomsRef = useRef(mushrooms)
   const enemiesRef = useRef(enemies)
   const levelIntroTimeoutRef = useRef(null)
+  const levelSnapshotRef = useRef(null)
+  const pipeExitAnimationRef = useRef(null)
 
   useEffect(() => {
     stateRef.current = {
@@ -139,6 +156,8 @@ export const AppContextProvider = ({ children }) => {
     motionRef.current.input = {
       left: false,
       right: false,
+      up: false,
+      down: false,
       jump: false,
     }
     motionRef.current.jumpHeld = false
@@ -160,6 +179,49 @@ export const AppContextProvider = ({ children }) => {
     }, LEVEL_INTRO_MS)
   }, [clearLoopInput])
 
+  const playPipeExitAnimation = useCallback(direction => {
+    if (!direction) return
+
+    if (pipeExitAnimationRef.current) {
+      window.cancelAnimationFrame(pipeExitAnimationRef.current)
+      pipeExitAnimationRef.current = null
+    }
+
+    const startOffset = getPipeExitStartOffset(direction)
+    setPipeTransition({
+      active: true,
+      direction,
+      translateX: startOffset.x,
+      translateY: startOffset.y,
+    })
+
+    const start = performance.now()
+    const step = now => {
+      const progress = Math.min(1, (now - start) / PIPE_TRANSITION_DURATION_MS)
+      setPipeTransition({
+        active: true,
+        direction,
+        translateX: Math.round(startOffset.x * (1 - progress)),
+        translateY: Math.round(startOffset.y * (1 - progress)),
+      })
+
+      if (progress < 1) {
+        pipeExitAnimationRef.current = window.requestAnimationFrame(step)
+        return
+      }
+
+      setPipeTransition({
+        active: false,
+        direction: null,
+        translateX: 0,
+        translateY: 0,
+      })
+      pipeExitAnimationRef.current = null
+    }
+
+    pipeExitAnimationRef.current = window.requestAnimationFrame(step)
+  }, [])
+
   useEffect(() => {
     levelIntroTimeoutRef.current = window.setTimeout(() => {
       setIsLevelIntroVisible(false)
@@ -173,6 +235,15 @@ export const AppContextProvider = ({ children }) => {
       }
     }
   }, [])
+
+  useEffect(() => (
+    () => {
+      if (pipeExitAnimationRef.current) {
+        window.cancelAnimationFrame(pipeExitAnimationRef.current)
+        pipeExitAnimationRef.current = null
+      }
+    }
+  ), [])
 
   useEffect(() => {
     if (gameLoopEnabled) return
@@ -212,6 +283,7 @@ export const AppContextProvider = ({ children }) => {
   const {
     bumpInteractiveBlockAt,
     collectRevealedMysteryItemAt,
+    collectWorldCoinAt,
   } = useBlockInteractions({
     objects,
     pixels,
@@ -243,6 +315,7 @@ export const AppContextProvider = ({ children }) => {
     time,
     gameStatus,
     loseReason,
+    restoreSessionState,
   } = useGameSession({
     gameLoopEnabled,
     isPaused,
@@ -281,6 +354,7 @@ export const AppContextProvider = ({ children }) => {
     enemiesRef,
     playerDamageCooldownRef,
     lastGameStatusRef,
+    playPipeExitAnimation,
   })
 
   const {
@@ -311,9 +385,110 @@ export const AppContextProvider = ({ children }) => {
     })
   }, [clearLoopInput, gameStatus])
 
+  const captureLevelSnapshot = useCallback(levelId => {
+    levelSnapshotRef.current = {
+      levelId,
+      objects: objects.map(item => ({ ...item })),
+      mushrooms: mushrooms.map(item => ({ ...item })),
+      brickBreaks: brickBreaks.map(item => ({ ...item })),
+      enemies: enemies.map(item => ({ ...item })),
+      left,
+      bottom,
+      time,
+    }
+  }, [bottom, brickBreaks, enemies, left, mushrooms, objects, time])
+
+  const restoreLevelSnapshot = useCallback(({ fallbackLevelId, fallbackSpawnId = null, exitDirection = null }) => {
+    const snapshot = levelSnapshotRef.current
+    if (!snapshot) {
+      setCurrentLevelId(fallbackLevelId)
+      resetLevelState(fallbackLevelId, {
+        spawnId: fallbackSpawnId,
+        showIntro: false,
+        pipeExitDirection: exitDirection,
+      })
+      return
+    }
+
+    const level = getLevelById(snapshot.levelId)
+    if (!level) {
+      setCurrentLevelId(fallbackLevelId)
+      resetLevelState(fallbackLevelId, {
+        spawnId: fallbackSpawnId,
+        showIntro: false,
+        pipeExitDirection: exitDirection,
+      })
+      return
+    }
+
+    const targetSpawn = fallbackSpawnId && level.spawns?.[fallbackSpawnId]
+      ? level.spawns[fallbackSpawnId]
+      : null
+    const restoreLeft = targetSpawn ? targetSpawn.x * pixels : snapshot.left
+    const restoreBottom = targetSpawn ? targetSpawn.y * pixels : snapshot.bottom
+
+    setCurrentLevelId(snapshot.levelId)
+    setObjects(snapshot.objects.map(item => ({ ...item })))
+    setMushrooms(snapshot.mushrooms.map(item => ({ ...item })))
+    setBrickBreaks(snapshot.brickBreaks.map(item => ({ ...item })))
+    setEnemies(snapshot.enemies.map(item => ({ ...item })))
+    setLeftSafe(restoreLeft)
+    setBottomSafe(restoreBottom)
+    setEnemyHit(false)
+    playerDamageCooldownRef.current = 0
+    restoreSessionState({ nextTime: snapshot.time })
+
+    mushroomsRef.current = snapshot.mushrooms.map(item => ({ ...item }))
+    enemiesRef.current = snapshot.enemies.map(item => ({ ...item }))
+
+    motionRef.current.x = restoreLeft
+    motionRef.current.y = restoreBottom
+    motionRef.current.vx = 0
+    motionRef.current.vy = 0
+    motionRef.current.grounded = true
+    motionRef.current.input = {
+      left: false,
+      right: false,
+      up: false,
+      down: false,
+      jump: false,
+    }
+    motionRef.current.jumpHeld = false
+    motionRef.current.coyoteTimer = 0
+    motionRef.current.jumpBufferTimer = 0
+    motionRef.current.headBlockedLastFrame = false
+
+    lastPositionRef.current = {
+      x: restoreLeft,
+      y: restoreBottom,
+    }
+    publishPendingRef.current = false
+    setPipeTransition({
+      active: false,
+      direction: null,
+      translateX: 0,
+      translateY: 0,
+    })
+    playPipeExitAnimation(exitDirection)
+    levelSnapshotRef.current = null
+  }, [
+    playPipeExitAnimation,
+    resetLevelState,
+    restoreSessionState,
+    setPipeTransition,
+    setBottomSafe,
+    setCurrentLevelId,
+    setEnemies,
+    setLeftSafe,
+    setObjects,
+    setMushrooms,
+    setBrickBreaks,
+    setEnemyHit,
+  ])
+
   // Modern mode: requestAnimationFrame physics loop.
   useMarioPhysics({
-    enabled: gameLoopEnabled && gameStatus === 'playing' && !isPaused && !isLevelIntroVisible,
+    enabled: gameLoopEnabled && gameStatus === 'playing' && !isPaused && !isLevelIntroVisible && !pipeTransition.active,
     motionRef,
     lastPositionRef,
     stateRef,
@@ -324,6 +499,7 @@ export const AppContextProvider = ({ children }) => {
     getLandingYAt,
     bumpInteractiveBlockAt,
     collectRevealedMysteryItemAt,
+    collectWorldCoinAt,
     hasSideCollisionAt,
     resolveEnemyCollision,
     onEnemyHit,
@@ -333,7 +509,7 @@ export const AppContextProvider = ({ children }) => {
   })
 
   useMushroomPhysics({
-    enabled: gameLoopEnabled && gameStatus === 'playing' && !isPaused && !isLevelIntroVisible,
+    enabled: gameLoopEnabled && gameStatus === 'playing' && !isPaused && !isLevelIntroVisible && !pipeTransition.active,
     objects,
     pixels,
     playerForm,
@@ -353,7 +529,7 @@ export const AppContextProvider = ({ children }) => {
   })
 
   useEnemyPhysics({
-    enabled: gameLoopEnabled && gameStatus === 'playing' && !isPaused && !isLevelIntroVisible,
+    enabled: gameLoopEnabled && gameStatus === 'playing' && !isPaused && !isLevelIntroVisible && !pipeTransition.active,
     objects,
     pixels,
     enemiesRef,
@@ -361,18 +537,36 @@ export const AppContextProvider = ({ children }) => {
     setScore,
   })
 
+  useLevelTransitions({
+    enabled: gameLoopEnabled && gameStatus === 'playing' && !isPaused && !isLevelIntroVisible && !pipeTransition.active,
+    currentLevel,
+    currentLevelId,
+    left,
+    bottom,
+    pixels,
+    playerForm,
+    motionRef,
+    objects,
+    setCurrentLevelId,
+    resetLevelState,
+    captureLevelSnapshot,
+    restoreLevelSnapshot,
+    setPipeTransition,
+    setLeftSafe,
+  })
+
   const setLoopInput = useCallback(nextInput => {
-    if (gameStatus !== 'playing' || isPaused || isLevelIntroVisible) return
+    if (gameStatus !== 'playing' || isPaused || isLevelIntroVisible || pipeTransition.active) return
     motionRef.current.input = {
       ...motionRef.current.input,
       ...nextInput,
     }
-  }, [gameStatus, isPaused, isLevelIntroVisible])
+  }, [gameStatus, isPaused, isLevelIntroVisible, pipeTransition.active])
 
   useEffect(() => {
-    if (gameLoopEnabled && !isPaused && !isLevelIntroVisible) return
+    if (gameLoopEnabled && !isPaused && !isLevelIntroVisible && !pipeTransition.active) return
     clearLoopInput()
-  }, [clearLoopInput, gameLoopEnabled, isPaused, isLevelIntroVisible])
+  }, [clearLoopInput, gameLoopEnabled, isPaused, isLevelIntroVisible, pipeTransition.active])
 
   useEffect(() => {
     if (gameStatus === 'playing') return
@@ -405,7 +599,7 @@ export const AppContextProvider = ({ children }) => {
     currentLevelIndex,
     gameStatus,
     onAdvanceLevel: resetLevelState,
-    setCurrentLevelIndex,
+    setCurrentLevelId,
   })
 
   return (
@@ -421,7 +615,9 @@ export const AppContextProvider = ({ children }) => {
         currentWorld: currentLevel.world,
         currentStage: currentLevel.stage,
         currentLevelLabel: currentLevel.label,
+        currentLevelId: currentLevelId,
         currentBackground: currentLevel.background,
+        currentTheme: currentLevel.theme ?? 'overworld',
         currentDecorations: currentLevel.decorations ?? {
           clouds: [],
           mountains: [],
@@ -442,6 +638,7 @@ export const AppContextProvider = ({ children }) => {
         loseReason: loseReason,
         isPaused: isPaused,
         isLevelIntroVisible: isLevelIntroVisible,
+        pipeTransition: pipeTransition,
 
         renderLimit: renderLimit, 
         motionRef: motionRef,

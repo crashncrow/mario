@@ -42,6 +42,7 @@ const WorldScene = ({
   debug,
   objects,
   background = 'sky',
+  theme = 'overworld',
   decorations = {},
   mushrooms,
   brickBreaks,
@@ -85,6 +86,7 @@ const WorldScene = ({
             visibleObjects={visibleObjects}
             pixels={pixels}
             debug={debug}
+            theme={theme}
           />
 
           <Floor
@@ -92,6 +94,7 @@ const WorldScene = ({
             pixels={pixels}
             minPx={visibleMinPx}
             maxPx={visibleMaxPx}
+            theme={theme}
           />
 
           {visibleMaxPx > (castle.x - worldPreloadTiles) * pixels && <Flag x={flag.x} y={flag.y} pixels={pixels} debug={debug} />}

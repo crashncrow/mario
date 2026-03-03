@@ -10,6 +10,7 @@ const DebugPanel = ({
   visibleObjectsCount,
   visibleSpritesApprox,
   visibleBrickCount,
+  visibleCoinCount,
   visibleSolidCount,
   visibleMysteryCount,
   visiblePipeCount,
@@ -49,6 +50,7 @@ const DebugPanel = ({
       <br/>
       <div>World:</div>
       <div>- bricks: {visibleBrickCount}</div>
+      <div>- coins: {visibleCoinCount}</div>
       <div>- solids: {visibleSolidCount}</div>
       <div>- mystery: {visibleMysteryCount}</div>
       <div>- pipes: {visiblePipeCount}</div>

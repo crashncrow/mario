@@ -1,5 +1,6 @@
 import { useCallback, useEffect } from 'react'
 import { createEnemiesState } from 'libs/enemies/createEnemyState'
+import { getLevelById } from 'libs/levels'
 import { createLevelObjectsState } from 'libs/levels/createLevelState'
 
 const RESPAWN_DELAY_MS = 1200
@@ -26,7 +27,23 @@ export default function useLevelReset({
   enemiesRef,
   playerDamageCooldownRef,
   lastGameStatusRef,
+  playPipeExitAnimation,
 }) {
+  const getLevelSpawn = useCallback((level, spawnId) => {
+    if (spawnId && level.spawns?.[spawnId]) {
+      return level.spawns[spawnId]
+    }
+
+    if (level.spawns?.start) {
+      return level.spawns.start
+    }
+
+    return {
+      x: level.startLeft / pixels,
+      y: level.startBottom / pixels,
+    }
+  }, [pixels])
+
   const createInitialEnemies = useCallback(level => (
     createEnemiesState({
       enemies: level.enemies,
@@ -35,35 +52,46 @@ export default function useLevelReset({
     })
   ), [pixels])
 
-  const resetLevelState = useCallback((level, options = {}) => {
-    const { resetPlayerForm = false } = options
+  const resetLevelState = useCallback((levelOrId, options = {}) => {
+    const { resetPlayerForm = false, spawnId = null, showIntro = true, pipeExitDirection = null } = options
+    const level = typeof levelOrId === 'string' ? getLevelById(levelOrId) : levelOrId
+    if (!level) return
     const nextEnemies = createInitialEnemies(level)
     const nextObjects = createLevelObjectsState(level)
+    const spawn = getLevelSpawn(level, spawnId)
+    const spawnLeft = spawn.x * pixels
+    const spawnBottom = spawn.y * pixels
 
     setObjects(nextObjects)
     setMushrooms([])
     setBrickBreaks([])
     setEnemies(nextEnemies)
-    setLeftSafe(level.startLeft)
-    setBottomSafe(level.startBottom)
+    setLeftSafe(spawnLeft)
+    setBottomSafe(spawnBottom)
     setEnemyHit(false)
     if (resetPlayerForm) {
       setPlayerForm('small')
     }
     playerDamageCooldownRef.current = 0
-    startLevelIntro()
+    if (showIntro) {
+      startLevelIntro()
+    } else if (pipeExitDirection) {
+      playPipeExitAnimation(pipeExitDirection)
+    }
 
     mushroomsRef.current = []
     enemiesRef.current = nextEnemies
 
-    motionRef.current.x = level.startLeft
-    motionRef.current.y = level.startBottom
+    motionRef.current.x = spawnLeft
+    motionRef.current.y = spawnBottom
     motionRef.current.vx = 0
     motionRef.current.vy = 0
     motionRef.current.grounded = true
     motionRef.current.input = {
       left: false,
       right: false,
+      up: false,
+      down: false,
       jump: false,
     }
     motionRef.current.jumpHeld = false
@@ -72,16 +100,18 @@ export default function useLevelReset({
     motionRef.current.headBlockedLastFrame = false
 
     lastPositionRef.current = {
-      x: level.startLeft,
-      y: level.startBottom,
+      x: spawnLeft,
+      y: spawnBottom,
     }
     publishPendingRef.current = false
   }, [
     createInitialEnemies,
     enemiesRef,
+    getLevelSpawn,
     lastPositionRef,
     motionRef,
     mushroomsRef,
+    pixels,
     publishPendingRef,
     playerDamageCooldownRef,
     setBottomSafe,
@@ -92,6 +122,7 @@ export default function useLevelReset({
     setMushrooms,
     setObjects,
     setPlayerForm,
+    playPipeExitAnimation,
     startLevelIntro,
   ])
 

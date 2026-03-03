@@ -12,6 +12,7 @@ export default function useMarioPhysics({
   getLandingYAt,
   bumpInteractiveBlockAt,
   collectRevealedMysteryItemAt,
+  collectWorldCoinAt,
   hasSideCollisionAt,
   resolveEnemyCollision,
   onEnemyHit,
@@ -213,6 +214,7 @@ export default function useMarioPhysics({
     }
 
     collectRevealedMysteryItemAt(nextX, nextY)
+    collectWorldCoinAt(nextX, nextY)
 
     if (!Number.isFinite(nextX) || !Number.isFinite(nextY)) {
       return

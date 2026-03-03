@@ -37,6 +37,7 @@ export default function Home() {
     currentWorld,
     currentStage,
     currentBackground,
+    currentTheme,
     currentDecorations,
     isLevelIntroVisible,
     currentFlag,
@@ -135,10 +136,7 @@ export default function Home() {
       <div
         className={`fixed inset-0 h-dvh w-full z-50 ${gameLoopEnabled ? 'pointer-events-auto' : 'pointer-events-none'}`}
       ></div>
-      <div
-        ref={scrollContainerRef}
-        className={gameLoopEnabled ? 'fixed inset-0 h-dvh overflow-hidden overscroll-none' : 'fixed inset-0 h-dvh overflow-x-scroll overflow-y-hidden overscroll-none'}
-      >
+      <div className='fixed inset-0 h-dvh w-full bg-black'>
         <Head>
           <title>It&apos;s Me, Mario!</title>
           <link rel='icon' href='/favicon.ico' />
@@ -148,25 +146,31 @@ export default function Home() {
           />
         </Head>
 
-        <div style={{ width: `${scrollWorldWidthPx}px`, height: '100%' }}>
-          <WorldScene
-            worldRef={worldRef}
-            cameraXForMetrics={cameraXForMetrics}
-            visibleObjects={visibleObjects}
-            pixels={pixels}
-            debug={debug}
-            objects={objects}
-            background={currentBackground}
-            decorations={currentDecorations}
-            mushrooms={mushrooms}
-            brickBreaks={brickBreaks}
-            enemies={enemies}
-            visibleMinPx={visibleMinPx}
-            visibleMaxPx={visibleMaxPx}
-            worldPreloadTiles={worldPreloadTiles}
-            flag={currentFlag}
-            castle={currentCastle}
-          />
+        <div
+          ref={scrollContainerRef}
+          className={gameLoopEnabled ? 'relative mx-auto h-dvh w-full max-w-[1080px] overflow-hidden overscroll-none' : 'relative mx-auto h-dvh w-full max-w-[1080px] overflow-x-scroll overflow-y-hidden overscroll-none'}
+        >
+          <div style={{ width: `${scrollWorldWidthPx}px`, height: '100%' }}>
+            <WorldScene
+              worldRef={worldRef}
+              cameraXForMetrics={cameraXForMetrics}
+              visibleObjects={visibleObjects}
+              pixels={pixels}
+              debug={debug}
+              objects={objects}
+              background={currentBackground}
+              theme={currentTheme}
+              decorations={currentDecorations}
+              mushrooms={mushrooms}
+              brickBreaks={brickBreaks}
+              enemies={enemies}
+              visibleMinPx={visibleMinPx}
+              visibleMaxPx={visibleMaxPx}
+              worldPreloadTiles={worldPreloadTiles}
+              flag={currentFlag}
+              castle={currentCastle}
+            />
+          </div>
         </div>
       </div>
     </>

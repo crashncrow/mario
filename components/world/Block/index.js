@@ -1,6 +1,7 @@
 import { memo, useEffect, useRef, useState } from 'react'
 import useBlockBump from 'hooks/world/useBlockBump'
 import { TILE_SIZE } from 'libs/world/constants'
+import { getWorldTheme } from 'libs/world/theme'
 import Coin from 'components/items/Coin'
 import Mushroom from 'components/items/Mushroom'
 import Star from 'components/items/Star'
@@ -39,7 +40,17 @@ const BlockContentPreview = ({ content, moving = false }) => {
   return null
 }
 
-const MysteryBlock = ({ x, y, touches, content, isBumping, hidden = false, itemCollected = false }) => {
+const MysteryBlock = ({
+  x,
+  y,
+  touches,
+  content,
+  isBumping,
+  hidden = false,
+  itemCollected = false,
+  theme = 'overworld',
+}) => {
+  const worldTheme = getWorldTheme(theme)
   const normalizedContent = normalizeContent(content)
   const [showCoin, setShowCoin] = useState(false)
   const [revealedContent, setRevealedContent] = useState(null)
@@ -98,9 +109,9 @@ const MysteryBlock = ({ x, y, touches, content, isBumping, hidden = false, itemC
           />
         </div>
       )}
-      <div className='w-14 h-1 ml-1 mr-1 bg-smb-orange-dark'></div>
+      <div className={`w-14 h-1 ml-1 mr-1 ${worldTheme.blockDarkBg}`}></div>
       <div className='flex flex-wrap h-15 w-full border-r-4 border-b-4 border-black'>
-        <div className='w-1 h-full bg-smb-orange-dark'></div>
+        <div className={`w-1 h-full ${worldTheme.blockDarkBg}`}></div>
         <div
           className={`flex flex-wrap w-14 h-full bg-smb-yellow ${touches === 0 ? 'animate-pulse' : ''}`}
         >
@@ -111,24 +122,27 @@ const MysteryBlock = ({ x, y, touches, content, isBumping, hidden = false, itemC
       </div>
       {touches === 0 && (
         <>
-          <div className='absolute w-5 h-1 mt-3 ml-5 mr-1 bg-smb-orange-dark'></div>
-          <div className='absolute w-7 h-3 mt-4 ml-4 border-l-8 border-r-8 border-smb-orange-dark'>
+          <div className={`absolute w-5 h-1 mt-3 ml-5 mr-1 ${worldTheme.blockDarkBg}`}></div>
+          <div className={`absolute w-7 h-3 mt-4 ml-4 border-l-8 border-r-8 ${worldTheme.blockDarkBorder ?? 'border-smb-orange-dark'}`}>
             <div className='w-full h-full border-l-4 border-t-4 border-black'></div>
           </div>
-          <div className='absolute w-3 h-1 bg-smb-orange-dark top-0 right-0 mt-7 mr-5'></div>
+          <div className={`absolute w-3 h-1 top-0 right-0 mt-7 mr-5 ${worldTheme.blockDarkBg}`}></div>
           <div className='absolute w-3 h-4 border-b-4 border-r-4 border-black top-0 right-0 mt-5 mr-4'></div>
           <div className='absolute w-2 h-5 border-b-8 border-t-8 border-black top-0 left-0 mt-9 ml-8'></div>
-          <div className='absolute w-2 h-5 border-b-8 border-t-8 border-smb-orange-dark top-0 left-0 mt-8 ml-7'></div>
+          <div className={`absolute w-2 h-5 border-b-8 border-t-8 top-0 left-0 mt-8 ml-7 ${worldTheme.blockDarkBorder ?? 'border-smb-orange-dark'}`}></div>
         </>
       )}
     </BlockShell>
   )
 }
 
-const BrickBlock = ({ x, y, border, isBumping }) => (
-  <BlockShell x={x} y={y} isBumping={isBumping} className='bg-smb-orange-dark'>
+const BrickBlock = ({ x, y, border, isBumping, theme = 'overworld' }) => {
+  const worldTheme = getWorldTheme(theme)
+
+  return (
+    <BlockShell x={x} y={y} isBumping={isBumping} className={worldTheme.blockDarkBg}>
     <div className='flex flex-wrap h-full w-full'>
-      <div className={`h-full w-full ${border ? 'border-t-4 border-smb-orange-light' : 'border-t-0'}`}>
+      <div className={`h-full w-full ${border ? `border-t-4 ${worldTheme.blockLightBorder}` : 'border-t-0'}`}>
         <div className={`${border ? 'h-3' : 'h-4'} w-full border-r-4 border-b-4 border-black`}>
           <div className='h-full w-8 border-r-4 border-black'></div>
         </div>
@@ -144,28 +158,33 @@ const BrickBlock = ({ x, y, border, isBumping }) => (
       </div>
     </div>
   </BlockShell>
-)
+  )
+}
 
-const SolidBlock = ({ x, y, isBumping = false }) => (
-  <BlockShell x={x} y={y} isBumping={isBumping} className='bg-black'> 
-      <div className='absolute w-15 h-1 border-l-4 border-smb-orange-dark bg-smb-orange-light'></div>
-      <div className='absolute w-13 h-1 border-l-4 border-smb-orange-dark bg-smb-orange-light ml-1 mt-1'></div>
-      <div className='absolute w-11 h-1 border-l-4 border-smb-orange-dark bg-smb-orange-light ml-2 mt-2'></div>
-      <div className='absolute w-9 h-1 border-l-4 border-smb-orange-dark bg-smb-orange-light ml-3 mt-3'></div>
+const SolidBlock = ({ x, y, isBumping = false, theme = 'overworld' }) => {
+  const worldTheme = getWorldTheme(theme)
 
-      <div className='absolute w-1 h-14 bg-smb-orange-light mt-1 ml-0'></div>
-      <div className='absolute w-1 h-12 bg-smb-orange-light mt-2 ml-1'></div>
-      <div className='absolute w-1 h-10 bg-smb-orange-light mt-3 ml-2'></div>
-      <div className='absolute w-1 h-8 bg-smb-orange-light mt-4 ml-3'></div>
+  return (
+    <BlockShell x={x} y={y} isBumping={isBumping} className='bg-black'>
+      <div className={`absolute w-15 h-1 border-l-4 ${worldTheme.blockDarkBorder} ${worldTheme.blockLightBg}`}></div>
+      <div className={`absolute w-13 h-1 border-l-4 ml-1 mt-1 ${worldTheme.blockDarkBorder} ${worldTheme.blockLightBg}`}></div>
+      <div className={`absolute w-11 h-1 border-l-4 ml-2 mt-2 ${worldTheme.blockDarkBorder} ${worldTheme.blockLightBg}`}></div>
+      <div className={`absolute w-9 h-1 border-l-4 ml-3 mt-3 ${worldTheme.blockDarkBorder} ${worldTheme.blockLightBg}`}></div>
 
-      <div className='absolute w-1 h-1 bg-smb-orange-dark right-0 bottom-0 mr-0 mb-0'></div>
-      <div className='absolute w-1 h-1 bg-smb-orange-dark right-0 bottom-0 mr-1 mb-1'></div>
-      <div className='absolute w-1 h-1 bg-smb-orange-dark right-0 bottom-0 mr-2 mb-2'></div>
-      <div className='absolute w-1 h-1 bg-smb-orange-dark right-0 bottom-0 mr-3 mb-3'></div>
+      <div className={`absolute w-1 h-14 mt-1 ml-0 ${worldTheme.blockLightBg}`}></div>
+      <div className={`absolute w-1 h-12 mt-2 ml-1 ${worldTheme.blockLightBg}`}></div>
+      <div className={`absolute w-1 h-10 mt-3 ml-2 ${worldTheme.blockLightBg}`}></div>
+      <div className={`absolute w-1 h-8 mt-4 ml-3 ${worldTheme.blockLightBg}`}></div>
 
-      <div className='w-8 h-8 bg-smb-orange-dark m-4'></div>
-  </BlockShell>
-)
+      <div className={`absolute w-1 h-1 right-0 bottom-0 mr-0 mb-0 ${worldTheme.blockDarkBg}`}></div>
+      <div className={`absolute w-1 h-1 right-0 bottom-0 mr-1 mb-1 ${worldTheme.blockDarkBg}`}></div>
+      <div className={`absolute w-1 h-1 right-0 bottom-0 mr-2 mb-2 ${worldTheme.blockDarkBg}`}></div>
+      <div className={`absolute w-1 h-1 right-0 bottom-0 mr-3 mb-3 ${worldTheme.blockDarkBg}`}></div>
+
+      <div className={`w-8 h-8 m-4 ${worldTheme.blockDarkBg}`}></div>
+    </BlockShell>
+  )
+}
 
 const Block = ({
   variant = 'brick',
@@ -176,6 +195,7 @@ const Block = ({
   content = 'coin',
   hidden = false,
   itemCollected = false,
+  theme = 'overworld',
 }) => {
   const normalizedVariant = (variant || '').toLowerCase()
   const interactive = INTERACTIVE_VARIANTS.includes(normalizedVariant)
@@ -185,13 +205,14 @@ const Block = ({
 
   const renderers = {
     brick: () => (
-      <BrickBlock
-        {...commonProps}
-        {...stateProps}
-        border={border}
-        isBumping={isBumping}
-      />
-    ),
+        <BrickBlock
+          {...commonProps}
+          {...stateProps}
+          border={border}
+          isBumping={isBumping}
+          theme={theme}
+        />
+      ),
     mystery: () => (
       <MysteryBlock
         {...commonProps}
@@ -199,9 +220,10 @@ const Block = ({
         hidden={hidden}
         itemCollected={itemCollected}
         isBumping={isBumping}
+        theme={theme}
       />
     ),
-    solid: () => <SolidBlock {...commonProps} />,
+    solid: () => <SolidBlock {...commonProps} theme={theme} />,
   }
 
   const render = renderers[normalizedVariant] ?? renderers.brick

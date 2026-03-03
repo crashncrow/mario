@@ -1,10 +1,13 @@
 import { getObjectHeight, getObjectWidth } from 'libs/world/objectDimensions'
 import { getPlayerBounds, getPlayerDimensions } from 'libs/playerDimensions'
 
+const isSolidObject = obj => obj.type !== 'Coin'
+
 export const hasCollisionAtPosition = ({ objects, pixels, x, y, playerForm }) => {
   const playerBounds = getPlayerBounds({ x, y, pixels, playerForm })
 
   return objects.some(obj => (
+    isSolidObject(obj) &&
     playerBounds.left - 2 < obj.x * pixels + getObjectWidth(obj) &&
     playerBounds.right + 2 > obj.x * pixels &&
     y >= obj.y * pixels &&
@@ -21,6 +24,8 @@ export const getLandingYAtPosition = ({ objects, pixels, x, fromY, toY, playerFo
   const playerBounds = getPlayerBounds({ x, y: fromY, pixels, playerForm })
 
   objects.forEach(obj => {
+    if (!isSolidObject(obj)) return
+
     const objLeft = obj.x * pixels
     const objRight = objLeft + getObjectWidth(obj)
     const objTop = (obj.y * pixels) + getObjectHeight(obj)
@@ -47,6 +52,8 @@ export const hasSideCollisionAtPosition = ({ objects, pixels, x, y, playerForm }
   const marioTop = marioBounds.top - 2
 
   return objects.some(obj => {
+    if (!isSolidObject(obj)) return false
+
     const objLeft = obj.x * pixels
     const objRight = objLeft + getObjectWidth(obj)
     const objBottom = obj.y * pixels
@@ -67,7 +74,7 @@ export const hasCeilingCollisionAtPosition = ({ objects, pixels, x, y, playerFor
   const headTop = marioBounds.top
 
   return objects.some(obj => {
-    if (obj.type === 'Floor') return false
+    if (obj.type === 'Floor' || !isSolidObject(obj)) return false
 
     const objLeft = obj.x * pixels
     const objRight = objLeft + getObjectWidth(obj)

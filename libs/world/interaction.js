@@ -168,3 +168,35 @@ export const collectRevealedMysteryItemAtPosition = ({ objects, pixels, x, y, pl
 
   return { nextObjects, collected, reward }
 }
+
+export const collectWorldCoinAtPosition = ({ objects, pixels, x, y, playerForm }) => {
+  let collected = false
+  const reward = { scoreDelta: 200, coinsDelta: 1, item: 'coin' }
+  const playerBounds = getPlayerBounds({ x, y, pixels, playerForm })
+
+  const nextObjects = objects.filter(obj => {
+    if (collected || obj.type !== 'Coin') return true
+
+    const coinLeft = obj.x * pixels
+    const coinRight = coinLeft + getObjectWidth(obj)
+    const coinBottom = obj.y * pixels
+    const coinTop = coinBottom + getObjectHeight(obj)
+
+    const overlaps =
+      playerBounds.left < coinRight &&
+      playerBounds.right > coinLeft &&
+      playerBounds.bottom < coinTop &&
+      playerBounds.top > coinBottom
+
+    if (!overlaps) return true
+
+    collected = true
+    return false
+  })
+
+  return {
+    nextObjects,
+    collected,
+    reward: collected ? reward : { scoreDelta: 0, coinsDelta: 0, item: null },
+  }
+}

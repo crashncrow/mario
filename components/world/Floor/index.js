@@ -14,7 +14,7 @@ const getVisibleTileRange = ({ segment, pixels, minPx, maxPx }) => {
   }
 }
 
-const Floor = ({ segments, pixels, minPx = 0, maxPx }) => (
+const Floor = ({ segments, pixels, minPx = 0, maxPx, theme = 'overworld' }) => (
   segments.map(segment => {
     const {
       segmentLeftPx,
@@ -39,7 +39,7 @@ const Floor = ({ segments, pixels, minPx = 0, maxPx }) => (
           {Array(tileCount)
             .fill(1)
             .map((_, index) => (
-              <FloorTile key={`floor_${segment.x}_${startTile + index}`} />
+              <FloorTile key={`floor_${segment.x}_${startTile + index}`} theme={theme} />
             ))}
         </div>
       </div>

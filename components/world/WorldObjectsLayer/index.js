@@ -1,10 +1,11 @@
 import Block from 'components/world/Block'
+import Coin from 'components/items/Coin'
 import Pipe from 'components/world/Pipe'
 import { getObjectHeight, getObjectWidth } from 'libs/world/objectDimensions'
 
 const getElementKey = el => `${el.type}_${el.x}_${el.y}_${el.size ?? 1}`
 
-const WorldObjectsLayer = ({ visibleObjects, pixels, debug }) => (
+const WorldObjectsLayer = ({ visibleObjects, pixels, debug, theme = 'overworld' }) => (
   <>
     {debug && visibleObjects.map((o, i) => (
       <div
@@ -36,14 +37,25 @@ const WorldObjectsLayer = ({ visibleObjects, pixels, debug }) => (
               content={el.content ?? 'coin'}
               hidden={Boolean(el.hidden)}
               itemCollected={Boolean(el.itemCollected)}
+              theme={theme}
             />
           )
         case 'Brick':
-          return <Block key={key} variant='brick' x={el.x} y={el.y} touches={el.touches} />
+          return <Block key={key} variant='brick' x={el.x} y={el.y} touches={el.touches} theme={theme} />
         case 'Solid':
           return <Block key={key} variant='solid' x={el.x} y={el.y} />
         case 'Pipe':
-          return <Pipe key={key} x={el.x} size={el.size} pixels={pixels} />
+          return <Pipe key={key} x={el.x} y={el.y} size={el.size} pixels={pixels} direction={el.direction} />
+        case 'Coin':
+          return (
+            <div
+              key={key}
+              className='absolute pointer-events-none z-20'
+              style={{ left: `${el.x * pixels}px`, bottom: `${el.y * pixels}px` }}
+            >
+              <Coin variant='world' />
+            </div>
+          )
         default:
           return null
       }

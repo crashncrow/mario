@@ -104,10 +104,18 @@ export default function useGameSession({
     return () => window.cancelAnimationFrame(rafId)
   }, [initialTime, levelKey])
 
+  const restoreSessionState = ({ nextTime = initialTime } = {}) => {
+    terminalStateRef.current = null
+    setTime(nextTime)
+    setGameStatus('playing')
+    setLoseReason(null)
+  }
+
   return {
     time,
     gameStatus,
     loseReason,
     floorEndPx,
+    restoreSessionState,
   }
 }

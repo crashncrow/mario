@@ -24,6 +24,12 @@ export default function useGameInput({
       } else if (e.code === 'ArrowRight') {
         e.preventDefault()
         setLoopInput({ right: true })
+      } else if (e.code === 'ArrowUp') {
+        e.preventDefault()
+        setLoopInput({ up: true })
+      } else if (e.code === 'ArrowDown') {
+        e.preventDefault()
+        setLoopInput({ down: true })
       } else if (e.code === 'Space') {
         e.preventDefault()
         setLoopInput({ jump: true })
@@ -37,6 +43,10 @@ export default function useGameInput({
         setLoopInput({ left: false })
       } else if (e.code === 'ArrowRight') {
         setLoopInput({ right: false })
+      } else if (e.code === 'ArrowUp') {
+        setLoopInput({ up: false })
+      } else if (e.code === 'ArrowDown') {
+        setLoopInput({ down: false })
       } else if (e.code === 'Space') {
         setLoopInput({ jump: false })
       }
