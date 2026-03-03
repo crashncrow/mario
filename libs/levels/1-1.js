@@ -165,8 +165,8 @@ const elementsByType = {
     { x: 29,  y: 1, size: 1 },
     { x: 39,  y: 1, size: 2 },
     { x: 47,  y: 1, size: 3 },
-    { x: 58,  y: 1, size: 3 },
-    { x: 166, y: 1, size: 1 },
+    { x: 58,  y: 1, size: 3, pipeId: 'bonus-entry' },
+    { x: 166, y: 1, size: 1, pipeId: 'bonus-exit' },
     { x: 182, y: 1, size: 1 },
   ],
 
@@ -242,14 +242,16 @@ const level1_1 = {
   enemies,
   spawns: {
     start: { x: 3, y: 1 },
-    'return-from-bonus': { x: 58, y: 1 },
+    'return-from-bonus': { x: 166, y: 3 },
   },
   transitions: [
     {
       type: 'pipe',
       x: 58,
       y: 1,
-      direction: 'down',
+      pipeId: 'bonus-entry',
+      entryDirection: 'down',
+      exitDirection: 'up',
       targetLevelId: '1-1-bonus',
       targetSpawnId: 'entry',
     },

@@ -164,7 +164,9 @@ const Mario = () => {
           bottom: `${bottom}px`,
           width: `${playerSize.width}px`,
           height: `${playerSize.height}px`,
-          transform: pipeTransition?.active ? `translateY(${pipeTransition.translateY}px)` : undefined,
+          transform: pipeTransition?.active
+            ? `translate(${pipeTransition.translateX ?? 0}px, ${pipeTransition.translateY ?? 0}px)`
+            : undefined,
         }}>
 
         {

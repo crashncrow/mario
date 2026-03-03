@@ -2,6 +2,7 @@ const TYPE_MAP = {
   solid: 'Solid',
   mystery: 'Mystery',
   brick: 'Brick',
+  coin: 'Coin',
   pipe: 'Pipe',
   floor: 'Floor',
 }

@@ -70,6 +70,7 @@ export default function useDebugMetrics({
   const visibleObjectsCount = visibleObjects.length
   const visibleSpritesApprox = visibleObjects.filter(el => el.type !== 'Floor').length
   const visibleBrickCount = visibleObjects.filter(el => el.type === 'Brick').length
+  const visibleCoinCount = visibleObjects.filter(el => el.type === 'Coin').length
   const visibleSolidCount = visibleObjects.filter(el => el.type === 'Solid').length
   const visibleMysteryCount = visibleObjects.filter(el => el.type === 'Mystery').length
   const visiblePipeCount = visibleObjects.filter(el => el.type === 'Pipe').length
@@ -133,6 +134,7 @@ export default function useDebugMetrics({
       visibleObjectsCount,
       visibleSpritesApprox,
       visibleBrickCount,
+      visibleCoinCount,
       visibleSolidCount,
       visibleMysteryCount,
       visiblePipeCount,

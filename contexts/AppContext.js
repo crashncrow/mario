@@ -24,6 +24,10 @@ import {
   hasMarioEnemyContact,
 } from 'libs/enemies/enemyInteractions'
 import { TILE_SIZE } from 'libs/world/constants'
+import {
+  PIPE_TRANSITION_DURATION_MS,
+  getPipeExitStartOffset,
+} from 'libs/world/pipeTransition'
 
 const AppContext = createContext(null)
 const pixels = TILE_SIZE
@@ -69,6 +73,7 @@ export const AppContextProvider = ({ children }) => {
   const [ pipeTransition, setPipeTransition ] = useState({
     active: false,
     direction: null,
+    translateX: 0,
     translateY: 0,
   })
   const renderLimit = left + (width ?? 0) + 500
@@ -111,6 +116,7 @@ export const AppContextProvider = ({ children }) => {
   const enemiesRef = useRef(enemies)
   const levelIntroTimeoutRef = useRef(null)
   const levelSnapshotRef = useRef(null)
+  const pipeExitAnimationRef = useRef(null)
 
   useEffect(() => {
     stateRef.current = {
@@ -173,6 +179,49 @@ export const AppContextProvider = ({ children }) => {
     }, LEVEL_INTRO_MS)
   }, [clearLoopInput])
 
+  const playPipeExitAnimation = useCallback(direction => {
+    if (!direction) return
+
+    if (pipeExitAnimationRef.current) {
+      window.cancelAnimationFrame(pipeExitAnimationRef.current)
+      pipeExitAnimationRef.current = null
+    }
+
+    const startOffset = getPipeExitStartOffset(direction)
+    setPipeTransition({
+      active: true,
+      direction,
+      translateX: startOffset.x,
+      translateY: startOffset.y,
+    })
+
+    const start = performance.now()
+    const step = now => {
+      const progress = Math.min(1, (now - start) / PIPE_TRANSITION_DURATION_MS)
+      setPipeTransition({
+        active: true,
+        direction,
+        translateX: Math.round(startOffset.x * (1 - progress)),
+        translateY: Math.round(startOffset.y * (1 - progress)),
+      })
+
+      if (progress < 1) {
+        pipeExitAnimationRef.current = window.requestAnimationFrame(step)
+        return
+      }
+
+      setPipeTransition({
+        active: false,
+        direction: null,
+        translateX: 0,
+        translateY: 0,
+      })
+      pipeExitAnimationRef.current = null
+    }
+
+    pipeExitAnimationRef.current = window.requestAnimationFrame(step)
+  }, [])
+
   useEffect(() => {
     levelIntroTimeoutRef.current = window.setTimeout(() => {
       setIsLevelIntroVisible(false)
@@ -186,6 +235,15 @@ export const AppContextProvider = ({ children }) => {
       }
     }
   }, [])
+
+  useEffect(() => (
+    () => {
+      if (pipeExitAnimationRef.current) {
+        window.cancelAnimationFrame(pipeExitAnimationRef.current)
+        pipeExitAnimationRef.current = null
+      }
+    }
+  ), [])
 
   useEffect(() => {
     if (gameLoopEnabled) return
@@ -225,6 +283,7 @@ export const AppContextProvider = ({ children }) => {
   const {
     bumpInteractiveBlockAt,
     collectRevealedMysteryItemAt,
+    collectWorldCoinAt,
   } = useBlockInteractions({
     objects,
     pixels,
@@ -295,6 +354,7 @@ export const AppContextProvider = ({ children }) => {
     enemiesRef,
     playerDamageCooldownRef,
     lastGameStatusRef,
+    playPipeExitAnimation,
   })
 
   const {
@@ -338,28 +398,42 @@ export const AppContextProvider = ({ children }) => {
     }
   }, [bottom, brickBreaks, enemies, left, mushrooms, objects, time])
 
-  const restoreLevelSnapshot = useCallback(({ fallbackLevelId, fallbackSpawnId = null }) => {
+  const restoreLevelSnapshot = useCallback(({ fallbackLevelId, fallbackSpawnId = null, exitDirection = null }) => {
     const snapshot = levelSnapshotRef.current
     if (!snapshot) {
       setCurrentLevelId(fallbackLevelId)
-      resetLevelState(fallbackLevelId, { spawnId: fallbackSpawnId, showIntro: false })
+      resetLevelState(fallbackLevelId, {
+        spawnId: fallbackSpawnId,
+        showIntro: false,
+        pipeExitDirection: exitDirection,
+      })
       return
     }
 
     const level = getLevelById(snapshot.levelId)
     if (!level) {
       setCurrentLevelId(fallbackLevelId)
-      resetLevelState(fallbackLevelId, { spawnId: fallbackSpawnId, showIntro: false })
+      resetLevelState(fallbackLevelId, {
+        spawnId: fallbackSpawnId,
+        showIntro: false,
+        pipeExitDirection: exitDirection,
+      })
       return
     }
+
+    const targetSpawn = fallbackSpawnId && level.spawns?.[fallbackSpawnId]
+      ? level.spawns[fallbackSpawnId]
+      : null
+    const restoreLeft = targetSpawn ? targetSpawn.x * pixels : snapshot.left
+    const restoreBottom = targetSpawn ? targetSpawn.y * pixels : snapshot.bottom
 
     setCurrentLevelId(snapshot.levelId)
     setObjects(snapshot.objects.map(item => ({ ...item })))
     setMushrooms(snapshot.mushrooms.map(item => ({ ...item })))
     setBrickBreaks(snapshot.brickBreaks.map(item => ({ ...item })))
     setEnemies(snapshot.enemies.map(item => ({ ...item })))
-    setLeftSafe(snapshot.left)
-    setBottomSafe(snapshot.bottom)
+    setLeftSafe(restoreLeft)
+    setBottomSafe(restoreBottom)
     setEnemyHit(false)
     playerDamageCooldownRef.current = 0
     restoreSessionState({ nextTime: snapshot.time })
@@ -367,8 +441,8 @@ export const AppContextProvider = ({ children }) => {
     mushroomsRef.current = snapshot.mushrooms.map(item => ({ ...item }))
     enemiesRef.current = snapshot.enemies.map(item => ({ ...item }))
 
-    motionRef.current.x = snapshot.left
-    motionRef.current.y = snapshot.bottom
+    motionRef.current.x = restoreLeft
+    motionRef.current.y = restoreBottom
     motionRef.current.vx = 0
     motionRef.current.vy = 0
     motionRef.current.grounded = true
@@ -385,17 +459,20 @@ export const AppContextProvider = ({ children }) => {
     motionRef.current.headBlockedLastFrame = false
 
     lastPositionRef.current = {
-      x: snapshot.left,
-      y: snapshot.bottom,
+      x: restoreLeft,
+      y: restoreBottom,
     }
     publishPendingRef.current = false
     setPipeTransition({
       active: false,
       direction: null,
+      translateX: 0,
       translateY: 0,
     })
+    playPipeExitAnimation(exitDirection)
     levelSnapshotRef.current = null
   }, [
+    playPipeExitAnimation,
     resetLevelState,
     restoreSessionState,
     setPipeTransition,
@@ -422,6 +499,7 @@ export const AppContextProvider = ({ children }) => {
     getLandingYAt,
     bumpInteractiveBlockAt,
     collectRevealedMysteryItemAt,
+    collectWorldCoinAt,
     hasSideCollisionAt,
     resolveEnemyCollision,
     onEnemyHit,

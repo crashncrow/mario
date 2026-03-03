@@ -1,9 +1,9 @@
 import { useEffect, useRef } from 'react'
 import { getPlayerBounds } from 'libs/playerDimensions'
 import { getObjectHeight, getObjectWidth } from 'libs/world/objectDimensions'
+import { PIPE_TRANSITION_DURATION_MS, PIPE_TRAVEL_PX, getPipeTransitionDelta } from 'libs/world/pipeTransition'
 
-const TRANSITION_DURATION_MS = 300
-const PIPE_TRAVEL_PX = 48
+const getEntryDirection = transition => transition.entryDirection ?? transition.direction
 
 export default function useLevelTransitions({
   enabled,
@@ -23,6 +23,21 @@ export default function useLevelTransitions({
   setLeftSafe,
 }) {
   const transitionTimeoutRef = useRef(null)
+  const getPipeForTransition = (transition, worldObjects) => {
+    if (transition.pipeId) {
+      const pipeById = worldObjects.find(obj => (
+        obj.type === 'Pipe' &&
+        obj.pipeId === transition.pipeId
+      ))
+      if (pipeById) return pipeById
+    }
+
+    return worldObjects.find(obj => (
+      obj.type === 'Pipe' &&
+      obj.x === transition.x &&
+      obj.y === transition.y
+    )) ?? null
+  }
 
   useEffect(() => {
     return () => {
@@ -43,19 +58,19 @@ export default function useLevelTransitions({
     const input = motionRef.current.input
     const marioBounds = getPlayerBounds({ x: left, y: bottom, pixels, playerForm })
     const marioCenterX = (marioBounds.left + marioBounds.right) / 2
+    const marioCenterY = (marioBounds.bottom + marioBounds.top) / 2
     const isGrounded = motionRef.current.grounded
 
     const activeTransition = transitions.find(transition => {
-      const wantsDown = transition.direction === 'down' && input.down
-      const wantsUp = transition.direction === 'up' && input.up
-      if (!wantsDown && !wantsUp) return false
-      if (!isGrounded) return false
+      const entryDirection = getEntryDirection(transition)
+      const wantsDown = entryDirection === 'down' && input.down
+      const wantsUp = entryDirection === 'up' && input.up
+      const wantsLeft = entryDirection === 'left' && input.left
+      const wantsRight = entryDirection === 'right' && input.right
+      if (!wantsDown && !wantsUp && !wantsLeft && !wantsRight) return false
+      if ((wantsDown || wantsUp) && !isGrounded) return false
 
-      const pipe = objects.find(obj => (
-        obj.type === 'Pipe' &&
-        obj.x === transition.x &&
-        obj.y === transition.y
-      ))
+      const pipe = getPipeForTransition(transition, objects)
       if (!pipe) return false
 
       const pipeLeft = pipe.x * pixels
@@ -67,8 +82,25 @@ export default function useLevelTransitions({
         marioBounds.bottom <= pipeTop + 4 &&
         marioBounds.bottom >= pipeTop - pixels
       )
+      const overlapsPipeMiddleY = marioCenterY >= pipeBottom && marioCenterY <= pipeTop
+      const touchesPipeLeft = (
+        marioBounds.right >= pipeLeft - 4 &&
+        marioBounds.right <= pipeLeft + pixels
+      )
+      const touchesPipeRight = (
+        marioBounds.left <= pipeRight + 4 &&
+        marioBounds.left >= pipeRight - pixels
+      )
 
-      return centeredOnPipe && overlapsPipeTop
+      if (wantsDown || wantsUp) {
+        return centeredOnPipe && overlapsPipeTop
+      }
+
+      if (wantsLeft) {
+        return overlapsPipeMiddleY && touchesPipeRight
+      }
+
+      return overlapsPipeMiddleY && touchesPipeLeft
     })
 
     if (!activeTransition) return
@@ -76,11 +108,7 @@ export default function useLevelTransitions({
     const targetLevelId = activeTransition.targetLevelId
     const targetSpawnId = activeTransition.targetSpawnId ?? null
     const shouldRestoreParent = activeTransition.returnToParent === true
-    const pipe = objects.find(obj => (
-      obj.type === 'Pipe' &&
-      obj.x === activeTransition.x &&
-      obj.y === activeTransition.y
-    ))
+    const pipe = getPipeForTransition(activeTransition, objects)
     if (!pipe) return
 
     const pipeLeft = pipe.x * pixels
@@ -95,22 +123,28 @@ export default function useLevelTransitions({
       right: false,
       jump: false,
     }
-    setLeftSafe(centeredLeft)
+    const entryDirection = getEntryDirection(activeTransition)
+
+    if (entryDirection === 'down' || entryDirection === 'up') {
+      setLeftSafe(centeredLeft)
+    }
     setPipeTransition({
       active: true,
-      direction: activeTransition.direction,
+      direction: entryDirection,
+      translateX: 0,
       translateY: 0,
     })
 
     const start = performance.now()
-    const directionMultiplier = activeTransition.direction === 'down' ? 1 : -1
+    const transitionDelta = getPipeTransitionDelta(entryDirection)
 
     const step = now => {
-      const progress = Math.min(1, (now - start) / TRANSITION_DURATION_MS)
+      const progress = Math.min(1, (now - start) / PIPE_TRANSITION_DURATION_MS)
       setPipeTransition({
         active: true,
-        direction: activeTransition.direction,
-        translateY: Math.round(progress * PIPE_TRAVEL_PX * directionMultiplier),
+        direction: entryDirection,
+        translateX: Math.round(progress * transitionDelta.x),
+        translateY: Math.round(progress * transitionDelta.y),
       })
 
       if (progress < 1) {
@@ -122,16 +156,22 @@ export default function useLevelTransitions({
         restoreLevelSnapshot({
           fallbackLevelId: targetLevelId,
           fallbackSpawnId: targetSpawnId,
+          exitDirection: activeTransition.exitDirection ?? null,
         })
       } else {
         captureLevelSnapshot(currentLevelId)
         setCurrentLevelId(targetLevelId)
-        resetLevelState(targetLevelId, { spawnId: targetSpawnId, showIntro: false })
+        resetLevelState(targetLevelId, {
+          spawnId: targetSpawnId,
+          showIntro: false,
+          pipeExitDirection: activeTransition.exitDirection ?? null,
+        })
       }
 
       setPipeTransition({
         active: false,
         direction: null,
+        translateX: 0,
         translateY: 0,
       })
       transitionTimeoutRef.current = null

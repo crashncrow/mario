@@ -1,6 +1,7 @@
 import { useCallback } from 'react'
 import {
   bumpInteractiveBlockAtPosition,
+  collectWorldCoinAtPosition,
   collectRevealedMysteryItemAtPosition,
 } from 'libs/world/interaction'
 
@@ -78,8 +79,25 @@ export default function useBlockInteractions({
     if (reward?.coinsDelta) setCoins(prev => prev + reward.coinsDelta)
   }, [objects, pixels, playerForm, setCoins, setObjects, setScore])
 
+  const collectWorldCoinAt = useCallback((x, y) => {
+    const { nextObjects, collected, reward } = collectWorldCoinAtPosition({
+      objects,
+      pixels,
+      x,
+      y,
+      playerForm,
+    })
+
+    if (!collected) return
+
+    setObjects(nextObjects)
+    if (reward?.scoreDelta) setScore(prev => prev + reward.scoreDelta)
+    if (reward?.coinsDelta) setCoins(prev => prev + reward.coinsDelta)
+  }, [objects, pixels, playerForm, setCoins, setObjects, setScore])
+
   return {
     bumpInteractiveBlockAt,
     collectRevealedMysteryItemAt,
+    collectWorldCoinAt,
   }
 }

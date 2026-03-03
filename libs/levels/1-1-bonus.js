@@ -3,13 +3,31 @@ import { normalizeLevelEnemies } from 'libs/levels/normalizeLevelEnemies'
 import { TILE_SIZE } from 'libs/world/constants'
 
 const elementsByType = {
-  mystery: [
-    // { x: 6, y: 4, content: 'coin' },
-    // { x: 7, y: 4, content: 'coin' },
-    // { x: 8, y: 4, content: 'coin' },
-    // { x: 9, y: 4, content: 'coin' },
-    // { x: 10, y: 4, content: 'coin' },
+  coin: [
+    { x: 5, y: 8 },
+    { x: 6, y: 8 },
+    { x: 7, y: 8 },
+    { x: 8, y: 8 },
+    { x: 9, y: 8 },
+
+    { x: 4, y: 7 },
+    { x: 5, y: 7 },
+    { x: 6, y: 7 },
+    { x: 7, y: 7 },
+    { x: 8, y: 7 },
+    { x: 9, y: 7 },
+    { x: 10, y: 7 },
+
+    { x: 4, y: 4 },
+    { x: 5, y: 4 },
+    { x: 6, y: 4 },
+    { x: 7, y: 4 },
+    { x: 8, y: 4 },
+    { x: 9, y: 4 },
+    { x: 10, y: 4 },
   ],
+
+  mystery: [],
 
   brick: [
     { x: 0, y: 1 },
@@ -57,8 +75,8 @@ const elementsByType = {
     { x: 10, y: 11 },
   ],
   pipe: [
-    // { x: 1, y: 1, size: 3 },
-    { x: 15, y: 1, size: 5 },
+    { x: 13, y: 1, size: 3, direction: 'right', pipeId: 'bonus-exit-side' },
+    { x: 16, y: 1, size: 7, pipeId: 'bonus-exit-top' },
   ],
   floor: [
     { x: 0, y: 0, size: 18 },
@@ -88,14 +106,27 @@ const level1_1_bonus = {
   enemies: normalizeLevelEnemies(enemiesByType),
   spawns: {
     entry: { x: 2, y: 1 },
-    exit: { x: 17, y: 1 },
+    exit: { x: 17, y: 1},
   },
   transitions: [
     {
       type: 'pipe',
-      x: 17,
+      x: 13,
       y: 1,
-      direction: 'up',
+      pipeId: 'bonus-exit-side',
+      entryDirection: 'right',
+      exitDirection: 'up',
+      targetLevelId: '1-1',
+      targetSpawnId: 'return-from-bonus',
+      returnToParent: true,
+    },
+    {
+      type: 'pipe',
+      x: 16,
+      y: 1,
+      pipeId: 'bonus-exit-top',
+      entryDirection: 'up',
+      exitDirection: 'up',
       targetLevelId: '1-1',
       targetSpawnId: 'return-from-bonus',
       returnToParent: true,

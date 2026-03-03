@@ -27,6 +27,7 @@ export default function useLevelReset({
   enemiesRef,
   playerDamageCooldownRef,
   lastGameStatusRef,
+  playPipeExitAnimation,
 }) {
   const getLevelSpawn = useCallback((level, spawnId) => {
     if (spawnId && level.spawns?.[spawnId]) {
@@ -52,7 +53,7 @@ export default function useLevelReset({
   ), [pixels])
 
   const resetLevelState = useCallback((levelOrId, options = {}) => {
-    const { resetPlayerForm = false, spawnId = null, showIntro = true } = options
+    const { resetPlayerForm = false, spawnId = null, showIntro = true, pipeExitDirection = null } = options
     const level = typeof levelOrId === 'string' ? getLevelById(levelOrId) : levelOrId
     if (!level) return
     const nextEnemies = createInitialEnemies(level)
@@ -74,6 +75,8 @@ export default function useLevelReset({
     playerDamageCooldownRef.current = 0
     if (showIntro) {
       startLevelIntro()
+    } else if (pipeExitDirection) {
+      playPipeExitAnimation(pipeExitDirection)
     }
 
     mushroomsRef.current = []
@@ -119,6 +122,7 @@ export default function useLevelReset({
     setMushrooms,
     setObjects,
     setPlayerForm,
+    playPipeExitAnimation,
     startLevelIntro,
   ])
 
