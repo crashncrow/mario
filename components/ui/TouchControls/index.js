@@ -5,6 +5,7 @@ const TouchControls = ({ gameLoopEnabled, isPaused, setLoopInput }) => {
   const [pressed, setPressed] = useState({
     left: false,
     right: false,
+    down: false,
     jump: false,
   })
 
@@ -42,7 +43,7 @@ const TouchControls = ({ gameLoopEnabled, isPaused, setLoopInput }) => {
       <div className='flex gap-3 pointer-events-auto'>
         <button
           type='button'
-          className={`w-14 h-14 border-2 text-xl transition-colors select-none ${
+          className={`h-14 w-14 border-2 text-xl transition-colors select-none ${
             pressed.left ? 'bg-white text-black border-white' : 'bg-black/80 text-white border-white'
           }`}
           style={{ touchAction: 'none', userSelect: 'none', WebkitUserSelect: 'none', WebkitTouchCallout: 'none' }}
@@ -57,7 +58,7 @@ const TouchControls = ({ gameLoopEnabled, isPaused, setLoopInput }) => {
         </button>
         <button
           type='button'
-          className={`w-14 h-14 border-2 text-xl transition-colors select-none ${
+          className={`h-14 w-14 border-2 text-xl transition-colors select-none ${
             pressed.right ? 'bg-white text-black border-white' : 'bg-black/80 text-white border-white'
           }`}
           style={{ touchAction: 'none', userSelect: 'none', WebkitUserSelect: 'none', WebkitTouchCallout: 'none' }}
@@ -72,7 +73,22 @@ const TouchControls = ({ gameLoopEnabled, isPaused, setLoopInput }) => {
         </button>
       </div>
 
-      <div className='pointer-events-auto'>
+      <div className='flex gap-3 pointer-events-auto'>
+        <button
+          type='button'
+          className={`min-w-20 h-14 px-4 border-2 text-sm transition-colors select-none ${
+            pressed.down ? 'bg-white text-black border-white' : 'bg-black/80 text-white border-white'
+          }`}
+          style={{ touchAction: 'none', userSelect: 'none', WebkitUserSelect: 'none', WebkitTouchCallout: 'none' }}
+          onTouchStart={press('down', { down: true })}
+          onTouchEnd={press('down', { down: false })}
+          onTouchCancel={press('down', { down: false })}
+          onMouseDown={press('down', { down: true })}
+          onMouseUp={press('down', { down: false })}
+          onMouseLeave={press('down', { down: false })}
+        >
+          Down
+        </button>
         <button
           type='button'
           className={`min-w-20 h-14 px-4 border-2 text-sm transition-colors select-none ${
