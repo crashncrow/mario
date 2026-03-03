@@ -10,13 +10,13 @@ const elementsByType = {
     { x: 8, y: 8 },
     { x: 9, y: 8 },
 
-    { x: 4, y: 7 },
-    { x: 5, y: 7 },
-    { x: 6, y: 7 },
-    { x: 7, y: 7 },
-    { x: 8, y: 7 },
-    { x: 9, y: 7 },
-    { x: 10, y: 7 },
+    { x: 4, y: 6 },
+    { x: 5, y: 6 },
+    { x: 6, y: 6 },
+    { x: 7, y: 6 },
+    { x: 8, y: 6 },
+    { x: 9, y: 6 },
+    { x: 10, y: 6 },
 
     { x: 4, y: 4 },
     { x: 5, y: 4 },
@@ -75,8 +75,8 @@ const elementsByType = {
     { x: 10, y: 11 },
   ],
   pipe: [
-    { x: 13, y: 1, size: 3, direction: 'right', pipeId: 'bonus-exit-side' },
-    { x: 16, y: 1, size: 7, pipeId: 'bonus-exit-top' },
+    { x: 13, y: 1, size: 2, direction: 'right', pipeId: 'bonus-exit-side' },
+    { x: 15, y: 1, size: 7, pipeId: 'bonus-exit-top' },
   ],
   floor: [
     { x: 0, y: 0, size: 18 },
