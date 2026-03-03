@@ -1,4 +1,4 @@
-import { useRef } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { useAppContext } from 'contexts/AppContext'
 import useGameInput from 'hooks/game/useGameInput'
 import useCameraFollow from 'hooks/world/useCameraFollow'
@@ -9,11 +9,13 @@ import Head from 'next/head'
 import GameHud from 'components/ui/GameHud'
 import LevelIntroScreen from 'components/ui/LevelIntroScreen'
 import WorldScene from 'components/world/WorldScene'
+import { GAME_VIEWPORT_MAX_WIDTH } from 'libs/game/config'
 
 export default function Home() {
   const worldRef = useRef(null)
   const cameraXRef = useRef(0)
   const scrollContainerRef = useRef(null)
+  const [viewportWidth, setViewportWidth] = useState(null)
 
   const {
     debug,
@@ -49,6 +51,24 @@ export default function Home() {
     togglePause,
   } = useAppContext()
 
+  useEffect(() => {
+    if (typeof window === 'undefined') return
+
+    const updateViewportWidth = () => {
+      const nextWidth = scrollContainerRef.current?.clientWidth ?? null
+      setViewportWidth(nextWidth)
+    }
+
+    updateViewportWidth()
+    window.addEventListener('resize', updateViewportWidth)
+
+    return () => {
+      window.removeEventListener('resize', updateViewportWidth)
+    }
+  }, [])
+
+  const gameViewportWidth = viewportWidth ?? width
+
   const {
     floorEndPx,
     maxCameraX,
@@ -61,19 +81,19 @@ export default function Home() {
   } = useVisibleWorldWindow({
     objects,
     pixels,
-    width,
+    width: gameViewportWidth,
     left,
     gameLoopEnabled,
     scrollContainerRef,
   })
-  const scrollWorldWidthPx = Math.max(width || 0, floorEndPx || 0)
+  const scrollWorldWidthPx = Math.max(gameViewportWidth || 0, floorEndPx || 0)
 
   useCameraFollow({
     gameLoopEnabled,
     worldRef,
     cameraXRef,
     left,
-    width,
+    width: gameViewportWidth,
     maxCameraX,
   })
 
@@ -148,7 +168,8 @@ export default function Home() {
 
         <div
           ref={scrollContainerRef}
-          className={gameLoopEnabled ? 'relative mx-auto h-dvh w-full max-w-[1080px] overflow-hidden overscroll-none' : 'relative mx-auto h-dvh w-full max-w-[1080px] overflow-x-scroll overflow-y-hidden overscroll-none'}
+          className={gameLoopEnabled ? 'relative mx-auto h-dvh w-full overflow-hidden overscroll-none' : 'relative mx-auto h-dvh w-full overflow-x-scroll overflow-y-hidden overscroll-none'}
+          style={{ maxWidth: `${GAME_VIEWPORT_MAX_WIDTH}px` }}
         >
           <div style={{ width: `${scrollWorldWidthPx}px`, height: '100%' }}>
             <WorldScene
