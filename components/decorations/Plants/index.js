@@ -1,12 +1,9 @@
-import { useAppContext } from 'contexts/AppContext'
+import { memo } from 'react'
+import { TILE_SIZE } from 'libs/world/constants'
 import Bush from 'components/decorations/Bush'
 
-const Plants = ({ cameraX = null, plants = [] }) =>{
-  const { left, width, pixels } = useAppContext()
-  const preloadPx = pixels * 8
-  const cameraLeft = cameraX ?? left
-  const minPx = Math.max(0, cameraLeft - preloadPx)
-  const maxPx = cameraLeft + (width || 0) + preloadPx
+const Plants = ({ minPx = 0, maxPx = 0, plants = [] }) =>{
+  const pixels = TILE_SIZE
 
   return (
     <>
@@ -24,4 +21,4 @@ const Plants = ({ cameraX = null, plants = [] }) =>{
   )
 }
 
-export default Plants
+export default memo(Plants)

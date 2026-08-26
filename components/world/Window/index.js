@@ -1,7 +1,8 @@
-import { useAppContext } from 'contexts/AppContext'
+import { memo } from 'react'
+import { TILE_SIZE } from 'libs/world/constants'
 
 const Window = ({x, y, left = 1}) => {
-  const { pixels } = useAppContext()
+  const pixels = TILE_SIZE
   const marginClass = left ? 'ml-8' : 'ml-0'
 
   return (
@@ -18,4 +19,4 @@ const Window = ({x, y, left = 1}) => {
   )
 }
 
-export default Window
+export default memo(Window)

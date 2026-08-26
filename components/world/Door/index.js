@@ -1,7 +1,8 @@
-import { useAppContext } from 'contexts/AppContext'
+import { memo } from 'react'
+import { TILE_SIZE } from 'libs/world/constants'
 
 const Door = ({x, y}) => {
-  const { pixels } = useAppContext()
+  const pixels = TILE_SIZE
 
   return (
     <>
@@ -22,4 +23,4 @@ const Door = ({x, y}) => {
   )
 }
 
-export default Door
+export default memo(Door)

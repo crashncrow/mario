@@ -73,7 +73,6 @@ export default function Home() {
     floorEndPx,
     maxCameraX,
     worldPreloadTiles,
-    cameraXForMetrics,
     visibleMinPx,
     visibleMaxPx,
     decorMinPx,
@@ -174,7 +173,8 @@ export default function Home() {
           <div style={{ width: `${scrollWorldWidthPx}px`, height: '100%' }}>
             <WorldScene
               worldRef={worldRef}
-              cameraXForMetrics={cameraXForMetrics}
+              decorMinPx={decorMinPx}
+              decorMaxPx={decorMaxPx}
               visibleObjects={visibleObjects}
               pixels={pixels}
               debug={debug}

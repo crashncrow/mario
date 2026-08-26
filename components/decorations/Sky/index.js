@@ -1,12 +1,9 @@
-import { useAppContext } from 'contexts/AppContext'
+import { memo } from 'react'
+import { TILE_SIZE } from 'libs/world/constants'
 import Cloud from 'components/decorations/Cloud'
 
-const Sky = ({ cameraX = null, clouds = [] }) => {
-  const { left, width, pixels } = useAppContext()
-  const preloadPx = pixels * 8
-  const cameraLeft = cameraX ?? left
-  const minPx = Math.max(0, cameraLeft - preloadPx)
-  const maxPx = cameraLeft + (width || 0) + preloadPx
+const Sky = ({ minPx = 0, maxPx = 0, clouds = [] }) => {
+  const pixels = TILE_SIZE
 
   return (
     <>
@@ -24,4 +21,4 @@ const Sky = ({ cameraX = null, clouds = [] }) => {
   )
 }
 
-export default Sky
+export default memo(Sky)
