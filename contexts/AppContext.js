@@ -1,4 +1,6 @@
-import { createContext, useCallback, useContext, useEffect, useRef, useState } from 'react'
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
+import { MotionContext } from 'contexts/MotionContext'
+import { SessionContext } from 'contexts/SessionContext'
 import { useWindowDimensions } from 'hooks/shared/window'
 import useMarioPhysics from 'hooks/world/useMarioPhysics'
 import useBlockInteractions from 'hooks/world/useBlockInteractions'
@@ -29,9 +31,9 @@ import {
   getPipeExitStartOffset,
 } from 'libs/world/pipeTransition'
 
-const AppContext = createContext(null)
 const pixels = TILE_SIZE
 const LEVEL_INTRO_MS = 1800
+const EMPTY_DECORATIONS = { clouds: [], mountains: [], plants: [] }
 
 export const AppContextProvider = ({ children }) => {
   const { width } = useWindowDimensions();
@@ -602,64 +604,95 @@ export const AppContextProvider = ({ children }) => {
     setCurrentLevelId,
   })
 
+  const currentBackground = currentLevel.background
+  const currentTheme = currentLevel.theme ?? 'overworld'
+  const currentDecorations = currentLevel.decorations ?? EMPTY_DECORATIONS
+  const currentFlag = currentLevel.flag
+  const currentCastle = currentLevel.castle
+  const currentWorld = currentLevel.world
+  const currentStage = currentLevel.stage
+  const currentLevelLabel = currentLevel.label
+
+  // High-frequency: physics/world state that changes on every RAF tick
+  // while Mario, an enemy, or a mushroom is moving. Consumed directly by
+  // Mario; pages/index.js consumes this alongside SessionContext to
+  // orchestrate the world scene.
+  const motionValue = useMemo(() => ({
+    debug: debugEnabled,
+    pixels,
+    width,
+
+    left,
+    bottom,
+    marioCollision,
+    objects,
+    mushrooms,
+    brickBreaks,
+    enemies,
+    playerForm,
+
+    currentBackground,
+    currentTheme,
+    currentDecorations,
+    currentFlag,
+    currentCastle,
+
+    motionRef,
+    gameLoopEnabled,
+    pipeTransition,
+    renderLimit,
+
+    setLeft,
+    setBottom,
+    setObjects,
+    setPlayerForm,
+    spawnEnemy,
+  }), [
+    debugEnabled, width,
+    left, bottom, marioCollision, objects, mushrooms, brickBreaks, enemies, playerForm,
+    currentBackground, currentTheme, currentDecorations, currentFlag, currentCastle,
+    motionRef, gameLoopEnabled, pipeTransition, renderLimit,
+    setLeft, setBottom, setObjects, setPlayerForm, spawnEnemy,
+  ])
+
+  // Low-frequency: HUD/session/game-flow state that only changes on
+  // discrete events (coin pickup, once-a-second timer tick, pause, level
+  // transition) — not on every physics frame.
+  const sessionValue = useMemo(() => ({
+    lives,
+    coins,
+    score,
+    time,
+    gameStatus,
+    loseReason,
+    isPaused,
+    isLevelIntroVisible,
+
+    currentWorld,
+    currentStage,
+    currentLevelLabel,
+    currentLevelId,
+
+    gameLoopEnabled,
+
+    setLives,
+    setCoins,
+    setScore,
+    setGameLoopEnabled,
+    setLoopInput,
+    togglePause,
+  }), [
+    lives, coins, score, time, gameStatus, loseReason, isPaused, isLevelIntroVisible,
+    currentWorld, currentStage, currentLevelLabel, currentLevelId,
+    gameLoopEnabled,
+    setLoopInput, togglePause,
+  ])
+
   return (
-    <AppContext.Provider
-      value={{
-        debug: debugEnabled,
-        pixels: pixels,
-        width: width,
-
-        left: left,
-        bottom: bottom,
-        marioCollision: marioCollision,
-        currentWorld: currentLevel.world,
-        currentStage: currentLevel.stage,
-        currentLevelLabel: currentLevel.label,
-        currentLevelId: currentLevelId,
-        currentBackground: currentLevel.background,
-        currentTheme: currentLevel.theme ?? 'overworld',
-        currentDecorations: currentLevel.decorations ?? {
-          clouds: [],
-          mountains: [],
-          plants: [],
-        },
-        currentFlag: currentLevel.flag,
-        currentCastle: currentLevel.castle,
-        objects: objects,
-        mushrooms: mushrooms,
-        brickBreaks: brickBreaks,
-        enemies: enemies,
-        playerForm: playerForm,
-        lives: lives,
-        coins: coins,
-        score: score,
-        time: time,
-        gameStatus: gameStatus,
-        loseReason: loseReason,
-        isPaused: isPaused,
-        isLevelIntroVisible: isLevelIntroVisible,
-        pipeTransition: pipeTransition,
-
-        renderLimit: renderLimit, 
-        motionRef: motionRef,
-        gameLoopEnabled: gameLoopEnabled,
-        
-        setLeft: setLeft,
-        setBottom: setBottom,
-        setObjects: setObjects,
-        setPlayerForm: setPlayerForm,
-        setLives: setLives,
-        setCoins: setCoins,
-        setScore: setScore,
-        spawnEnemy: spawnEnemy,
-        setLoopInput: setLoopInput,
-        setGameLoopEnabled: setGameLoopEnabled,
-        togglePause: togglePause,
-      }}
-    >
-      {children}
-    </AppContext.Provider>
+    <MotionContext.Provider value={motionValue}>
+      <SessionContext.Provider value={sessionValue}>
+        {children}
+      </SessionContext.Provider>
+    </MotionContext.Provider>
   )
 }
-
-export const useAppContext = () => useContext(AppContext)
