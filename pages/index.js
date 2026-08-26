@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from 'react'
-import { useAppContext } from 'contexts/AppContext'
+import { useMotionContext } from 'contexts/MotionContext'
+import { useSessionContext } from 'contexts/SessionContext'
 import useGameInput from 'hooks/game/useGameInput'
 import useCameraFollow from 'hooks/world/useCameraFollow'
 import useDebugMetrics from 'hooks/world/useDebugMetrics'
@@ -20,7 +21,6 @@ export default function Home() {
   const {
     debug,
     gameLoopEnabled,
-    isPaused,
     renderLimit,
     pixels,
     width,
@@ -28,28 +28,22 @@ export default function Home() {
     bottom,
     motionRef,
     objects,
-    mushrooms,
-    brickBreaks,
-    enemies,
-    lives,
     playerForm,
+    currentDecorations,
+  } = useMotionContext()
+
+  const {
+    isPaused,
+    lives,
     coins,
     score,
     time,
     currentWorld,
     currentStage,
-    currentBackground,
-    currentTheme,
-    currentDecorations,
     isLevelIntroVisible,
-    currentFlag,
-    currentCastle,
-    gameStatus,
-    loseReason,
     setLoopInput,
-    setGameLoopEnabled,
     togglePause,
-  } = useAppContext()
+  } = useSessionContext()
 
   useEffect(() => {
     if (typeof window === 'undefined') return
@@ -129,19 +123,6 @@ export default function Home() {
       <GameHud
         debug={debug}
         debugPanelProps={debugPanelProps}
-        gameLoopEnabled={gameLoopEnabled}
-        setGameLoopEnabled={setGameLoopEnabled}
-        setLoopInput={setLoopInput}
-        isPaused={isPaused}
-        togglePause={togglePause}
-        coins={coins}
-        score={score}
-        time={time}
-        world={currentWorld}
-        stage={currentStage}
-        gameStatus={gameStatus}
-        loseReason={loseReason}
-        lives={lives}
       />
       <LevelIntroScreen
         visible={isLevelIntroVisible}
@@ -176,20 +157,9 @@ export default function Home() {
               decorMinPx={decorMinPx}
               decorMaxPx={decorMaxPx}
               visibleObjects={visibleObjects}
-              pixels={pixels}
-              debug={debug}
-              objects={objects}
-              background={currentBackground}
-              theme={currentTheme}
-              decorations={currentDecorations}
-              mushrooms={mushrooms}
-              brickBreaks={brickBreaks}
-              enemies={enemies}
               visibleMinPx={visibleMinPx}
               visibleMaxPx={visibleMaxPx}
               worldPreloadTiles={worldPreloadTiles}
-              flag={currentFlag}
-              castle={currentCastle}
             />
           </div>
         </div>

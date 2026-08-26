@@ -1,3 +1,5 @@
+import { memo } from 'react'
+import { useMotionContext } from 'contexts/MotionContext'
 import Castle from 'components/world/Castle'
 import BrickBreakEffect from 'components/world/BrickBreakEffect'
 import Decorations from 'components/decorations/Decorations'
@@ -39,21 +41,24 @@ const WorldScene = ({
   decorMinPx,
   decorMaxPx,
   visibleObjects,
-  pixels,
-  debug,
-  objects,
-  background = 'sky',
-  theme = 'overworld',
-  decorations = {},
-  mushrooms,
-  brickBreaks,
-  enemies,
   visibleMinPx,
   visibleMaxPx,
   worldPreloadTiles,
-  flag,
-  castle,
 }) => {
+  const {
+    pixels,
+    debug,
+    objects,
+    mushrooms,
+    brickBreaks,
+    enemies,
+    currentBackground: background = 'sky',
+    currentTheme: theme = 'overworld',
+    currentDecorations: decorations = {},
+    currentFlag: flag,
+    currentCastle: castle,
+  } = useMotionContext()
+
   return (
     <main className={`relative h-full w-full overflow-hidden ${BACKGROUND_CLASS[background] ?? BACKGROUND_CLASS.sky}`}>
       <div ref={worldRef} className='absolute inset-x-0 bottom-0 h-full w-full'>
@@ -106,4 +111,4 @@ const WorldScene = ({
   )
 }
 
-export default WorldScene
+export default memo(WorldScene)

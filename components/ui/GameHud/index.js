@@ -1,4 +1,5 @@
-import { useEffect, useState } from 'react'
+import { memo, useEffect, useState } from 'react'
+import { useSessionContext } from 'contexts/SessionContext'
 import DebugPanel from 'components/ui/DebugPanel'
 import Stats from 'components/ui/Stats'
 import TouchControls from 'components/ui/TouchControls'
@@ -29,20 +30,23 @@ const ControlsHint = ({ debug, isPaused }) => {
 const GameHud = ({
   debug,
   debugPanelProps,
-  gameLoopEnabled,
-  isPaused,
-  setGameLoopEnabled,
-  setLoopInput,
-  togglePause,
-  coins,
-  score,
-  time,
-  world,
-  stage,
-  gameStatus,
-  loseReason,
-  lives,
 }) => {
+  const {
+    gameLoopEnabled,
+    isPaused,
+    setGameLoopEnabled,
+    setLoopInput,
+    togglePause,
+    coins,
+    score,
+    time,
+    currentWorld: world,
+    currentStage: stage,
+    gameStatus,
+    loseReason,
+    lives,
+  } = useSessionContext()
+
   const showRespawnMessage = gameStatus === 'lost' && lives > 0
   const showTerminalMessage =
     gameStatus === 'won' ||
@@ -109,4 +113,4 @@ const GameHud = ({
   )
 }
 
-export default GameHud
+export default memo(GameHud)

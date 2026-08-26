@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 
 import { getObjectWidth } from 'libs/world/objectDimensions'
 
@@ -61,11 +61,16 @@ export default function useDebugMetrics({
     return () => clearInterval(interval)
   }, [debug, motionRef, worldRef])
 
-  const visibleObjects = objects.filter(el => {
-    const elLeft = el.x * pixels
-    const elRight = elLeft + getObjectWidth(el)
-    return elRight > visibleMinPx && elLeft < visibleMaxPx
-  })
+  // Keep this reference stable when nothing relevant changed, so
+  // React.memo on WorldScene/WorldObjectsLayer can actually bail out
+  // instead of re-rendering on every unrelated (e.g. session/HUD) update.
+  const visibleObjects = useMemo(() => (
+    objects.filter(el => {
+      const elLeft = el.x * pixels
+      const elRight = elLeft + getObjectWidth(el)
+      return elRight > visibleMinPx && elLeft < visibleMaxPx
+    })
+  ), [objects, pixels, visibleMinPx, visibleMaxPx])
 
   const visibleObjectsCount = visibleObjects.length
   const visibleSpritesApprox = visibleObjects.filter(el => el.type !== 'Floor').length

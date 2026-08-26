@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect } from 'react'
-import { useAppContext } from 'contexts/AppContext'
+import { useMotionContext } from 'contexts/MotionContext'
 import { processFullArray } from 'libs/pixless'
 import { getPlayerDimensions } from 'libs/playerDimensions'
 
@@ -101,7 +101,7 @@ const Mario = () => {
     gameLoopEnabled,
     pipeTransition,
     motionRef,
-  } = useAppContext()
+  } = useMotionContext()
 
   const [reverse, setReverse] = useState(false)
   const [index, setIndex] = useState(1)
