@@ -1,12 +1,9 @@
-import { useAppContext } from 'contexts/AppContext'
+import { memo } from 'react'
+import { TILE_SIZE } from 'libs/world/constants'
 import Mountain from 'components/decorations/Mountain'
 
-const Mountains = ({ cameraX = null, mountains = [] }) => {
-  const { left, width, pixels } = useAppContext()
-  const preloadPx = pixels * 8
-  const cameraLeft = cameraX ?? left
-  const minPx = Math.max(0, cameraLeft - preloadPx)
-  const maxPx = cameraLeft + (width || 0) + preloadPx
+const Mountains = ({ minPx = 0, maxPx = 0, mountains = [] }) => {
+  const pixels = TILE_SIZE
 
   return (
     <>
@@ -24,4 +21,4 @@ const Mountains = ({ cameraX = null, mountains = [] }) => {
   )
 }
 
-export default Mountains
+export default memo(Mountains)

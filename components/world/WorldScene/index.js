@@ -36,7 +36,8 @@ const VisibleEntitiesLayer = ({ items, visibleMinPx, visibleMaxPx, renderItem })
 
 const WorldScene = ({
   worldRef,
-  cameraXForMetrics,
+  decorMinPx,
+  decorMaxPx,
   visibleObjects,
   pixels,
   debug,
@@ -58,7 +59,7 @@ const WorldScene = ({
       <div ref={worldRef} className='absolute inset-x-0 bottom-0 h-full w-full'>
         <Mario />
 
-        <Decorations decorations={decorations} cameraX={cameraXForMetrics} />
+        <Decorations decorations={decorations} minPx={decorMinPx} maxPx={decorMaxPx} />
 
         <div className='inline-block'>
           <VisibleEntitiesLayer
