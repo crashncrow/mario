@@ -84,3 +84,7 @@
   --spacing-80: 20rem;
   --spacing-134: 33.5rem;
 }
+
+/* Safelist for dynamic w- and ml- classes built at runtime (Mario, Bush, Cloud, Mountain). */
+@source inline("w-{1..80}");
+@source inline("ml-{0..44}");
